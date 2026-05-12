@@ -969,12 +969,12 @@ function detectarHotelMaisProximo() {
 
     if (!hotel.lat || !hotel.lon) return;
 
-const distancia = calcularDistancia(
-  userLat,
-  userLng,
-  hotel.lat,
-  hotel.lon
-);
+    const distancia = calcularDistancia(
+      userLat,
+      userLng,
+      hotel.lat,
+      hotel.lon
+    );
 
     if (distancia < menorDistancia) {
 
@@ -1002,9 +1002,7 @@ const distancia = calcularDistancia(
 
       ⏱️ ${tempoMin} min estimados
     `;
-
   }
-
 }
 
 </script>
