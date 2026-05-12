@@ -848,5 +848,48 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("/service-worker.js");
 }
 </script>
+<script>
+let userLat = null;
+let userLng = null;
+
+function iniciarGPS() {
+  if ("geolocation" in navigator) {
+
+    navigator.geolocation.watchPosition(
+      (position) => {
+
+        userLat = position.coords.latitude;
+        userLng = position.coords.longitude;
+
+        console.log("Latitude:", userLat);
+        console.log("Longitude:", userLng);
+
+        const gpsInfo = document.getElementById("gps-info");
+
+        if (gpsInfo) {
+          gpsInfo.innerHTML =
+            `📍 GPS Ativo<br>
+             Lat: ${userLat.toFixed(5)}<br>
+             Lng: ${userLng.toFixed(5)}`;
+        }
+
+      },
+      (error) => {
+        console.error(error);
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 5000
+      }
+    );
+
+  } else {
+    alert("GPS não suportado");
+  }
+}
+
+iniciarGPS();
+</script>
 </body>
 </html>
