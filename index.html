@@ -879,124 +879,100 @@ if ("serviceWorker" in navigator) {
 
 <script>
 
+/* VARIÁVEIS GLOBAIS */
 let userLat = null;
 let userLng = null;
-let rotaGerada = [];
+let rotaGerada = []; // Será preenchida ao gerar ou ao carregar a página
+
+// FUNÇÃO PARA CARREGAR DADOS SALVOS (Adicione isto!)
+function inicializarDadosSalvos() {
+    const idsSalvos = JSON.parse(localStorage.getItem('rota_salva') || '[]');
+    if (idsSalvos.length > 0) {
+        const todos = [
+            ...locaisBase,
+            ...JSON.parse(localStorage.getItem('locais_extras') || '[]')
+        ];
+        // Filtra os locais que estão na rota salva para popular a rotaGerada
+        rotaGerada = todos.filter(l => idsSalvos.includes(l.id));
+        console.log("Rota recuperada do cache:", rotaGerada);
+    }
+}
 
 function iniciarGPS() {
-
-  if (!("geolocation" in navigator)) {
-    alert("GPS não suportado");
-    return;
-  }
-
-  navigator.geolocation.watchPosition(
-
-    (position) => {
-
-      userLat = position.coords.latitude;
-      userLng = position.coords.longitude;
-
-      console.log("GPS:", userLat, userLng);
-
-      const gpsInfo =
-        document.getElementById("gps-info");
-
-      if(gpsInfo){
-
-        gpsInfo.innerHTML = `
-          📍 GPS Ativo<br>
-          Lat: ${userLat.toFixed(5)}<br>
-          Lon: ${userLng.toFixed(5)}
-        `;
-      }
-
-      detectarHotelMaisProximo();
-
-    },
-
-    (error) => {
-      console.log(error);
-    },
-
-    {
-      enableHighAccuracy:true,
-      maximumAge:0,
-      timeout:5000
+    if (!("geolocation" in navigator)) {
+        alert("GPS não suportado");
+        return;
     }
 
-  );
+    navigator.geolocation.watchPosition(
+        (position) => {
+            userLat = position.coords.latitude;
+            userLng = position.coords.longitude;
 
+            const gpsInfo = document.getElementById("gps-info");
+            if (gpsInfo) {
+                gpsInfo.innerHTML = `
+                    <span style="color:#4caf50">●</span> GPS Ativo<br>
+                    <small>${userLat.toFixed(5)}, ${userLng.toFixed(5)}</small>
+                `;
+            }
+
+            detectarHotelMaisProximo();
+        },
+        (error) => console.error("Erro GPS:", error),
+        { enableHighAccuracy: true, maximumAge: 0, timeout: 10000 }
+    );
 }
 
 function calcularDistancia(lat1, lon1, lat2, lon2) {
-
-  const R = 6371;
-
-  const dLat = (lat2-lat1) * Math.PI / 180;
-  const dLon = (lon2-lon1) * Math.PI / 180;
-
-  const a =
-    Math.sin(dLat/2) * Math.sin(dLat/2) +
-    Math.cos(lat1 * Math.PI / 180) *
-    Math.cos(lat2 * Math.PI / 180) *
-    Math.sin(dLon/2) * Math.sin(dLon/2);
-
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-  return R * c;
-
+    const R = 6371; // Raio da Terra em km
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+              Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return R * c;
 }
 
 function detectarHotelMaisProximo() {
+    // Agora rotaGerada não estará mais vazia
+    if (rotaGerada.length === 0 || !userLat) return;
 
-  if (rotaGerada.length === 0) return;
+    let menorDistancia = Infinity;
+    let hotelMaisProximo = null;
 
-  let menorDistancia = Infinity;
-  let hotelMaisProximo = null;
+    rotaGerada.forEach(hotel => {
+        // Ignora hotéis que já foram concluídos visualmente
+        const card = document.querySelector(`.card[data-id="${hotel.id}"]`);
+        if (card && card.classList.contains('concluido')) return;
 
-  rotaGerada.forEach(hotel => {
+        const dist = calcularDistancia(userLat, userLng, hotel.lat, hotel.lon);
+        if (dist < menorDistancia) {
+            menorDistancia = dist;
+            hotelMaisProximo = hotel;
+        }
+    });
 
-    if (!hotel.lat || !hotel.lon) return;
-
-    const distancia = calcularDistancia(
-      userLat,
-      userLng,
-      hotel.lat,
-      hotel.lon
-    );
-
-    if (distancia < menorDistancia) {
-
-      menorDistancia = distancia;
-      hotelMaisProximo = hotel;
-
+    const box = document.getElementById("hotel-proximo");
+    if (hotelMaisProximo && box) {
+        box.style.display = "block";
+        const tempoMin = Math.round((menorDistancia / 35) * 60); // Baseado em 35km/h urbano
+        
+        box.innerHTML = `
+            <div style="border-left: 4px solid #33ccff; padding-left: 10px;">
+                <b style="color:#33ccff">📍 Próximo de você:</b><br>
+                <span style="font-size: 1.1rem;">${hotelMaisProximo.nome}</span><br>
+                <small>Distância: ${menorDistancia.toFixed(2)} km | ~${tempoMin} min</small>
+            </div>
+        `;
     }
-
-  });
-
-  if (hotelMaisProximo) {
-
-    const tempoMin =
-      Math.round((menorDistancia / 40) * 60);
-
-    const box =
-      document.getElementById("hotel-proximo");
-
-    box.style.display = "block";
-
-    box.innerHTML = `
-      <b>📍 Hotel mais próximo</b><br><br>
-
-      🏨 ${hotelMaisProximo.nome}<br>
-
-      📏 ${menorDistancia.toFixed(2)} km<br>
-
-      ⏱️ ${tempoMin} min estimados
-    `;
-  }
-
 }
+
+// CHAMADA INICIAL AO CARREGAR A PÁGINA
+inicializarDadosSalvos();
+iniciarGPS();
+
 
 </script>
 
