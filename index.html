@@ -309,6 +309,17 @@ header{
 #view-rota-ativa{
     display:none;
 }
+
+.gps-box{
+  background:#1e293b;
+  color:white;
+  padding:15px;
+  border-radius:12px;
+  margin-top:15px;
+  font-size:15px;
+  line-height:1.6;
+}
+
 </style>
 </head>
 
@@ -605,6 +616,7 @@ function gerarRota(){
     document.getElementById('view-rota-ativa').style.display = 'block';
 
     renderizarRotaAtiva(ids);
+iniciarGPS();
 }
 
 /* ROTA */
@@ -893,6 +905,101 @@ function iniciarGPS() {
 }
 
 iniciarGPS();
+</script>
+<script>
+
+let userLat = null;
+let userLng = null;
+
+function iniciarGPS() {
+
+  navigator.geolocation.watchPosition(
+    (position) => {
+
+      userLat = position.coords.latitude;
+      userLng = position.coords.longitude;
+
+      detectarHotelMaisProximo();
+
+    },
+    (error) => {
+      console.log(error);
+    },
+    {
+      enableHighAccuracy: true
+    }
+  );
+
+}
+
+function calcularDistancia(lat1, lon1, lat2, lon2) {
+
+  const R = 6371;
+
+  const dLat = (lat2-lat1) * Math.PI / 180;
+  const dLon = (lon2-lon1) * Math.PI / 180;
+
+  const a =
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) *
+    Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+  return R * c;
+
+}
+
+function detectarHotelMaisProximo() {
+
+  if (!rotaGerada || rotaGerada.length === 0) return;
+
+  let menorDistancia = Infinity;
+  let hotelMaisProximo = null;
+
+  rotaGerada.forEach(hotel => {
+
+    if (!hotel.lat || !hotel.lng) return;
+
+    const distancia = calcularDistancia(
+      userLat,
+      userLng,
+      hotel.lat,
+      hotel.lng
+    );
+
+    if (distancia < menorDistancia) {
+
+      menorDistancia = distancia;
+      hotelMaisProximo = hotel;
+
+    }
+
+  });
+
+  if (hotelMaisProximo) {
+
+    const tempoMin = Math.round((menorDistancia / 40) * 60);
+
+    const box = document.getElementById("hotel-proximo");
+
+    box.style.display = "block";
+
+    box.innerHTML = `
+      <b>📍 Hotel mais próximo</b><br><br>
+
+      🏨 ${hotelMaisProximo.nome}<br>
+
+      📏 ${menorDistancia.toFixed(2)} km<br>
+
+      ⏱️ ${tempoMin} min estimados
+    `;
+
+  }
+
+}
+
 </script>
 </body>
 </html>
