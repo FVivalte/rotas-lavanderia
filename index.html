@@ -960,7 +960,7 @@ function detectarHotelMaisProximo() {
 
   rotaGerada.forEach(hotel => {
 
-    if (!hotel.lat || !hotel.lon) return;
+    if (!hotel.lat || !hotel.lng) return;
 
 const distancia = calcularDistancia(
   userLat,
