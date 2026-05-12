@@ -839,6 +839,14 @@ function voltarSelecao(){
 carregarSelecao();
 
 </script>
+<script>
+function iniciar() {
+  console.log("ok");
+}
 
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("/service-worker.js");
+}
+</script>
 </body>
 </html>
