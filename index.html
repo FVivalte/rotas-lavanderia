@@ -615,6 +615,12 @@ function gerarRota(){
     document.getElementById('view-selecao').style.display = 'none';
     document.getElementById('view-rota-ativa').style.display = 'block';
 
+const todos = [
+    ...locaisBase,
+    ...JSON.parse(localStorage.getItem('locais_extras') || '[]')
+];
+
+rotaGerada = todos.filter(l => ids.includes(l.id));
     renderizarRotaAtiva(ids);
 iniciarGPS();
 }
@@ -910,6 +916,7 @@ iniciarGPS();
 
 let userLat = null;
 let userLng = null;
+let rotaGerada = [];
 
 function iniciarGPS() {
 
@@ -960,7 +967,7 @@ function detectarHotelMaisProximo() {
 
   rotaGerada.forEach(hotel => {
 
-    if (!hotel.lat || !hotel.lng) return;
+    if (!hotel.lat || !hotel.lon) return;
 
 const distancia = calcularDistancia(
   userLat,
