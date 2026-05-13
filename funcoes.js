@@ -204,7 +204,9 @@ function iniciarGPS() {
             userLng = position.coords.longitude;  
             const gpsInfo = document.getElementById("gps-info");  
             if (gpsInfo) {  
-                gpsInfo.innerHTML = `<span style="color:#4caf50">●</span> GPS Ativo<br><small>${userLat.toFixed(5)}, ${userLng.toFixed(5)}</small>`;  
+                gpsInfo.innerHTML = `
+<span style="color:#4caf50">●</span> GPS Ativo
+`;  
             }  
             detectarHotelMaisProximo();  
         },  
