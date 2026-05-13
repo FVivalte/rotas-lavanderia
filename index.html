@@ -1,356 +1,220 @@
-<!DOCTYPE html>  
-<html lang="pt-BR">  
-<head>  
-<link rel="manifest" href="manifest.json">  
-<meta name="theme-color" content="#2563eb">  
-<meta charset="UTF-8">  
-<title>Rota Pro Búzios</title>  
-  
-<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>  
-  
-<link rel="stylesheet" href="style.css">
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Rota Pro Búzios</title>
+
+    <link rel="manifest" href="manifest.json">
+
+    <meta name="theme-color" content="#2563eb">
+
+    <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+</head>
+
+<body>
+
+<header>
+    <h1 style="margin:0;font-size:1.3rem;">
+        🚚 Rota Pro Búzios
+    </h1>
+
+    <button class="btn-add"
+            onclick="toggleCadastro()">
+        +
+    </button>
+</header>
+
+<div class="container" id="view-selecao">
+
+    <div id="painel-cadastro">
+
+        <h3 style="margin-top:0">
+            Nova Parada
+        </h3>
+
+        <div class="input-group">
+            <label>Nome</label>
+            <input type="text" id="novo-nome">
+        </div>
+
+        <div class="input-group">
+            <label>Endereço</label>
+            <input type="text" id="novo-end">
+        </div>
+
+        <div class="input-group">
+            <label>Coordenadas (Lat, Lon)</label>
+
+            <input type="text"
+                   id="novo-coords"
+                   placeholder="-22.7490005, -41.9561384">
+        </div>
+
+        <div style="display:flex;gap:10px">
+
+            <button class="btn-gps btn-google"
+                    style="flex:1;border:none;cursor:pointer;"
+                    onclick="salvarNovoLocal()">
+                Salvar
+            </button>
+
+            <button class="btn-gps"
+                    style="flex:1;border:none;background:#666;cursor:pointer;"
+                    onclick="toggleCadastro()">
+                Fechar
+            </button>
+
+        </div>
+
+    </div>
+
+    <div id="lista-selecao"></div>
+
+    <div class="footer-btns">
+
+        <button class="btn-acao"
+                style="background:#dc3545;flex:1;"
+                onclick="limparSelecao()">
+            Limpar
+        </button>
+
+        <button class="btn-acao"
+                style="background:var(--success);"
+                onclick="gerarRota()">
+            🚀 Gerar Rota
+        </button>
+
+    </div>
+
+</div>
+
+<div class="container" id="view-rota-ativa">
+
+    <div class="painel-controle">
+
+        <div class="resumo-stats"
+             style="display:flex;gap:20px;margin-bottom:15px;">
+
+            <div class="resumo-item">
+                <span style="font-size:0.7rem;color:#666;display:block;">
+                    DISTÂNCIA
+                </span>
+
+                <span class="resumo-valor"
+                      id="total-km"
+                      style="font-weight:bold;">
+                    0 km
+                </span>
+            </div>
+
+            <div class="resumo-item">
+                <span style="font-size:0.7rem;color:#666;display:block;">
+                    TEMPO EST.
+                </span>
+
+                <span class="resumo-valor"
+                      id="total-tempo"
+                      style="font-weight:bold;">
+                    0 min
+                </span>
+            </div>
+
+        </div>
+
+        <div id="gps-info"></div>
+
+        <div id="hotel-proximo"
+             class="gps-box"
+             style="display:none;">
+        </div>
+
+        <div class="btn-gps-group">
+
+            <a id="btn-full-google"
+               href="#"
+               target="_blank"
+               class="btn-gps btn-google">
+                Tudo no Maps
+            </a>
+
+            <a id="btn-full-waze"
+               href="#"
+               target="_blank"
+               class="btn-gps btn-waze">
+                Final no Waze
+            </a>
+
+        </div>
+
+    </div>
+
+    <div id="lista-rota-ativa"></div>
+
+    <button class="btn-acao"
+            onclick="voltarSelecao()"
+            style="background:#666;width:100%;margin-top:20px;">
+        ✎ Editar Lista
+    </button>
+
+</div>
+
+<div class="overlay" id="overlay"></div>
+
+<div id="modal-next">
+
+    <h2>Próxima parada</h2>
+
+    <p id="next-stop-name"
+       style="font-weight:bold;color:var(--primary);font-size:1.2rem;">
+    </p>
+
+    <div class="btn-gps-group">
+
+        <a id="modal-google"
+           href="#"
+           target="_blank"
+           class="btn-gps btn-google">
+            Maps
+        </a>
+
+        <a id="modal-waze"
+           href="#"
+           target="_blank"
+           class="btn-gps btn-waze">
+            Waze
+        </a>
+
+    </div>
+
+    <button onclick="fecharModal()"
+            style="margin-top:15px;
+                   padding:10px 20px;
+                   background:#eee;
+                   border-radius:8px;
+                   border:none;
+                   cursor:pointer;
+                   font-weight:bold;">
+
+        Fechar
+
+    </button>
+
+</div>
+
 <script src="dados.js"></script>
 
+<script src="funcoes.js"></script>
 
+<script src="app.js"></script>
 
-</head>  
-  
-<body>  
-  
-<header>  
-    <h1 style="margin:0;font-size:1.3rem;">🚚 Rota Pro Búzios</h1>  
-    <button class="btn-add" onclick="toggleCadastro()">+</button>  
-</header>  
-  
-<div class="container" id="view-selecao">  
-    <div id="painel-cadastro">  
-        <h3 style="margin-top:0">Nova Parada</h3>  
-        <div class="input-group">  
-            <label>Nome</label>  
-            <input type="text" id="novo-nome">  
-        </div>  
-        <div class="input-group">  
-            <label>Endereço</label>  
-            <input type="text" id="novo-end">  
-        </div>  
-        <div class="input-group">  
-            <label>Coordenadas (Lat, Lon)</label>  
-            <input type="text" id="novo-coords" placeholder="-22.7490005, -41.9561384">  
-        </div>  
-        <div style="display:flex;gap:10px">  
-            <button class="btn-gps btn-google" style="flex:1;border:none;cursor:pointer;" onclick="salvarNovoLocal()">Salvar</button>  
-            <button class="btn-gps" style="flex:1;border:none;background:#666;cursor:pointer;" onclick="toggleCadastro()">Fechar</button>  
-        </div>  
-    </div>  
-    <div id="lista-selecao"></div>  
-    <div class="footer-btns">  
-        <button class="btn-acao" style="background:#dc3545;flex:1;" onclick="limparSelecao()">Limpar</button>  
-        <button class="btn-acao" style="background:var(--success);" onclick="gerarRota()">🚀 Gerar Rota</button>  
-    </div>  
-</div>  
-  
-<div class="container" id="view-rota-ativa">  
-    <div class="painel-controle">  
-        <div class="resumo-stats" style="display: flex; gap: 20px; margin-bottom: 15px;">  
-            <div class="resumo-item">  
-                <span style="font-size:0.7rem;color:#666;display:block;">DISTÂNCIA</span>  
-                <span class="resumo-valor" id="total-km" style="font-weight:bold;">0 km</span>  
-            </div>  
-            <div class="resumo-item">  
-                <span style="font-size:0.7rem;color:#666;display:block;">TEMPO EST.</span>  
-                <span class="resumo-valor" id="total-tempo" style="font-weight:bold;">0 min</span>  
-            </div>  
-        </div>  
-        <div id="gps-info"></div>  
-        <div id="hotel-proximo" class="gps-box" style="display:none;"></div>  
-  
-        <div class="btn-gps-group">  
-            <a id="btn-full-google" href="#" target="_blank" class="btn-gps btn-google">Tudo no Maps</a>  
-            <a id="btn-full-waze" href="#" target="_blank" class="btn-gps btn-waze">Final no Waze</a>  
-        </div>  
-    </div>  
-    <div id="lista-rota-ativa"></div>  
-    <button class="btn-acao" onclick="voltarSelecao()" style="background:#666;width:100%;margin-top:20px;">✎ Editar Lista</button>  
-</div>  
-  
-<div class="overlay" id="overlay"></div>  
-<div id="modal-next">  
-    <h2>Próxima parada</h2>  
-    <p id="next-stop-name" style="font-weight:bold;color:var(--primary);font-size: 1.2rem;"></p>  
-    <div class="btn-gps-group">  
-        <a id="modal-google" href="#" target="_blank" class="btn-gps btn-google">Maps</a>  
-        <a id="modal-waze" href="#" target="_blank" class="btn-gps btn-waze">Waze</a>  
-    </div>  
-    <button onclick="fecharModal()" style="margin-top:15px;padding: 10px 20px;background:#eee;border-radius: 8px;border:none;cursor:pointer;font-weight:bold;">Fechar</button>  
-</div>  
-  
-<script>  
-let locaisBase = [  
-    {id:1, nome:"Hotel Aretê", regiao:"Baía Formosa / Rasa", endereco:"Alameda Andorinhas – Loteamento Praia Baía Formosa", lat:-22.7490005, lon:-41.9561384, plus:"722V+9GX Armação dos Búzios, RJ", prioridade:1},  
-    {id:2, nome:"Pousada Manaaki", regiao:"Praia Rasa", endereco:"Av. Greta Blanck do Rio, 82", lat:-22.7632675, lon:-41.9422559, plus:"63P5+M3 Armação dos Búzios, RJ", prioridade:2},  
-    {id:3, nome:"Pousada Maré Búzios", regiao:"Vila Luiza", endereco:"Rua do Começo, 162", lat:-22.7597922, lon:-41.9441392, plus:"63R4+38 Armação dos Búzios, RJ", prioridade:2},  
-    {id:4, nome:"Casa da Ruth Pousada", regiao:"Geribá", endereco:"Rua Gerbert Périssé, 10", lat:-22.7798199, lon:-41.9146731, plus:"63CP+34 Armação dos Búzios, RJ", prioridade:2},  
-    {id:5, nome:"Maravista Hotel e Spa", regiao:"Geribá", endereco:"Rua Gerbert Périssé, 276", lat:-22.7796447, lon:-41.9143854, plus:"63CP+46 Armação dos Búzios, RJ", prioridade:2},  
-    {id:6, nome:"Le Relais La Borie", regiao:"Geribá", endereco:"Rua Gerbert Périssé, 554", lat:-22.7783015, lon:-41.9118299, plus:"63CQ+M7 Armação dos Búzios, RJ", prioridade:2},  
-    {id:7, nome:"Carmel", regiao:"Ferradura", endereco:"Rua Parque, 17", lat:-22.7709027, lon:-41.8910921, plus:"64H5+JH Armação dos Búzios, RJ", prioridade:4},  
-    {id:8, nome:"Lavanderia LAVILAGOS", regiao:"Ferradura", endereco:"Av. José Bento Ribeiro Dantas, 1195", lat:-22.7625969, lon:-41.8964253, plus:"64P3+XC Armação dos Búzios, RJ", prioridade:2.5},  
-    {id:9, nome:"Aroma", regiao:"Village", endereco:"Rua Quinze, 379-221", lat:-22.7533440, lon:-41.8780750, plus:"64WC+MQ Armação dos Búzios, RJ", prioridade:3},  
-    {id:10, nome:"Hibiscus Beach", regiao:"Village", endereco:"Rua 01, 22", lat:-22.7442026, lon:-41.8758089, plus:"744F+8M Armação dos Búzios, RJ", prioridade:4},  
-    {id:11, nome:"Condomínio Praia Brava", regiao:"Village", endereco:"Rua Dezessete, 2-60", lat:-22.7570727, lon:-41.8766645, plus:"64VF+58 Armação dos Búzios, RJ", prioridade:4},  
-    {id:12, nome:"Vale das Emas", regiao:"Village", endereco:"Rua Miguelote Viana", lat:-22.7485933, lon:-41.8805990, plus:"7429+HQ Armação dos Búzios, RJ", prioridade:4},  
-    {id:13, nome:"Mainá", regiao:"Village", endereco:"Travessa Vilage, 36", lat:-22.7475234, lon:-41.8791968, plus:"742C+X8V Armação dos Búzios, RJ", prioridade:4},  
-    {id:14, nome:"Azeda", regiao:"Azeda / Ossos", endereco:"Praia da Azeda", lat:-22.7458674, lon:-41.8783928, plus:"743C+MJ Armação dos Búzios, RJ", prioridade:4}  
-];  
-  
-let userLat = null;  
-let userLng = null;  
-let rotaGerada = [];  
-  
-function toggleCadastro(){  
-    const p = document.getElementById('painel-cadastro');  
-    p.style.display = p.style.display === 'block' ? 'none' : 'block';  
-}  
-  
-function salvarNovoLocal(){  
-    const nome = document.getElementById('novo-nome').value;  
-    const end = document.getElementById('novo-end').value;  
-    const coords = document.getElementById('novo-coords').value.split(',');  
-    if(!nome || !end || coords.length < 2){  
-        alert("Preencha tudo corretamente. Ex: -22.7490005, -41.9561384");  
-        return;  
-    }  
-    const novo = {  
-        id:Date.now(),  
-        nome,  
-        regiao:"Extra",  
-        endereco:end,  
-        lat:parseFloat(coords[0].trim()),  
-        lon:parseFloat(coords[1].trim()),  
-        custom:true,  
-        prioridade: 99  
-    };  
-    let extras = JSON.parse(localStorage.getItem('locais_extras') || '[]');  
-    extras.push(novo);  
-    localStorage.setItem('locais_extras', JSON.stringify(extras));  
-    document.getElementById('novo-nome').value = '';  
-    document.getElementById('novo-end').value = '';  
-    document.getElementById('novo-coords').value = '';  
-    toggleCadastro();  
-    carregarSelecao();  
-}  
-  
-function carregarSelecao(){  
-    const container = document.getElementById('lista-selecao');  
-    container.innerHTML = '';  
-    const todos = [...locaisBase, ...JSON.parse(localStorage.getItem('locais_extras') || '[]')];  
-    const selecionadosIds = JSON.parse(localStorage.getItem('rota_salva') || '[]');  
-    todos.forEach(l => {  
-        const isChecked = selecionadosIds.includes(l.id) ? 'checked' : '';  
-        const card = document.createElement('div');  
-        card.className = `card ${l.custom ? 'custom' : ''}`;  
-        card.innerHTML = `  
-            <h3 style="margin:0">${l.nome}</h3>  
-            <span class="info-endereco">📍 ${l.endereco}</span>  
-            <label class="switch">  
-                <input type="checkbox" class="toggle-rota" value="${l.id}" ${isChecked}>  
-                <span class="slider"></span>  
-            </label>  
-        `;  
-        card.onclick = (e) => {  
-            if(!e.target.closest('.switch')){  
-                const checkbox = card.querySelector('input');  
-                checkbox.checked = !checkbox.checked;  
-            }  
-        };  
-        container.appendChild(card);  
-    });  
-}  
-  
-function gerarRota(){  
-    const ids = Array.from(document.querySelectorAll('.toggle-rota:checked')).map(c => parseInt(c.value));  
-    if(ids.length === 0){  
-        alert("Selecione os locais para gerar a rota.");  
-        return;  
-    }  
-    const todos = [...locaisBase, ...JSON.parse(localStorage.getItem('locais_extras') || '[]')];  
-    rotaGerada = todos.filter(l => ids.includes(l.id));  
-    localStorage.setItem('rota_salva', JSON.stringify(ids));  
-    document.getElementById('view-selecao').style.display = 'none';  
-    document.getElementById('view-rota-ativa').style.display = 'block';  
-    renderizarRotaAtiva(ids);  
-    iniciarGPS();  
-}  
-  
-function renderizarRotaAtiva(ids){  
-    const container = document.getElementById('lista-rota-ativa');  
-    container.innerHTML = '';  
-    const todos = [...locaisBase, ...JSON.parse(localStorage.getItem('locais_extras') || '[]')];  
-    const ordemRegioes = ["Praia Rasa", "Baía Formosa / Rasa", "Vila Luiza", "Geribá", "Ferradura", "Village", "Azeda / Ossos"];  
-      
-    const ativos = todos.filter(l => ids.includes(l.id)).sort((a,b)=>{  
-        if(a.prioridade !== b.prioridade) return a.prioridade - b.prioridade;  
-        return ordemRegioes.indexOf(a.regiao) - ordemRegioes.indexOf(b.regiao);  
-    });  
-  
-    let stopsGoogle = "";  
-    ativos.forEach((l,index)=>{  
-        stopsGoogle += `${l.lat},${l.lon}/`;  
-        const card = document.createElement('div');  
-        card.className = 'card';  
-        card.dataset.id = l.id;  
-        card.innerHTML = `  
-            <div class="drag-handle">☰</div>  
-            <div class="titulo-rota" data-nome="${l.nome}" style="font-weight:bold;color:var(--primary);">${index + 1}. ${l.nome}</div>  
-            <div class="info-endereco">📍 ${l.endereco}</div>  
-            <div class="btn-gps-group">  
-                <a href="https://www.google.com/maps/search/?api=1&query=${l.lat},${l.lon}" target="_blank" class="btn-gps btn-google">Maps</a>  
-                <a href="https://waze.com/ul?ll=${l.lat},${l.lon}&navigate=yes" target="_blank" class="btn-gps btn-waze">Waze</a>  
-            </div>  
-            <div class="extra-checks">  
-                <label class="mini-check"><input type="checkbox" class="check-coleta"> Coleta</label>  
-                <label class="mini-check"><input type="checkbox" class="check-entrega"> Entrega</label>  
-                <label class="mini-check"><input type="checkbox" class="check-retorno"> Retornar</label>  
-                <button class="btn-finalizar" onclick="validarPendencia(this)">Finalizar Hotel</button>  
-            </div>  
-        `;  
-        container.appendChild(card);  
-    });  
-  
-    document.getElementById('btn-full-google').href = `https://www.google.com/maps/dir/${stopsGoogle}`;  
-    if(ativos.length > 0){  
-        const last = ativos[ativos.length - 1];  
-        document.getElementById('btn-full-waze').href = `https://waze.com/ul?ll=${last.lat},${last.lon}&navigate=yes`;  
-    }  
-  
-    new Sortable(container,{  
-        animation:150,  
-        handle:'.drag-handle',  
-        onEnd:()=>{  
-            const novosIds = Array.from(container.querySelectorAll('.card')).map(c => parseInt(c.dataset.id));  
-            localStorage.setItem('rota_salva', JSON.stringify(novosIds));  
-            atualizarNumeracao();  
-        }  
-    });  
-}  
-  
-function validarPendencia(btn){  
-    const card = btn.closest('.card');  
-    const coleta = card.querySelector('.check-coleta').checked;  
-    const entrega = card.querySelector('.check-entrega').checked;  
-    const retorno = card.querySelector('.check-retorno').checked;  
-    const container = document.getElementById('lista-rota-ativa');  
-  
-    if((coleta && entrega) || retorno){  
-        card.classList.remove('pendente');  
-        toggleConcluido(btn);  
-    } else {  
-        card.classList.remove('concluido');  
-        card.classList.add('pendente');  
-        container.appendChild(card);  
-    }  
-    atualizarNumeracao();  
-}  
-  
-function toggleConcluido(btn){  
-    const card = btn.closest('.card');  
-    card.classList.add('concluido');  
-    btn.innerHTML = '✅ Concluído';  
-    const prox = card.nextElementSibling;  
-    if(prox){  
-        const todos = [...locaisBase, ...JSON.parse(localStorage.getItem('locais_extras') || '[]')];  
-        const d = todos.find(l => l.id === parseInt(prox.dataset.id));  
-        if(d) {  
-            document.getElementById('next-stop-name').innerText = d.nome;  
-            document.getElementById('modal-google').href = `https://www.google.com/maps/search/?api=1&query=${d.lat},${d.lon}`;  
-            document.getElementById('modal-waze').href = `https://waze.com/ul?ll=${d.lat},${d.lon}&navigate=yes`;  
-            document.getElementById('overlay').style.display = 'block';  
-            document.getElementById('modal-next').style.display = 'block';  
-        }  
-    }  
-}  
-  
-function atualizarNumeracao(){  
-    const cards = document.querySelectorAll('#lista-rota-ativa .card');  
-    cards.forEach((card,index)=>{  
-        const titulo = card.querySelector('.titulo-rota');  
-        if(titulo) titulo.innerHTML = `${index + 1}. ${titulo.dataset.nome}`;  
-    });  
-}  
-  
-function fecharModal(){  
-    document.getElementById('overlay').style.display = 'none';  
-    document.getElementById('modal-next').style.display = 'none';  
-}  
-  
-function limparSelecao(){  
-    if(confirm("Deseja realmente limpar a lista de paradas?")){  
-        document.querySelectorAll('.toggle-rota').forEach(c => c.checked = false);  
-        localStorage.removeItem('rota_salva');  
-    }  
-}  
-  
-function voltarSelecao(){  
-    document.getElementById('view-rota-ativa').style.display = 'none';  
-    document.getElementById('view-selecao').style.display = 'block';  
-    carregarSelecao();  
-}  
-  
-function inicializarDadosSalvos() {  
-    const idsSalvos = JSON.parse(localStorage.getItem('rota_salva') || '[]');  
-    if (idsSalvos.length > 0) {  
-        const todos = [...locaisBase, ...JSON.parse(localStorage.getItem('locais_extras') || '[]')];  
-        rotaGerada = todos.filter(l => idsSalvos.includes(l.id));  
-    }  
-}  
-  
-function iniciarGPS() {  
-    if (!("geolocation" in navigator)) return;  
-    navigator.geolocation.watchPosition(  
-        (position) => {  
-            userLat = position.coords.latitude;  
-            userLng = position.coords.longitude;  
-            const gpsInfo = document.getElementById("gps-info");  
-            if (gpsInfo) {  
-                gpsInfo.innerHTML = `<span style="color:#4caf50">●</span> GPS Ativo<br><small>${userLat.toFixed(5)}, ${userLng.toFixed(5)}</small>`;  
-            }  
-            detectarHotelMaisProximo();  
-        },  
-        (error) => console.error(error),  
-        { enableHighAccuracy: true }  
-    );  
-}  
-  
-function calcularDistancia(lat1, lon1, lat2, lon2) {  
-    const R = 6371;  
-    const dLat = (lat2 - lat1) * Math.PI / 180;  
-    const dLon = (lon2 - lon1) * Math.PI / 180;  
-    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);  
-    return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));  
-}  
-  
-function detectarHotelMaisProximo() {  
-    if (rotaGerada.length === 0 || !userLat) return;  
-    let menorDistancia = Infinity;  
-    let hotelMaisProximo = null;  
-    rotaGerada.forEach(hotel => {  
-        const card = document.querySelector(`.card[data-id="${hotel.id}"]`);  
-        if (card && card.classList.contains('concluido')) return;  
-        const dist = calcularDistancia(userLat, userLng, hotel.lat, hotel.lon);  
-        if (dist < menorDistancia) {  
-            menorDistancia = dist;  
-            hotelMaisProximo = hotel;  
-        }  
-    });  
-    const box = document.getElementById("hotel-proximo");  
-    if (hotelMaisProximo && box) {  
-        box.style.display = "block";  
-        const tempoMin = Math.round((menorDistancia / 35) * 60);  
-        box.innerHTML = `<div style="border-left: 4px solid #33ccff; padding-left: 10px;"><b style="color:#33ccff">📍 Próximo:</b><br>${hotelMaisProximo.nome}<br><small>${menorDistancia.toFixed(2)} km | ~${tempoMin} min</small></div>`;  
-    }  
-}  
-  
-carregarSelecao();  
-inicializarDadosSalvos();  
-</script>  
-</body>  
-</html>  
+</body>
+</html>
