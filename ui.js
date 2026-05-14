@@ -37,10 +37,21 @@ function renderizarRotaAtiva(rotaAtual){
     const todos = [...locaisBase, ...JSON.parse(localStorage.getItem('locais_extras') || '[]')];  
     const ordemRegioes = ["Praia Rasa", "Baía Formosa / Rasa", "Vila Luiza", "Geribá", "Ferradura", "Village", "Azeda / Ossos"];  
 
-    const ativos = todos.filter(l => ids.includes(l.id)).sort((a,b)=>{  
-        if(a.prioridade !== b.prioridade) return a.prioridade - b.prioridade;  
-        return ordemRegioes.indexOf(a.regiao) - ordemRegioes.indexOf(b.regiao);  
-    });  
+    const ativos = todos
+.filter(l => ids.includes(l.id))
+.filter(l => {
+
+    const entrega = localStorage.getItem(`entrega_${l.id}`) === 'true';
+    const coleta = localStorage.getItem(`coleta_${l.id}`) === 'true';
+    const retorno = localStorage.getItem(`retorno_${l.id}`) === 'true';
+
+    return !(entrega && (coleta || retorno));
+
+})
+.sort((a,b)=>{  
+    if(a.prioridade !== b.prioridade) return a.prioridade - b.prioridade;  
+    return ordemRegioes.indexOf(a.regiao) - ordemRegioes.indexOf(b.regiao);  
+});
 
     let stopsGoogle = "";  
     ativos.forEach((l,index)=>{  
