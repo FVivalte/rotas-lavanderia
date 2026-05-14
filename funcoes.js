@@ -59,20 +59,41 @@ function carregarSelecao(){
     });  
 }  
   
-function gerarRota(){  
-    const ids = Array.from(document.querySelectorAll('.toggle-rota:checked')).map(c => parseInt(c.value));  
-    if(ids.length === 0){  
-        alert("Selecione os locais para gerar a rota.");  
-        return;  
-    }  
-    const todos = [...locaisBase, ...JSON.parse(localStorage.getItem('locais_extras') || '[]')];  
-    rotaGerada = todos.filter(l => ids.includes(l.id));  
-    localStorage.setItem('rota_salva', JSON.stringify(ids));  
-    document.getElementById('view-selecao').style.display = 'none';  
-    document.getElementById('view-rota-ativa').style.display = 'block';  
-    renderizarRotaAtiva(ids);  
-    iniciarGPS();  
-}  
+function gerarRota(){
+
+    const ids = Array.from(
+        document.querySelectorAll('.toggle-rota:checked')
+    ).map(c => parseInt(c.value));
+
+    if(ids.length === 0){
+
+        alert("Selecione os locais para gerar a rota.");
+
+        return;
+    }
+
+    const todos = [
+        ...locaisBase,
+        ...JSON.parse(localStorage.getItem('locais_extras') || '[]')
+    ];
+
+    rotaAtual = todos.filter(l => ids.includes(l.id));
+
+    localStorage.setItem(
+        'rota_salva',
+        JSON.stringify(ids)
+    );
+
+    document.getElementById('view-selecao')
+        .style.display = 'none';
+
+    document.getElementById('view-rota-ativa')
+        .style.display = 'block';
+
+    renderizarRotaAtiva(rotaAtual);
+
+    iniciarGPS();
+}
   
 function renderizarRotaAtiva(ids){  
     const container = document.getElementById('lista-rota-ativa');  
