@@ -167,6 +167,71 @@
     </div>
 
     <div id="lista-rota-ativa"></div>
+<div id="modo-rota"
+     style="display:none;">
+
+    <div class="gps-box">
+
+        <div style="font-size:0.8rem;color:#666;">
+            PRÓXIMO HOTEL
+        </div>
+
+        <h2 id="hotel-atual-nome">
+            --
+        </h2>
+
+        <div id="hotel-atual-regiao"></div>
+
+        <div style="
+            margin-top:15px;
+            font-size:1.2rem;
+            font-weight:bold;">
+
+            ⏱ <span id="tempo-hotel">
+                00:00
+            </span>
+
+        </div>
+
+        <div class="btn-gps-group"
+             style="margin-top:15px;">
+
+            <button class="btn-gps btn-google"
+                    onclick="navegarHotelAtual()">
+
+                🧭 Navegar
+
+            </button>
+
+            <button class="btn-gps"
+                    style="background:var(--success)"
+                    onclick="marcarEntregue()">
+
+                ✅ Entregue
+
+            </button>
+
+            <button class="btn-gps"
+                    style="background:#f59e0b"
+                    onclick="marcarColetado()">
+
+                📦 Coletado
+
+            </button>
+
+        </div>
+
+        <button class="btn-acao"
+                style="margin-top:15px;"
+                onclick="proximoHotel()">
+
+            ⏭ Próximo Hotel
+
+        </button>
+
+    </div>
+
+</div>
 
     <button class="btn-acao"
             onclick="voltarSelecao()"
