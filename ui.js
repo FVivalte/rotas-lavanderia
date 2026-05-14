@@ -3,6 +3,46 @@ function toggleCadastro(){
     p.style.display = p.style.display === 'block' ? 'none' : 'block';  
 }
 
+function salvarNovoLocal() {
+
+    const nome = document.getElementById('novo-nome').value;
+
+    const endereco = document.getElementById('novo-end').value;
+
+    const coords = document
+        .getElementById('novo-coords')
+        .value
+        .split(',');
+
+    if (!nome || !endereco || coords.length < 2) {
+
+        alert(
+            "Preencha tudo corretamente. Ex: -22.7490005, -41.9561384"
+        );
+
+        return;
+    }
+
+    const lat = parseFloat(coords[0].trim());
+
+    const lon = parseFloat(coords[1].trim());
+
+    const novoLocal = criarNovoLocal(
+        nome,
+        endereco,
+        lat,
+        lon
+    );
+
+    salvarLocalExtra(novoLocal);
+
+    limparFormularioCadastro();
+
+    toggleCadastro();
+
+    carregarSelecao();
+}
+
 function carregarSelecao(){  
     const container = document.getElementById('lista-selecao');  
     container.innerHTML = '';  
