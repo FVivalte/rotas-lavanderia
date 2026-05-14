@@ -217,6 +217,7 @@ container.sortableInstance = new Sortable(container,{
 
     }  
 });
+}
 
 function validarPendencia(btn){  
     const card = btn.closest('.card');  
