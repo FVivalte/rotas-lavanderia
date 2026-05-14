@@ -11,29 +11,15 @@ function gerarRota(){
         return;
     }
 
-    const todos = [
-        ...locaisBase,
-        ...JSON.parse(localStorage.getItem('locais_extras') || '[]')
-    ];
-
-    rotaAtual = ids
-        .map(id => todos.find(l => l.id === id))
-        .filter(Boolean);
-
     localStorage.setItem(
         'rota_salva',
         JSON.stringify(ids)
     );
 
-    document.getElementById('view-selecao')
-        .style.display = 'none';
-
-    document.getElementById('view-rota-ativa')
-        .style.display = 'block';
-
     renderizarRotaAtiva(ids);
-    iniciarGPS();
-document.getElementById('btn-add-hotel')
+
+    // ESCONDE BOTÃO +
+    document.getElementById('btn-add-hotel')
         .style.display = 'none';
 
     document.getElementById('view-selecao')
