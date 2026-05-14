@@ -32,8 +32,15 @@ function gerarRota(){
         .style.display = 'block';
 
     renderizarRotaAtiva(ids);
-
     iniciarGPS();
+document.getElementById('btn-add-hotel')
+        .style.display = 'none';
+
+    document.getElementById('view-selecao')
+        .style.display = 'none';
+
+    document.getElementById('view-rota-ativa')
+        .style.display = 'block';
 }
 
 
