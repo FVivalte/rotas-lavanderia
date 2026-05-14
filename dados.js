@@ -14,3 +14,15 @@ let locaisBase = [
     {id:13, nome:"Mainá", regiao:"Village", endereco:"Travessa Vilage, 36", lat:-22.7475234, lon:-41.8791968, plus:"742C+X8V Armação dos Búzios, RJ", prioridade:4},  
     {id:14, nome:"Azeda", regiao:"Azeda / Ossos", endereco:"Praia da Azeda", lat:-22.7458674, lon:-41.8783928, plus:"743C+MJ Armação dos Búzios, RJ", prioridade:4}  
 ];
+function criarNovoLocal(nome, endereco, lat, lon) {
+    return {
+        id: Date.now(),
+        nome,
+        regiao: "Extra",
+        endereco,
+        lat,
+        lon,
+        custom: true,
+        prioridade: 99
+    };
+}
