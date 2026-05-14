@@ -27,16 +27,6 @@ window.addEventListener("load", () => {
     }
 
 });
-// ==========================
-// MODO EM ROTA
-// ==========================
-
-let modoRotaAtivo = false;
-let hotelAtualIndex = 0;
-let inicioHotel = null;
-let timerHotel = null;
-
-
 // INICIAR MODO ROTA
 
 function iniciarModoRota() {
