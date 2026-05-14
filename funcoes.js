@@ -95,7 +95,7 @@ function gerarRota(){
     iniciarGPS();
 }
   
-renderizarRotaAtiva(rotaAtual){  
+function renderizarRotaAtiva(rotaAtual){  
     const container = document.getElementById('lista-rota-ativa');  
     container.innerHTML = '';  
     const todos = [...locaisBase, ...JSON.parse(localStorage.getItem('locais_extras') || '[]')];  
