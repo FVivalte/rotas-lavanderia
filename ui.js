@@ -165,3 +165,9 @@ function voltarSelecao(){
     document.getElementById('view-selecao').style.display = 'block';  
     carregarSelecao();  
 }
+
+function limparFormularioCadastro() {
+    document.getElementById('novo-nome').value = '';
+    document.getElementById('novo-end').value = '';
+    document.getElementById('novo-coords').value = '';
+}
