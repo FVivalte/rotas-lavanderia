@@ -278,4 +278,21 @@ header{
   margin-top:15px;  
   font-size:15px;  
   line-height:1.6;  
-}  
+}
+
+.topo-card{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+}
+
+.info-card{
+    flex:1;
+}
+
+.drag-handle{
+    font-size:22px;
+    cursor:grab;
+    padding:8px;
+}
