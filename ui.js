@@ -31,7 +31,7 @@ function carregarSelecao(){
 }
 
 
-function renderizarRotaAtiva(rotaAtual){  
+function renderizarRotaAtiva(ids){  
     const container = document.getElementById('lista-rota-ativa');  
     container.innerHTML = '';  
     const todos = [...locaisBase, ...JSON.parse(localStorage.getItem('locais_extras') || '[]')];  
@@ -87,10 +87,15 @@ function renderizarRotaAtiva(rotaAtual){
         animation:150,  
         handle:'.drag-handle',  
         onEnd:()=>{  
-            const novosIds = Array.from(container.querySelectorAll('.card')).map(c => parseInt(c.dataset.id));  
-            localStorage.setItem('rota_salva', JSON.stringify(novosIds));  
-            atualizarNumeracao();  
-        }  
+
+    const novosIds = Array.from(container.querySelectorAll('.card'))
+    .map(c => parseInt(c.dataset.id));
+
+    localStorage.setItem('rota_salva', JSON.stringify(novosIds));
+
+    renderizarRotaAtiva(novosIds);
+
+}
     });  
 }
 
