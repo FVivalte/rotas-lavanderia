@@ -43,100 +43,79 @@ function salvarNovoLocal() {
     carregarSelecao();
 }
 
-function carregarSelecao(){  
-    const container = document.getElementById('lista-selecao');  
-    container.innerHTML = '';  
-    const todos = [...locaisBase, ...JSON.parse(localStorage.getItem('locais_extras') || '[]')];  
-    const selecionadosIds = JSON.parse(localStorage.getItem('rota_salva') || '[]');  
-    todos.forEach(l => {  
-        const isChecked = selecionadosIds.includes(l.id) ? 'checked' : '';  
-        const card = document.createElement('div');  
-        card.className = `card ${l.custom ? 'custom' : ''}`;  
+function carregarSelecao(){
+
+    const container =
+        document.getElementById('lista-selecao');
+
+    container.innerHTML = '';
+
+    const todos = [
+        ...locaisBase,
+        ...JSON.parse(
+            localStorage.getItem('locais_extras') || '[]'
+        )
+    ];
+
+    const selecionadosIds =
+        JSON.parse(
+            localStorage.getItem('rota_salva') || '[]'
+        );
+
+    todos.forEach(l => {
+
+        const isChecked =
+            selecionadosIds.includes(l.id)
+            ? 'checked'
+            : '';
+
+        const card = document.createElement('div');
+
+        card.className =
+            `card ${l.custom ? 'custom' : ''}`;
+
         card.innerHTML = `
 
-<div class="topo-card">
+            <label class="switch">
 
-    <div class="info-card">
+                <input
+                    type="checkbox"
+                    class="toggle-rota"
+                    value="${l.id}"
+                    ${isChecked}>
 
-        <div class="titulo-rota"
-            data-nome="${l.nome}">
-
-            ${index + 1}. ${l.nome}
-
-        </div>
-
-        <div class="info-endereco">
-
-            📍 ${l.endereco}
-
-        </div>
-
-        <div class="btn-gps-group">
-
-            <a href="https://www.google.com/maps/search/?api=1&query=${l.lat},${l.lon}"
-                target="_blank"
-                class="btn-gps btn-google">
-
-                Maps
-
-            </a>
-
-            <a href="https://waze.com/ul?ll=${l.lat},${l.lon}&navigate=yes"
-                target="_blank"
-                class="btn-gps btn-waze">
-
-                Waze
-
-            </a>
-
-        </div>
-
-        <div class="extra-checks">
-
-            <label class="mini-check">
-
-                <input type="checkbox" class="check-coleta">
-
-                Coleta
+                <span class="slider"></span>
 
             </label>
 
-            <label class="mini-check">
+            <div class="titulo-rota">
 
-                <input type="checkbox" class="check-entrega">
+                ${l.nome}
 
-                Entrega
+            </div>
 
-            </label>
+            <div class="info-endereco">
 
-        </div>
+                📍 ${l.endereco}
 
-        <button
-            class="btn-finalizar"
-            onclick="finalizarHotel(${l.id})">
+            </div>
 
-            ✅ Finalizar Hotel
+        `;
 
-        </button>
+        card.onclick = (e) => {
 
-    </div>
+            if(!e.target.closest('.switch')){
 
-    <div class="drag-handle">
+                const checkbox =
+                    card.querySelector('.toggle-rota');
 
-        ☰
+                checkbox.checked =
+                    !checkbox.checked;
+            }
+        };
 
-    </div>
-
-</div>
-`;
-        card.onclick = (e) => {  
-            if(!e.target.closest('.switch')){  
-                const checkbox = card.querySelector('input');  
-                checkbox.checked = !checkbox.checked;  
-            }  
-        };  
-        container.appendChild(card);  
-    });  
+        container.appendChild(card);
+    });
 }
 
 
