@@ -40,9 +40,6 @@ let timerHotel = null;
 // INICIAR MODO ROTA
 
 function iniciarModoRota() {
-alert("modo rota iniciado");
-    
-    }
 
     modoRotaAtivo = true;
 
