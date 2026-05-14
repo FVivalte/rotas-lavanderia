@@ -35,11 +35,14 @@ function gerarRota(){
 }
 
 
-function detectarHotelMaisProximo() {  
-    if (rotaGerada.length === 0 || !userLat) return;  
-    let menorDistancia = Infinity;  
-    let hotelMaisProximo = null;  
-    rotaGerada.forEach(hotel => {  
+function detectarHotelMaisProximo() {
+
+    if (rotaAtual.length === 0 || !userLat) return;
+
+    let menorDistancia = Infinity;
+    let hotelMaisProximo = null;
+
+    rotaAtual.forEach(hotel => {  
         const card = document.querySelector(`.card[data-id="${hotel.id}"]`);  
         if (card && card.classList.contains('concluido')) return;  
         const dist = calcularDistancia(userLat, userLng, hotel.lat, hotel.lon);  
