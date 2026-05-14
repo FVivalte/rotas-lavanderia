@@ -1,6 +1,6 @@
 let userLat = null;
 let userLng = null;
-let rotaGerada = [];
+let rotaAtual = [];
 let modoRotaAtivo = false;
 let hotelAtualIndex = 0;
 let inicioHotel = null;
