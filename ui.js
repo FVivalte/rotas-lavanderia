@@ -83,21 +83,26 @@ function renderizarRotaAtiva(ids){
         document.getElementById('btn-full-waze').href = `https://waze.com/ul?ll=${last.lat},${last.lon}&navigate=yes`;  
     }  
 
-    new Sortable(container,{  
-        animation:150,  
-        handle:'.drag-handle',  
-        onEnd:()=>{  
-
-    const novosIds = Array.from(container.querySelectorAll('.card'))
-    .map(c => parseInt(c.dataset.id));
-
-    localStorage.setItem('rota_salva', JSON.stringify(novosIds));
-
-    renderizarRotaAtiva(novosIds);
-
+    if(container.sortableInstance){
+    container.sortableInstance.destroy();
 }
-    });  
-}
+
+container.sortableInstance = new Sortable(container,{  
+    animation:150,  
+    handle:'.drag-handle',  
+
+    onEnd:()=>{  
+
+        const novosIds = Array
+        .from(container.querySelectorAll('.card'))
+        .map(c => parseInt(c.dataset.id));
+
+        localStorage.setItem('rota_salva', JSON.stringify(novosIds));
+
+        renderizarRotaAtiva(novosIds);
+
+    }  
+});
 
 function validarPendencia(btn){  
     const card = btn.closest('.card');  
