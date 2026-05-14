@@ -52,14 +52,83 @@ function carregarSelecao(){
         const isChecked = selecionadosIds.includes(l.id) ? 'checked' : '';  
         const card = document.createElement('div');  
         card.className = `card ${l.custom ? 'custom' : ''}`;  
-        card.innerHTML = `  
-            <h3 style="margin:0">${l.nome}</h3>  
-            <span class="info-endereco">📍 ${l.endereco}</span>  
-            <label class="switch">  
-                <input type="checkbox" class="toggle-rota" value="${l.id}" ${isChecked}>  
-                <span class="slider"></span>  
-            </label>  
-        `;  
+        card.innerHTML = `
+
+<div class="topo-card">
+
+    <div class="info-card">
+
+        <div class="titulo-rota"
+            data-nome="${l.nome}">
+
+            ${index + 1}. ${l.nome}
+
+        </div>
+
+        <div class="info-endereco">
+
+            📍 ${l.endereco}
+
+        </div>
+
+        <div class="btn-gps-group">
+
+            <a href="https://www.google.com/maps/search/?api=1&query=${l.lat},${l.lon}"
+                target="_blank"
+                class="btn-gps btn-google">
+
+                Maps
+
+            </a>
+
+            <a href="https://waze.com/ul?ll=${l.lat},${l.lon}&navigate=yes"
+                target="_blank"
+                class="btn-gps btn-waze">
+
+                Waze
+
+            </a>
+
+        </div>
+
+        <div class="extra-checks">
+
+            <label class="mini-check">
+
+                <input type="checkbox" class="check-coleta">
+
+                Coleta
+
+            </label>
+
+            <label class="mini-check">
+
+                <input type="checkbox" class="check-entrega">
+
+                Entrega
+
+            </label>
+
+        </div>
+
+        <button
+            class="btn-finalizar"
+            onclick="finalizarHotel(${l.id})">
+
+            ✅ Finalizar Hotel
+
+        </button>
+
+    </div>
+
+    <div class="drag-handle">
+
+        ☰
+
+    </div>
+
+</div>
+`;
         card.onclick = (e) => {  
             if(!e.target.closest('.switch')){  
                 const checkbox = card.querySelector('input');  
@@ -109,8 +178,7 @@ function renderizarRotaAtiva(ids){
             </div>  
             <div class="extra-checks">  
                 <label class="mini-check"><input type="checkbox" class="check-coleta"> Coleta</label>  
-                <label class="mini-check"><input type="checkbox" class="check-entrega"> Entrega</label>  
-                <label class="mini-check"><input type="checkbox" class="check-retorno"> Retornar</label>  
+                <label class="mini-check"><input type="checkbox" class="check-entrega"> Entrega</label>
                 <button class="btn-finalizar" onclick="validarPendencia(this)">Finalizar Hotel</button>  
             </div>  
         `;  
