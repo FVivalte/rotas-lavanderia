@@ -140,14 +140,41 @@ function carregarSelecao(){
 }
 
 
-function renderizarRotaAtiva(ids){  
-    const container = document.getElementById('lista-rota-ativa');  
-    container.innerHTML = '';  
-    const todos = [...locaisBase, ...JSON.parse(localStorage.getItem('locais_extras') || '[]')];  
-    const ordemRegioes = ["Praia Rasa", "Baía Formosa / Rasa", "Vila Luiza", "Geribá", "Ferradura", "Village", "Azeda / Ossos"];  
+function renderizarRotaAtiva(ids){
+
+    const container =
+        document.getElementById('lista-rota-ativa');
+
+    container.innerHTML = '';
+
+    const todos = [
+        ...locaisBase,
+        ...JSON.parse(
+            localStorage.getItem('locais_extras') || '[]'
+        )
+    ];
+
+    // GARANTE ARRAY
+    if(!Array.isArray(ids)){
+
+        ids = [];
+    }
+
+    // CONVERTE PRA NÚMERO
+    ids = ids.map(id => parseInt(id));
+
+    const ordemRegioes = [
+        "Praia Rasa",
+        "Baía Formosa / Rasa",
+        "Vila Luiza",
+        "Geribá",
+        "Ferradura",
+        "Village",
+        "Azeda / Ossos"
+    ];
 
     const ativos = todos
-.filter(l => ids.includes(l.id))
+    .filter(l => ids.includes(parseInt(l.id)))
 .filter(l => {
 
     const entrega = localStorage.getItem(`entrega_${l.id}`) === 'true';
