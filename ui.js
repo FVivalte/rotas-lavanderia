@@ -223,7 +223,7 @@ function validarPendencia(btn){
     const card = btn.closest('.card');  
     const coleta = card.querySelector('.check-coleta').checked;  
     const entrega = card.querySelector('.check-entrega').checked;  
-    const retorno = card.querySelector('.check-retorno').checked;  
+    const retorno = false; 
     const container = document.getElementById('lista-rota-ativa');  
 
     if((coleta && entrega) || retorno){  
