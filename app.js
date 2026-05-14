@@ -6,8 +6,13 @@ let hotelAtualIndex = 0;
 let inicioHotel = null;
 let timerHotel = null;
 
-carregarSelecao();
-inicializarDadosSalvos();
+window.onload = () => {
+
+    inicializarDadosSalvos();
+
+    carregarSelecao();
+
+};
 
 window.addEventListener("load", () => {
 
