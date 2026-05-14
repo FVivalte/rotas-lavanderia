@@ -16,7 +16,9 @@ function gerarRota(){
         ...JSON.parse(localStorage.getItem('locais_extras') || '[]')
     ];
 
-    rotaAtual = todos.filter(l => ids.includes(l.id));
+    rotaAtual = ids
+        .map(id => todos.find(l => l.id === id))
+        .filter(Boolean);
 
     localStorage.setItem(
         'rota_salva',
@@ -29,7 +31,7 @@ function gerarRota(){
     document.getElementById('view-rota-ativa')
         .style.display = 'block';
 
-    renderizarRotaAtiva(rotaAtual);
+    renderizarRotaAtiva(ids);
 
     iniciarGPS();
 }
