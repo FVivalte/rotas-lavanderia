@@ -1,6 +1,10 @@
 let userLat = null;
 let userLng = null;
 let rotaGerada = [];
+let modoRotaAtivo = false;
+let hotelAtualIndex = 0;
+let inicioHotel = null;
+let timerHotel = null;
 
 carregarSelecao();
 inicializarDadosSalvos();
