@@ -32,6 +32,31 @@ window.addEventListener("load", () => {
     }
 
 });
+
+function finalizarHotel(id){
+
+    let rota =
+        JSON.parse(localStorage.getItem('rota_salva') || '[]');
+
+    rota = rota.filter(item => item !== id);
+
+    localStorage.setItem(
+        'rota_salva',
+        JSON.stringify(rota)
+    );
+
+    renderizarRotaAtiva(rota);
+
+    if(rota.length === 0){
+
+        document.getElementById('modo-rota')
+            .style.display = 'none';
+
+        document.getElementById('btn-add-hotel')
+            .style.display = 'block';
+    }
+}
+
 // INICIAR MODO ROTA
 
 function iniciarModoRota() {
