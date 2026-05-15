@@ -231,16 +231,18 @@ header{
     cursor:pointer;  
 }  
   
-.drag-handle{  
-    position:absolute;  
-    right:15px;  
-    top:50%;  
-    transform:translateY(-50%);  
-    font-size:24px;  
-    color:#ccc;  
-    cursor:grab;  
-    padding:10px;  
-}  
+.drag-handle{
+    font-size:22px;
+    cursor:grab;
+    padding:8px;
+    color:#666;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    flex-shrink:0;
+}
   
 #modal-next{  
     display:none;  
@@ -291,8 +293,3 @@ header{
     flex:1;
 }
 
-.drag-handle{
-    font-size:22px;
-    cursor:grab;
-    padding:8px;
-}
