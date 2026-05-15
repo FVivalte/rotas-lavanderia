@@ -219,22 +219,40 @@ container.sortableInstance = new Sortable(container,{
 });
 }
 
-function validarPendencia(btn){  
-    const card = btn.closest('.card');  
-    const coleta = card.querySelector('.check-coleta').checked;  
-    const entrega = card.querySelector('.check-entrega').checked;  
-    const retorno = false; 
-    const container = document.getElementById('lista-rota-ativa');  
+function validarPendencia(btn){
 
-    if((coleta && entrega) || retorno){  
-        card.classList.remove('pendente');  
-        toggleConcluido(btn);  
-    } else {  
-        card.classList.remove('concluido');  
-        card.classList.add('pendente');  
-        container.appendChild(card);  
-    }  
-    atualizarNumeracao();  
+    const card = btn.closest('.card');
+
+    const id = parseInt(card.dataset.id);
+
+    let rota =
+        JSON.parse(localStorage.getItem('rota_salva') || '[]');
+
+    rota = rota.filter(item => item !== id);
+
+    localStorage.setItem(
+        'rota_salva',
+        JSON.stringify(rota)
+    );
+
+    card.remove();
+
+    atualizarNumeracao();
+
+    // MOSTRA BOTÃO + SE ACABAR ROTA
+    if(rota.length === 0){
+
+        document.getElementById('btn-add-hotel')
+            .style.display = 'block';
+
+        document.getElementById('view-rota-ativa')
+            .style.display = 'none';
+
+        document.getElementById('view-selecao')
+            .style.display = 'block';
+
+        carregarSelecao();
+    }
 }
 
 function toggleConcluido(btn){  
