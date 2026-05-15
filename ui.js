@@ -133,86 +133,177 @@ function renderizarRotaAtiva(ids){
         )
     ];
 
-    // GARANTE ARRAY
+    // garante array
     if(!Array.isArray(ids)){
-
         ids = [];
     }
 
-    // CONVERTE PRA NÚMERO
+    // converte IDs para número
     ids = ids.map(id => parseInt(id));
 
-    const ordemRegioes = [
-        "Praia Rasa",
-        "Baía Formosa / Rasa",
-        "Vila Luiza",
-        "Geribá",
-        "Ferradura",
-        "Village",
-        "Azeda / Ossos"
-    ];
+    // RESPEITA A ORDEM DO ARRAY ids
+    const ativos = ids
 
-    const ativos = todos
-    .filter(l => ids.includes(parseInt(l.id)))
-.filter(l => {
+    .map(id =>
+        todos.find(
+            l => parseInt(l.id) === parseInt(id)
+        )
+    )
 
-    const finalizado =
-        localStorage.getItem(`finalizado_${l.id}`) === 'true';
+    .filter(l => l)
 
-    return !finalizado;
+    .filter(l => {
 
-});
+        const finalizado =
+            localStorage.getItem(
+                `finalizado_${l.id}`
+            ) === 'true';
 
+        return !finalizado;
 
-    let stopsGoogle = "";  
-    ativos.forEach((l,index)=>{  
-        stopsGoogle += `${l.lat},${l.lon}/`;  
-        const card = document.createElement('div');  
-        card.className = 'card';  
-        card.dataset.id = l.id;  
-        card.innerHTML = `  
-            <div class="drag-handle">☰</div>  
-            <div class="titulo-rota" data-nome="${l.nome}" style="font-weight:bold;color:var(--primary);">${index + 1}. ${l.nome}</div>  
-            <div class="info-endereco">📍 ${l.endereco}</div>  
-            <div class="btn-gps-group">  
-                <a href="https://www.google.com/maps/search/?api=1&query=${l.lat},${l.lon}" target="_blank" class="btn-gps btn-google">Maps</a>  
-                <a href="https://waze.com/ul?ll=${l.lat},${l.lon}&navigate=yes" target="_blank" class="btn-gps btn-waze">Waze</a>  
-            </div>  
-            <div class="extra-checks">  
-                <label class="mini-check"><input type="checkbox" class="check-coleta"> Coleta</label>  
-                <label class="mini-check"><input type="checkbox" class="check-entrega"> Entrega</label>
-                <button class="btn-finalizar" onclick="validarPendencia(this)">Finalizar Hotel</button>  
-            </div>  
-        `;  
-        container.appendChild(card);  
-    });  
+    });
 
-    document.getElementById('btn-full-google').href = `https://www.google.com/maps/dir/${stopsGoogle}`;  
-    if(ativos.length > 0){  
-        const last = ativos[ativos.length - 1];  
-        document.getElementById('btn-full-waze').href = `https://waze.com/ul?ll=${last.lat},${last.lon}&navigate=yes`;  
-    }  
+    let stopsGoogle = "";
 
+    ativos.forEach((l,index)=>{
+
+        stopsGoogle += `${l.lat},${l.lon}/`;
+
+        const card = document.createElement('div');
+
+        card.className = 'card';
+
+        card.dataset.id = l.id;
+
+        card.innerHTML = `
+
+            <div class="topo-card">
+
+                <div class="info-card">
+
+                    <div
+                        class="titulo-rota"
+                        data-nome="${l.nome}"
+                        style="
+                            font-weight:bold;
+                            color:var(--primary);
+                        "
+                    >
+                        ${index + 1}. ${l.nome}
+                    </div>
+
+                    <div class="info-endereco">
+                        📍 ${l.endereco}
+                    </div>
+
+                </div>
+
+                <div class="drag-handle">
+                    ☰
+                </div>
+
+            </div>
+
+            <div class="btn-gps-group">
+
+                <a
+                    href="https://www.google.com/maps/search/?api=1&query=${l.lat},${l.lon}"
+                    target="_blank"
+                    class="btn-gps btn-google"
+                >
+                    Maps
+                </a>
+
+                <a
+                    href="https://waze.com/ul?ll=${l.lat},${l.lon}&navigate=yes"
+                    target="_blank"
+                    class="btn-gps btn-waze"
+                >
+                    Waze
+                </a>
+
+            </div>
+
+            <div class="extra-checks">
+
+                <label class="mini-check">
+                    <input
+                        type="checkbox"
+                        class="check-coleta"
+                    >
+                    Coleta
+                </label>
+
+                <label class="mini-check">
+                    <input
+                        type="checkbox"
+                        class="check-entrega"
+                    >
+                    Entrega
+                </label>
+
+            </div>
+
+            <button
+                class="btn-finalizar"
+                onclick="finalizarHotel(${l.id})"
+            >
+                Finalizar Hotel
+            </button>
+
+        `;
+
+        container.appendChild(card);
+
+    });
+
+    document.getElementById('btn-full-google').href =
+        `https://www.google.com/maps/dir/${stopsGoogle}`;
+
+    if(ativos.length > 0){
+
+        const last = ativos[ativos.length - 1];
+
+        document.getElementById('btn-full-waze').href =
+            `https://waze.com/ul?ll=${last.lat},${last.lon}&navigate=yes`;
+    }
+
+    // evita múltiplas instâncias
     if(container.sortableInstance){
-    container.sortableInstance.destroy();
-}
 
-container.sortableInstance = new Sortable(container,{  
-    animation:150,  
-    handle:'.drag-handle',  
+        container.sortableInstance.destroy();
+    }
 
-    onEnd:()=>{  
+    container.sortableInstance =
+        new Sortable(container,{
 
-        const novosIds = Array
-        .from(container.querySelectorAll('.card'))
-        .map(c => parseInt(c.dataset.id));
+            animation:150,
 
-        localStorage.setItem('rota_salva', JSON.stringify(novosIds));
+            handle:'.drag-handle',
 
-        renderizarRotaAtiva(novosIds);
+            onEnd:()=>{
 
-    }  
-});
+                const novosIds = Array
+
+                .from(
+                    container.querySelectorAll('.card')
+                )
+
+                .map(c =>
+                    parseInt(c.dataset.id)
+                );
+
+                localStorage.setItem(
+                    'rota_salva',
+                    JSON.stringify(novosIds)
+                );
+
+                renderizarRotaAtiva(novosIds);
+
+            }
+
+        });
+
 }
 
 function validarPendencia(btn){
