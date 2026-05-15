@@ -156,17 +156,13 @@ function renderizarRotaAtiva(ids){
     .filter(l => ids.includes(parseInt(l.id)))
 .filter(l => {
 
-    const entrega = localStorage.getItem(`entrega_${l.id}`) === 'true';
-    const coleta = localStorage.getItem(`coleta_${l.id}`) === 'true';
-    const retorno = localStorage.getItem(`retorno_${l.id}`) === 'true';
+    const finalizado =
+        localStorage.getItem(`finalizado_${l.id}`) === 'true';
 
-    return !(entrega && (coleta || retorno));
+    return !finalizado;
 
-})
-.sort((a,b)=>{  
-    if(a.prioridade !== b.prioridade) return a.prioridade - b.prioridade;  
-    return ordemRegioes.indexOf(a.regiao) - ordemRegioes.indexOf(b.regiao);  
 });
+
 
     let stopsGoogle = "";  
     ativos.forEach((l,index)=>{  
