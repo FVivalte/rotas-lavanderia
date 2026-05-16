@@ -1,26 +1,26 @@
 function salvarRota(){
 
     localStorage.setItem(
-        "rota_atual",
+        "rotaAtual",
         JSON.stringify(rotaAtual)
     );
 }
 
 function carregarRota(){
 
-    const salva = localStorage.getItem("rota_atual");
+    const salva = localStorage.getItem("rotaAtual");
 
     if(!salva) return;
 
-    rota_atual = JSON.parse(salva);
+    rotaAtual = JSON.parse(salva);
     
     // Adicione esta linha para renderizar a interface
-    if(rota_atual.ativa){
+    if(rotaAtual.ativa){
         renderizarModoRota();
     }
 }
 
 function limparRota(){
 
-    localStorage.removeItem("rota_atual");
+    localStorage.removeItem("rotaAtual");
 }
