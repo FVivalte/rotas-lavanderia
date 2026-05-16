@@ -293,3 +293,60 @@ header{
     flex:1;
 }
 
+.card-proximo{
+
+    background:#fff;
+    border-radius:16px;
+    padding:14px;
+    margin-bottom:15px;
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+
+}
+
+.hotel-atual-box{
+
+    border-bottom:1px solid #eee;
+    padding-bottom:12px;
+    margin-bottom:12px;
+
+}
+
+.titulo-atual{
+
+    font-size:13px;
+    color:#666;
+    margin-bottom:4px;
+
+}
+
+.nome-atual{
+
+    font-size:18px;
+    font-weight:bold;
+    color:var(--primary);
+
+}
+
+.dist-atual{
+
+    margin-top:4px;
+    font-size:14px;
+    color:#444;
+
+}
+
+.lista-proximos{
+
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+
+}
+
+.item-proximo{
+
+    display:flex;
+    justify-content:space-between;
+    font-size:14px;
+
+}
