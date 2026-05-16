@@ -122,3 +122,8 @@ function gerarRota(){
 
     renderizarModoRota();
 }
+function iniciarModoRota(){
+
+    console.log("clicou");
+
+}
