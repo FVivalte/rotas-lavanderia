@@ -103,9 +103,9 @@ function finalizarRota(){
 
 function gerarRota(){
 
-    const ids = JSON.parse(
-        localStorage.getItem('rota_atual') || '[]'
-    );
+    const ids = Array.from(
+        document.querySelectorAll('.toggle-rota:checked')
+    ).map(c => String(c.value));
 
     if(ids.length === 0){
 
@@ -122,5 +122,3 @@ function gerarRota(){
 
     renderizarModoRota();
 }
-
-window.gerarRota = gerarRota;
