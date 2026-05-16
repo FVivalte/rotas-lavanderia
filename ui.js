@@ -120,7 +120,7 @@ function carregarSelecao(){
 
 
 function renderizarRotaAtiva(ids){
-
+    rotaAtual = ids;
     const container =
         document.getElementById('lista-rota-ativa');
 
