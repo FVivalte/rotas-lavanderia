@@ -44,6 +44,7 @@ function registrarChegada(id){
 function avancarProximoHotel(){
 
     const entrega = document.getElementById("check-entrega")?.checked || false;
+
     const coleta = document.getElementById("check-coleta")?.checked || false;
 
     rotaAtual.historico.push({
@@ -100,19 +101,26 @@ function finalizarRota(){
     alert("Rota finalizada!");
 }
 
-
 function gerarRota(){
 
     const ids = Array.from(
         document.querySelectorAll('.toggle-rota:checked')
-    ).map(c => c.value);
+    ).map(c => String(c.value));
 
     if(ids.length === 0){
 
-        alert("Selecione os hotéis.");
+        alert("Selecione os hotéis da rota.");
 
         return;
     }
 
     iniciarRota(ids);
+
+    document.getElementById('view-selecao').style.display = 'none';
+
+    document.getElementById('view-rota-ativa').style.display = 'block';
+
+    renderizarModoRota();
 }
+
+window.gerarRota = gerarRota;
