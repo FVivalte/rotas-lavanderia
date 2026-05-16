@@ -124,7 +124,7 @@ function renderizarCardHotel(atual, proximos){
                 </div>
 
                 <div class="dist-atual">
-                    ${(atual.distancia * 1000).toFixed(0)}m
+                    ${atual.distancia.toFixed(2).replace('.', ',')} km
                 </div>
 
             </div>
@@ -142,7 +142,7 @@ function renderizarCardHotel(atual, proximos){
                         <span>${h.nome}</span>
 
                         <strong>
-                            ${h.distancia ? (h.distancia * 1000).toFixed(0) : "0"}m
+                            ${h.distancia.toFixed(2).replace('.', ',')} km
                         </strong>
 
                     </div>
