@@ -34,37 +34,47 @@ function detectarHotelMaisProximo(){
 
     if(!userLat || !userLng || rotaAtual.length === 0) return;
 
-    // remove hotéis concluídos
-    const pendentes = rotaAtual.filter(h => {
+    const todos = [
+        ...locaisBase,
+        ...JSON.parse(localStorage.getItem('locais_extras') || '[]')
+    ];
 
-        return !(h.entregue && (h.coletado || h.retornar));
+    const rotaObjetos = rotaAtual.map(id =>
+        todos.find(l => l.id === id)
+    ).filter(Boolean);
+
+    const pendentes = rotaObjetos.filter(h => {
+
+        const entrega =
+            localStorage.getItem(`entrega_${h.id}`) === 'true';
+
+        const coleta =
+            localStorage.getItem(`coleta_${h.id}`) === 'true';
+
+        const retorno =
+            localStorage.getItem(`retorno_${h.id}`) === 'true';
+
+        return !(entrega && (coleta || retorno));
 
     });
 
     if(pendentes.length === 0) return;
 
-    // calcula distância
     pendentes.forEach(h => {
-
-        const lat = h.lat || h.latitude;
-        const lng = h.lng || h.lon || h.longitude;
 
         h.distancia = calcularDistancia(
             userLat,
             userLng,
-            lat,
-            lng
+            h.lat,
+            h.lon
         );
 
     });
 
-    // ordena por distância
     pendentes.sort((a,b)=>a.distancia - b.distancia);
 
-    // mantém hotel atual fixo
     let atual = pendentes.find(h => h.id === hotelAtualId);
 
-    // primeira definição
     if(!atual){
 
         atual = pendentes[0];
@@ -73,7 +83,6 @@ function detectarHotelMaisProximo(){
 
     }
 
-    // só troca se estiver longe
     if(atual.distancia > 0.08){
 
         atual = pendentes[0];
@@ -82,7 +91,6 @@ function detectarHotelMaisProximo(){
 
     }
 
-    // pega próximos 2
     const proximos = pendentes
         .filter(h => h.id !== atual.id)
         .slice(0,2);
