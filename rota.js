@@ -104,7 +104,7 @@ function finalizarRota(){
 function gerarRota(){
 
     const ids = JSON.parse(
-        localStorage.getItem('rotaAtual') || '[]'
+        localStorage.getItem('rota_atual') || '[]'
     );
 
     if(ids.length === 0){
