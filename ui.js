@@ -121,6 +121,11 @@ function carregarSelecao(){
 
 function renderizarRotaAtiva(ids){
     rotaAtual = ids;
+    setTimeout(() => {
+
+    detectarHotelMaisProximo();
+
+}, 300);
     const container =
         document.getElementById('lista-rota-ativa');
 
