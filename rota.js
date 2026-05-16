@@ -22,6 +22,18 @@ function obterHotelAtual(){
     return rotaAtual.locais[rotaAtual.indiceAtual];
 }
 
+function obterLocalPorId(id){
+
+    const todos = [
+        ...locaisBase,
+        ...JSON.parse(localStorage.getItem('locais_extras') || '[]')
+    ];
+
+    return todos.find(
+        l => String(l.id) === String(id)
+    );
+}
+
 function registrarChegada(id){
 
     if(rotaAtual.chegadaEm) return;
