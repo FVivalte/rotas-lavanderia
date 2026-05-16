@@ -99,3 +99,20 @@ function finalizarRota(){
 
     alert("Rota finalizada!");
 }
+
+
+function gerarRota(){
+
+    const ids = Array.from(
+        document.querySelectorAll('.toggle-rota:checked')
+    ).map(c => c.value);
+
+    if(ids.length === 0){
+
+        alert("Selecione os hotéis.");
+
+        return;
+    }
+
+    iniciarRota(ids);
+}
