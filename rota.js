@@ -1,4 +1,4 @@
-let rotaAtual = {
+let rota_atual = {
     ativa: false,
     iniciadaEm: null,
     hotelAtual: null,
@@ -10,7 +10,7 @@ let rotaAtual = {
 
 function iniciarRota(ids){
 
-    rotaAtual = {
+    rota_atual = {
         ativa: true,
         iniciadaEm: Date.now(),
         hotelAtual: ids[0] || null,
@@ -27,14 +27,14 @@ function iniciarRota(ids){
 
 function obterHotelAtual(){
 
-    return rotaAtual.locais[rotaAtual.indiceAtual];
+    return rota_atual.locais[rotaAtual.indiceAtual];
 }
 
 function registrarChegada(id){
 
-    if(rotaAtual.chegadaEm) return;
+    if(rota_atual.chegadaEm) return;
 
-    rotaAtual.chegadaEm = Date.now();
+    rota_atual.chegadaEm = Date.now();
 
     salvarRota();
 
@@ -49,24 +49,24 @@ function avancarProximoHotel(){
 
     rotaAtual.historico.push({
         hotelId: obterHotelAtual(),
-        chegada: rotaAtual.chegadaEm,
+        chegada: rota_atual.chegadaEm,
         saida: Date.now(),
         entrega,
         coleta
     });
 
-    rotaAtual.indiceAtual++;
+    rota_atual.indiceAtual++;
 
-    rotaAtual.chegadaEm = null;
+    rota_atual.chegadaEm = null;
 
-    if(rotaAtual.indiceAtual >= rotaAtual.locais.length){
+    if(rota_atual.indiceAtual >= rota_atual.locais.length){
 
         finalizarRota();
 
         return;
     }
 
-    rotaAtual.hotelAtual = obterHotelAtual();
+    rota_atual.hotelAtual = obterHotelAtual();
 
     salvarRota();
 
@@ -77,22 +77,22 @@ function avancarProximoHotel(){
 
 function obterProximosHoteis(){
 
-    return rotaAtual.locais.slice(
-        rotaAtual.indiceAtual + 1,
-        rotaAtual.indiceAtual + 3
+    return rota_atual.locais.slice(
+        rota_atual.indiceAtual + 1,
+        rota_atual.indiceAtual + 3
     );
 }
 
 function atualizarOrdemRota(ids){
 
-    rotaAtual.locais = ids;
+    rota_atual.locais = ids;
 
     salvarRota();
 }
 
 function finalizarRota(){
 
-    rotaAtual.ativa = false;
+    rota_atual.ativa = false;
 
     salvarRota();
 
