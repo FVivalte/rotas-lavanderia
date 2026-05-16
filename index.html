@@ -67,6 +67,7 @@
             </button>
         </div>
     </div>
+    <div id="hotel-mais-proximo"></div>
     <div id="lista-selecao"></div>
     <div class="footer-btns">
 
@@ -86,14 +87,10 @@
 </div>
 
 <div class="container" id="view-rota-ativa">
-
     <div class="painel-controle">
-
-        <div class="resumo-stats"
-             style="display:flex;gap:20px;margin-bottom:15px;">
+        <div class="resumo-stats"            style="display:flex;gap:20px;margin-bottom:15px;">
 
             <div class="resumo-item">
-
                 <span style="font-size:0.7rem;color:#666;display:block;">
                     DISTÂNCIA
                 </span>
@@ -101,15 +98,11 @@
                 <span class="resumo-valor"
                       id="total-km"
                       style="font-weight:bold;">
-
                     0 km
-
                 </span>
-
             </div>
 
             <div class="resumo-item">
-
                 <span style="font-size:0.7rem;color:#666;display:block;">
                     TEMPO EST.
                 </span>
@@ -117,118 +110,119 @@
                 <span class="resumo-valor"
                       id="total-tempo"
                       style="font-weight:bold;">
-
                     0 min
-
                 </span>
-
             </div>
 
         </div>
 
         <div id="gps-info"></div>
 
+        <div id="hotel-proximo"
+             class="gps-box"
+             style="display:none;">
+        </div>
+
         <div class="btn-gps-group">
 
-            <a id="btn-full-google"
-               href="#"
-               target="_blank"
-               class="btn-gps btn-google">
+    <a id="btn-full-google"
+       href="#"
+       target="_blank"
+       class="btn-gps btn-google">
+        Tudo no Maps
+    </a>
 
-                Tudo no Maps
+    <a id="btn-full-waze"
+       href="#"
+       target="_blank"
+       class="btn-gps btn-waze">
+        Final no Waze
+    </a>
 
-            </a>
+</div>
 
-            <a id="btn-full-waze"
-               href="#"
-               target="_blank"
-               class="btn-gps btn-waze">
+<button class="btn-acao"
+        id="btn-modo-rota"
+        onclick="renderizarModoRota()"
+        style="margin-top:15px;width:100%;">
 
-                Final no Waze
+    🚚 Modo em Rota 🚚
 
-            </a>
+</button>
+
+    </div>
+
+    <div id="lista-rota-ativa"></div>
+<div id="modo-rota"
+     style="display:none;">
+
+    <div class="gps-box">
+
+        <div style="font-size:0.8rem;color:#666;">
+            PRÓXIMO HOTEL
+        </div>
+
+        <h2 id="hotel-atual-nome">
+            --
+        </h2>
+
+        <div id="hotel-atual-regiao"></div>
+
+        <div style="
+            margin-top:15px;
+            font-size:1.2rem;
+            font-weight:bold;">
+
+            ⏱ <span id="tempo-hotel">
+                00:00
+            </span>
 
         </div>
 
-    <!-- CARD HOTEL MAIS PRÓXIMO -->
-    <div id="hotel-mais-proximo"></div>
+        <div class="btn-gps-group"
+             style="margin-top:15px;">
 
-    <!-- LISTA DA ROTA -->
-    <div id="lista-rota-ativa"></div>
+            <button class="btn-gps btn-google"
+                    onclick="navegarHotelAtual()">
 
-    <!-- MODO ROTA -->
-    <div id="modo-rota"
-         style="display:none;">
+                🧭 Navegar
 
-        <div class="gps-box">
+            </button>
 
-            <div style="font-size:0.8rem;color:#666;">
-                PRÓXIMO HOTEL
-            </div>
+            <button class="btn-gps"
+                    style="background:var(--success)"
+                    onclick="marcarEntregue()">
 
-            <h2 id="hotel-atual-nome">
-                --
-            </h2>
+                ✅ Entregue
 
-            <div id="hotel-atual-regiao"></div>
+            </button>
 
-            <div style="
-                margin-top:15px;
-                font-size:1.2rem;
-                font-weight:bold;">
+            <button class="btn-gps"
+                    style="background:#f59e0b"
+                    onclick="marcarColetado()">
 
-                ⏱ <span id="tempo-hotel">
-                    00:00
-                </span>
-
-            </div>
-
-            <div class="btn-gps-group"
-                 style="margin-top:15px;">
-
-                <button class="btn-gps btn-google"
-                        onclick="navegarHotelAtual()">
-
-                    🧭 Navegar
-
-                </button>
-
-                <button class="btn-gps"
-                        style="background:var(--success)"
-                        onclick="marcarEntregue()">
-
-                    ✅ Entregue
-
-                </button>
-
-                <button class="btn-gps"
-                        style="background:#f59e0b"
-                        onclick="marcarColetado()">
-
-                    📦 Coletado
-
-                </button>
-
-            </div>
-
-            <button class="btn-acao"
-                    style="margin-top:15px;"
-                    onclick="proximoHotel()">
-
-                ⏭ Próximo Hotel
+                📦 Coletado
 
             </button>
 
         </div>
 
+        <button class="btn-acao"
+                style="margin-top:15px;"
+                onclick="proximoHotel()">
+
+            ⏭ Próximo Hotel
+
+        </button>
+
     </div>
+
+</div>
 
     <button class="btn-acao"
             onclick="voltarSelecao()"
             style="background:#666;width:100%;margin-top:20px;">
-
         ✎ Editar Lista
-
     </button>
 
 </div>
@@ -286,6 +280,12 @@ if ("serviceWorker" in navigator) {
 <script src="distancia.js"></script>
 <script src="gps.js"></script>
 <script src="rota.js"></script>
+
+<script src="rota-storage.js"></script>
+<script src="rota-ui.js"></script>
+<script src="rota-gps.js"></script>
+<script src="rota-relatorio.js"></script>
+
 <script src="ui.js"></script>
 <script src="app.js"></script>
 
