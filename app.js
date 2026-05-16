@@ -1,7 +1,7 @@
 window.addEventListener("load", () => {
 
-    if(typeof renderizarLocais === "function"){
-        renderizarLocais();
+    if(typeof carregarSelecao === "function"){
+        carregarSelecao();
     }
 
     carregarRota();
