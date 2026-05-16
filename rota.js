@@ -1,12 +1,4 @@
-let rotaAtual = {
-    ativa: false,
-    iniciadaEm: null,
-    hotelAtual: null,
-    indiceAtual: 0,
-    chegadaEm: null,
-    locais: [],
-    historico: []
-};
+let rotaAtual = null;
 
 function iniciarRota(ids){
 
