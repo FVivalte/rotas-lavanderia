@@ -3,6 +3,7 @@ let userLng = null;
 let rotaAtual = [];
 let modoRotaAtivo = false;
 let hotelAtualIndex = 0;
+let hotelAtualId = null;
 let inicioHotel = null;
 let timerHotel = null;
 
