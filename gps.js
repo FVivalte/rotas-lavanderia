@@ -3,7 +3,7 @@ function iniciarGPS() {
     navigator.geolocation.watchPosition(  
         (position) => {  
             userLat = position.coords.latitude;  
-            userLng = position.coords.longitude;  
+            userLon = position.coords.longitude;  
             const gpsInfo = document.getElementById("gps-info");  
             if (gpsInfo) {  
                 gpsInfo.innerHTML = `
