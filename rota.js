@@ -124,6 +124,10 @@ function gerarRota(){
 }
 function iniciarModoRota(){
 
-    console.log("clicou");
+    document.getElementById('modo-rota').style.display = 'block';
+
+    renderizarModoRota();
 
 }
+
+window.iniciarModoRota = iniciarModoRota;
