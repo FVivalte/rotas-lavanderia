@@ -2,7 +2,7 @@ window.rotaAtual = null;
 
 function iniciarRota(ids){
 
-    window.rotaAtual = {
+    rotaAtual = {
         ativa: true,
         iniciadaEm: Date.now(),
         hotelAtual: ids[0] || null,
@@ -12,9 +12,15 @@ function iniciarRota(ids){
         historico: []
     };
 
+    alert("CRIADA");
+
     salvarRota();
 
+    alert("SALVOU");
+
     renderizarModoRota();
+
+    alert("RENDERIZOU");
 }
 
 function obterHotelAtual(){
