@@ -12,7 +12,7 @@ function carregarRota(){
 
     if(!salva) return;
 
-    rotaAtual = JSON.parse(salva);
+    rota_atual = JSON.parse(salva);
     
     // Adicione esta linha para renderizar a interface
     if(rota_atual.ativa){
