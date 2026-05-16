@@ -10,7 +10,6 @@ function renderizarModoRota(){
 
         return;
     }
-alert("1");
     const hotelAtual = obterLocalPorId(
         rotaAtual.locais[rotaAtual.indiceAtual]
     );
@@ -21,11 +20,9 @@ alert("1");
 
         return;
     }
-alert("2");
     const proximos = obterProximosHoteis()
         .map(id => obterLocalPorId(id)?.nome || "")
         .filter(Boolean);
-alert("3");
     container.innerHTML = `
         <div class="hotel-card hotel-ativo" id="hotel-card-atual">
 
