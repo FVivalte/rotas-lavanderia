@@ -1,8 +1,8 @@
-let rotaAtual = null;
+window.rotaAtual = null;
 
 function iniciarRota(ids){
 
-    rotaAtual = {
+    window.rotaAtual = {
         ativa: true,
         iniciadaEm: Date.now(),
         hotelAtual: ids[0] || null,
