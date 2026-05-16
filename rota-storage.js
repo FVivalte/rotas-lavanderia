@@ -15,7 +15,7 @@ function carregarRota(){
     rotaAtual = JSON.parse(salva);
     
     // Adicione esta linha para renderizar a interface
-    if(rotaAtual.ativa){
+    if(rota_atual.ativa){
         renderizarModoRota();
     }
 }
