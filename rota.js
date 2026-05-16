@@ -120,14 +120,7 @@ function gerarRota(){
 
     document.getElementById('view-rota-ativa').style.display = 'block';
 
-    renderizarModoRota();
-}
-function iniciarModoRota(){
-
-    document.getElementById('modo-rota').style.display = 'block';
-
-    renderizarModoRota();
-
+    alert("rota gerada");
 }
 
 window.iniciarModoRota = iniciarModoRota;
