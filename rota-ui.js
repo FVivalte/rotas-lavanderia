@@ -4,69 +4,9 @@ function renderizarModoRota(){
 
     if(!container) return;
 
-    if(!rotaAtual.ativa){
-
-        container.innerHTML = "<p>Nenhuma rota ativa.</p>";
-
-        return;
-    }
-
-    const hotelAtual = obterLocalPorId(
-        rotaAtual.locais[rotaAtual.indiceAtual]
-    );
-
-    if(!hotelAtual){
-
-        container.innerHTML = "<p>Hotel atual não encontrado.</p>";
-
-        return;
-    }
-
-    const proximos = obterProximosHoteis()
-        .map(id => obterLocalPorId(id)?.nome || "")
-        .filter(Boolean);
-
     container.innerHTML = `
-        <div class="hotel-card hotel-ativo" id="hotel-card-atual">
-
-            <h2>${hotelAtual.nome}</h2>
-
-            <div id="cronometro-hotel">
-                ⏱ 00:00
-            </div>
-
-            <label>
-                <input type="checkbox" id="check-entrega">
-                Entrega
-            </label>
-
-            <label>
-                <input type="checkbox" id="check-coleta">
-                Coleta
-            </label>
-
-            <div class="botoes-rota">
-
-                <button onclick="abrirNavegacao(${hotelAtual.lat}, ${hotelAtual.lng})">
-                    Navegar
-                </button>
-
-                <button onclick="avancarProximoHotel()">
-                    Próximo Hotel
-                </button>
-
-            </div>
-
-            <div class="proximos-hoteis">
-
-                <strong>Próximos hotéis:</strong>
-
-                <ul>
-                    ${proximos.map(h => `<li>${h}</li>`).join("")}
-                </ul>
-
-            </div>
-
+        <div class="hotel-card">
+            TESTE FUNCIONOU
         </div>
     `;
 }
