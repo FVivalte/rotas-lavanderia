@@ -1,37 +1,70 @@
-function inicializarDadosSalvos() {
 
-    const idsSalvos = JSON.parse(
-        localStorage.getItem('rota_salva') || '[]'
-    );
+const CACHE_NAME = "rotas-cache-v2";
 
-    if (idsSalvos.length > 0) {
+const APP_ASSETS = [
+  "./",
+  "./index.html",
+  "./style.css",
+  "./app.js",
+  "./ui.js",
+  "./rota.js",
+  "./gps.js",
+  "./dados.js",
+  "./storage.js",
+  "./distancia.js",
+  "./manifest.json",
+  "./icon-192.png",
+  "./icon-512.png"
+];
 
-        const todos = [
-            ...locaisBase,
-            ...JSON.parse(localStorage.getItem('locais_extras') || '[]')
-        ];
+self.addEventListener("install", event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(APP_ASSETS))
+      .then(() => self.skipWaiting())
+  );
+});
 
-        rotaAtual = todos.filter(
-            l => idsSalvos.includes(l.id)
-        );
-    }
-}
+self.addEventListener("activate", event => {
+  event.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(
+        keys
+          .filter(key => key !== CACHE_NAME)
+          .map(key => caches.delete(key))
+      )
+    ).then(() => self.clients.claim())
+  );
+});
 
-function salvarLocalExtra(local) {
-    let extras = JSON.parse(
-        localStorage.getItem('locais_extras') || '[]'
-    );
+self.addEventListener("fetch", event => {
 
-    extras.push(local);
+  if(event.request.method !== "GET"){
+    return;
+  }
 
-    localStorage.setItem(
-        'locais_extras',
-        JSON.stringify(extras)
-    );
-}
+  event.respondWith(
 
-function obterLocaisExtras() {
-    return JSON.parse(
-        localStorage.getItem('locais_extras') || '[]'
-    );
-}
+    caches.match(event.request)
+      .then(cachedResponse => {
+
+        const networkFetch = fetch(event.request)
+          .then(networkResponse => {
+
+            const responseClone =
+              networkResponse.clone();
+
+            caches.open(CACHE_NAME)
+              .then(cache =>
+                cache.put(event.request, responseClone)
+              );
+
+            return networkResponse;
+          })
+          .catch(() => cachedResponse);
+
+        return cachedResponse || networkFetch;
+
+      })
+  );
+});
