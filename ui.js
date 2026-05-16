@@ -25,13 +25,13 @@ function salvarNovoLocal() {
 
     const lat = parseFloat(coords[0].trim());
 
-    const lon = parseFloat(coords[1].trim());
+    const lng = parseFloat(coords[1].trim());
 
     const novoLocal = criarNovoLocal(
         nome,
         endereco,
         lat,
-        lon
+        lng
     );
 
     salvarLocalExtra(novoLocal);
@@ -120,7 +120,7 @@ function carregarSelecao(){
 
 
 function renderizarRotaAtiva(ids){
-    rotaAtual = ids;
+    rotaAtual = ids.map(id => parseInt(id));
     setTimeout(() => {
 
     detectarHotelMaisProximo();
@@ -172,7 +172,7 @@ function renderizarRotaAtiva(ids){
 
     ativos.forEach((l,index)=>{
 
-        stopsGoogle += `${l.lat},${l.lon}/`;
+        stopsGoogle += `${l.lat},${l.lng}/`;
 
         const card = document.createElement('div');
 
@@ -395,4 +395,18 @@ function limparFormularioCadastro() {
     document.getElementById('novo-nome').value = '';
     document.getElementById('novo-end').value = '';
     document.getElementById('novo-coords').value = '';
+}
+
+function salvarNovaOrdemRota(){
+
+    const novaOrdem = Array.from(
+        document.querySelectorAll('#lista-rota-ativa .card')
+    ).map(card => parseInt(card.dataset.id));
+
+    rotaAtual = novaOrdem;
+
+    localStorage.setItem(
+        'rota_salva',
+        JSON.stringify(novaOrdem)
+    );
 }
