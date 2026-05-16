@@ -103,9 +103,9 @@ function finalizarRota(){
 
 function gerarRota(){
 
-    const ids = Array.from(
-        document.querySelectorAll('.toggle-rota:checked')
-    ).map(c => String(c.value));
+    const ids = JSON.parse(
+        localStorage.getItem('rota_salva') || '[]'
+    );
 
     if(ids.length === 0){
 
