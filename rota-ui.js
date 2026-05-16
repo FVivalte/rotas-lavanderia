@@ -11,7 +11,16 @@ function renderizarModoRota(){
         return;
     }
 
-    const hotelAtual = obterLocalPorId(obterHotelAtual());
+    const hotelAtual = obterLocalPorId(
+        rotaAtual.locais[rotaAtual.indiceAtual]
+    );
+
+    if(!hotelAtual){
+
+        container.innerHTML = "<p>Hotel atual não encontrado.</p>";
+
+        return;
+    }
 
     const proximos = obterProximosHoteis()
         .map(id => obterLocalPorId(id)?.nome || "")
@@ -20,7 +29,7 @@ function renderizarModoRota(){
     container.innerHTML = `
         <div class="hotel-card hotel-ativo" id="hotel-card-atual">
 
-            <h2>${hotelAtual?.nome || "Hotel Atual"}</h2>
+            <h2>${hotelAtual.nome}</h2>
 
             <div id="cronometro-hotel">
                 ⏱ 00:00
@@ -38,7 +47,7 @@ function renderizarModoRota(){
 
             <div class="botoes-rota">
 
-                <button onclick="abrirNavegacao(${hotelAtual?.lat}, ${hotelAtual?.lng})">
+                <button onclick="abrirNavegacao(${hotelAtual.lat}, ${hotelAtual.lng})">
                     Navegar
                 </button>
 
@@ -50,7 +59,7 @@ function renderizarModoRota(){
 
             <div class="proximos-hoteis">
 
-                <strong>Próximos:</strong>
+                <strong>Próximos hotéis:</strong>
 
                 <ul>
                     ${proximos.map(h => `<li>${h}</li>`).join("")}
