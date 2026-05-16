@@ -107,6 +107,8 @@ function gerarRota(){
         document.querySelectorAll('.toggle-rota:checked')
     ).map(c => String(c.value));
 
+    console.log("IDs:", ids);
+
     if(ids.length === 0){
 
         alert("Selecione os hotéis da rota.");
@@ -114,11 +116,13 @@ function gerarRota(){
         return;
     }
 
+    alert("ANTES iniciarRota");
+
     iniciarRota(ids);
+
+    alert("DEPOIS iniciarRota");
 
     document.getElementById('view-selecao').style.display = 'none';
 
     document.getElementById('view-rota-ativa').style.display = 'block';
 }
-
-window.iniciarModoRota = iniciarModoRota;
