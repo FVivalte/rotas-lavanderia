@@ -1,3 +1,4 @@
+
 let userLat = null;
 let userLng = null;
 let rotaAtual = [];
@@ -7,31 +8,37 @@ let hotelAtualId = null;
 let inicioHotel = null;
 let timerHotel = null;
 
-window.onload = () => {
+function obterTodosLocais(){
+    return [
+        ...locaisBase,
+        ...JSON.parse(localStorage.getItem('locais_extras') || '[]')
+    ];
+}
 
-    inicializarDadosSalvos();
-
-    carregarSelecao();
-
-};
+function obterLocalPorId(id){
+    return obterTodosLocais().find(l => parseInt(l.id) === parseInt(id));
+}
 
 window.addEventListener("load", () => {
+
+    inicializarDadosSalvos();
+    carregarSelecao();
 
     const rotaSalva =
         JSON.parse(localStorage.getItem('rota_salva') || '[]');
 
     if(rotaSalva.length > 0){
 
-        document.getElementById('view-selecao').style.display = 'none';
+        const viewSelecao = document.getElementById('view-selecao');
+        const viewRota = document.getElementById('view-rota-ativa');
 
-        document.getElementById('view-rota-ativa').style.display = 'block';
+        if(viewSelecao) viewSelecao.style.display = 'none';
+        if(viewRota) viewRota.style.display = 'block';
 
         renderizarRotaAtiva(rotaSalva);
 
         iniciarGPS();
-
     }
-
 });
 
 function finalizarHotel(id){
@@ -39,7 +46,9 @@ function finalizarHotel(id){
     let rota =
         JSON.parse(localStorage.getItem('rota_salva') || '[]');
 
-    rota = rota.filter(item => item !== id);
+    rota = rota.filter(item => parseInt(item) !== parseInt(id));
+
+    rotaAtual = rota;
 
     localStorage.setItem(
         'rota_salva',
@@ -50,47 +59,58 @@ function finalizarHotel(id){
 
     if(rota.length === 0){
 
-        document.getElementById('modo-rota')
-            .style.display = 'none';
+        const modoRota = document.getElementById('modo-rota');
+        const btnAddHotel = document.getElementById('btn-add-hotel');
 
-        document.getElementById('btn-add-hotel')
-            .style.display = 'block';
+        if(modoRota){
+            modoRota.style.display = 'none';
+        }
+
+        if(btnAddHotel){
+            btnAddHotel.style.display = 'block';
+        }
     }
 }
 
-// INICIAR MODO ROTA
-
 function iniciarModoRota() {
 
-    modoRotaAtivo = true;
+    if(rotaAtual.length === 0) return;
 
+    modoRotaAtivo = true;
     hotelAtualIndex = 0;
 
-    document.getElementById("modo-rota")
-        .style.display = "block";
+    const modoRota = document.getElementById("modo-rota");
+
+    if(modoRota){
+        modoRota.style.display = "block";
+    }
 
     mostrarHotelAtual();
 }
 
-
-// MOSTRAR HOTEL ATUAL
 function mostrarHotelAtual() {
 
-    const hotel = rotaAtual[hotelAtualIndex];
+    const hotelId = rotaAtual[hotelAtualIndex];
+    const hotel = obterLocalPorId(hotelId);
 
     if (!hotel) return;
 
-    document.getElementById("hotel-atual-nome")
-        .innerText = hotel.nome || "Hotel";
+    const nome = document.getElementById("hotel-atual-nome");
+    const regiao = document.getElementById("hotel-atual-regiao");
 
-    document.getElementById("hotel-atual-regiao")
-        .innerText = hotel.regiao || "";
+    if(nome){
+        nome.innerText = hotel.nome || "Hotel";
+    }
+
+    if(regiao){
+        regiao.innerText = hotel.regiao || "";
+    }
+
+    hotelAtualId = hotel.id;
 
     iniciarTimerHotel();
 }
 
-
-// TIMER
 function iniciarTimerHotel() {
 
     inicioHotel = Date.now();
@@ -100,38 +120,30 @@ function iniciarTimerHotel() {
     timerHotel = setInterval(() => {
 
         const agora = Date.now();
-
         const diff = agora - inicioHotel;
 
         const minutos = Math.floor(diff / 60000);
-
         const segundos = Math.floor((diff % 60000) / 1000);
 
-        document.getElementById("tempo-hotel")
-            .innerText =
-            `${String(minutos).padStart(2, '0')}:${String(segundos).padStart(2, '0')}`;
+        const tempoHotel =
+            document.getElementById("tempo-hotel");
+
+        if(tempoHotel){
+            tempoHotel.innerText =
+                `${String(minutos).padStart(2, '0')}:${String(segundos).padStart(2, '0')}`;
+        }
 
     }, 1000);
 }
 
-
-// NAVEGAR
 function navegarHotelAtual() {
 
-    const hotel = rotaAtual[hotelAtualIndex];
+    const hotelId = rotaAtual[hotelAtualIndex];
+    const hotel = obterLocalPorId(hotelId);
 
     if (!hotel) return;
 
-    const lat =
-        hotel.lat ||
-        hotel.latitude;
-
-    const lng =
-        hotel.lng ||
-        hotel.lon ||
-        hotel.longitude;
-
-    if (!lat || !lng) {
+    if (hotel.lat == null || hotel.lng == null) {
 
         alert("Coordenadas não encontradas.");
 
@@ -139,84 +151,55 @@ function navegarHotelAtual() {
     }
 
     window.open(
-        `https://www.google.com/maps?q=${lat},${lng}`,
+        `https://www.google.com/maps?q=${hotel.lat},${hotel.lng}`,
         "_blank"
     );
 }
 
-
-// ENTREGUE
 function marcarEntregue() {
 
-    const hotel = rotaAtual[hotelAtualIndex];
+    const hotelId = rotaAtual[hotelAtualIndex];
+    const hotel = obterLocalPorId(hotelId);
 
     if (!hotel) return;
 
-    hotel.entregue = true;
-
-    salvarRotaLocal();
+    localStorage.setItem(`entrega_${hotel.id}`, 'true');
 
     alert(`Entrega marcada em ${hotel.nome}`);
 }
 
-
-// COLETADO
 function marcarColetado() {
 
-    const hotel = rotaAtual[hotelAtualIndex];
+    const hotelId = rotaAtual[hotelAtualIndex];
+    const hotel = obterLocalPorId(hotelId);
 
     if (!hotel) return;
 
-    hotel.coletado = true;
-
-    salvarRotaLocal();
+    localStorage.setItem(`coleta_${hotel.id}`, 'true');
 
     alert(`Coleta marcada em ${hotel.nome}`);
 }
 
-
-// PRÓXIMO HOTEL
 function proximoHotel() {
-
-    const hotel = rotaAtual[hotelAtualIndex];
-
-    if (hotel && inicioHotel) {
-
-        const tempoGasto = Date.now() - inicioHotel;
-
-        hotel.tempoGasto = tempoGasto;
-    }
 
     hotelAtualIndex++;
 
-    // FIM DA ROTA
     if (hotelAtualIndex >= rotaAtual.length) {
 
         clearInterval(timerHotel);
 
         alert("✅ Rota finalizada!");
 
-        document.getElementById("modo-rota")
-            .style.display = "none";
+        const modoRota = document.getElementById("modo-rota");
+
+        if(modoRota){
+            modoRota.style.display = "none";
+        }
 
         modoRotaAtivo = false;
-
-        salvarRotaLocal();
 
         return;
     }
 
     mostrarHotelAtual();
-
-    salvarRotaLocal();
-}
-
-
-// SALVAR ROTA
-function salvarRotaLocal() {
-
-    localStorage.setItem(
-        "rotaAtual",
-        JSON.stringify(rotaAtual)
-    );
 }
