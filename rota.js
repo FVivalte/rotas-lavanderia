@@ -19,8 +19,11 @@ function gerarRota(){
     renderizarRotaAtiva(ids);
 
     // ESCONDE BOTÃO +
-    document.getElementById('btn-add-hotel')
-        .style.display = 'none';
+    const btnAddHotel = document.getElementById('btn-add-hotel');
+
+    if(btnAddHotel){
+        btnAddHotel.style.display = 'none';
+    }
 
     document.getElementById('view-selecao')
         .style.display = 'none';
@@ -32,7 +35,7 @@ function gerarRota(){
 
 function detectarHotelMaisProximo(){
 
-    if(!userLat || !userLng || rotaAtual.length === 0) return;
+    if(userLat == null || userLng == null || rotaAtual.length === 0) return;
 
     const todos = [
         ...locaisBase,
@@ -66,7 +69,7 @@ function detectarHotelMaisProximo(){
             userLat,
             userLng,
             h.lat,
-            h.lon
+            h.lng
         );
 
     });
@@ -139,7 +142,7 @@ function renderizarCardHotel(atual, proximos){
                         <span>${h.nome}</span>
 
                         <strong>
-                            ${(h.distancia * 1000).toFixed(0)}m
+                            ${h.distancia ? (h.distancia * 1000).toFixed(0) : "0"}m
                         </strong>
 
                     </div>
