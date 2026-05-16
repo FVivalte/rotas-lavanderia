@@ -53,7 +53,7 @@ function avancarProximoHotel(){
 
     rotaAtual.historico.push({
         hotelId: obterHotelAtual(),
-        chegada: rota_atual.chegadaEm,
+        chegada: rotaAtual.chegadaEm,
         saida: Date.now(),
         entrega,
         coleta
