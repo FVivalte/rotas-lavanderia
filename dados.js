@@ -26,3 +26,12 @@ function criarNovoLocal(nome, endereco, lat, lon) {
         prioridade: 99
     };
 }
+
+const BASE_LAVANDERIA = {
+    id: "base",
+    nome: "Lavanderia",
+    endereco: "R. Tertuliano Cirílo, 56-84 - Baixo Grande, São Pedro da Aldeia - RJ",
+    regiao: "Baixo Grande",
+    lat: -22.8600942,
+    lng: -42.0541436
+};
