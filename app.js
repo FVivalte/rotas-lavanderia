@@ -72,22 +72,6 @@ function finalizarHotel(id){
     }
 }
 
-function iniciarModoRota() {
-
-    if(rotaAtual.length === 0) return;
-
-    modoRotaAtivo = true;
-    hotelAtualIndex = 0;
-
-    const modoRota = document.getElementById("modo-rota");
-
-    if(modoRota){
-        modoRota.style.display = "block";
-    }
-
-    mostrarHotelAtual();
-}
-
 function mostrarHotelAtual() {
 
     const hotelId = rotaAtual[hotelAtualIndex];
