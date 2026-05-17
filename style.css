@@ -231,17 +231,19 @@ header{
     cursor:pointer;  
 }  
   
-.drag-handle{
-    font-size:22px;
+.rota-drag{
+
+    font-size:1.4rem;
+
     cursor:grab;
-    padding:8px;
-    color:#666;
 
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    padding:6px 10px;
 
-    flex-shrink:0;
+    border-radius:8px;
+
+    background:#f3f4f6;
+
+    user-select:none;
 }
   
 #modal-next{  
