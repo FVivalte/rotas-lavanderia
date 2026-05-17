@@ -54,3 +54,9 @@ function abrirTudoNoMaps(){
 
     window.open(url, '_blank');
 }
+
+function abrirTudoNoMaps(){
+
+    alert("teste");
+
+}
