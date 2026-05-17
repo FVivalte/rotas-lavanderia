@@ -96,6 +96,59 @@ function iniciarCronometro(){
     }, 1000);
 }
 
+function renderizarRotaAtiva(ids){
+
+    const container = document.getElementById("lista-rota-ativa");
+
+    if(!container) return;
+
+    const todos = [
+        ...locaisBase,
+        ...JSON.parse(localStorage.getItem('locais_extras') || '[]')
+    ];
+
+    const rota = ids.map(id =>
+        todos.find(l => String(l.id) === String(id))
+    ).filter(Boolean);
+
+    container.innerHTML = rota.map((hotel, index) => `
+
+        <div class="hotel-card">
+
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+            ">
+
+                <div>
+
+                    <strong>
+                        ${index + 1}. ${hotel.nome}
+                    </strong>
+
+                    <div style="
+                        font-size:0.85rem;
+                        color:#666;
+                    ">
+                        ${hotel.regiao || ""}
+                    </div>
+
+                </div>
+
+                <button onclick="
+                    abrirNavegacao(${hotel.lat}, ${hotel.lng})
+                ">
+                    🧭
+                </button>
+
+            </div>
+
+        </div>
+
+    `).join("");
+}
+
 function animarSaidaHotel(){
 
     const card = document.getElementById("hotel-card-atual");
