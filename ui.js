@@ -210,7 +210,7 @@ function salvarNovaOrdemRota(){
         document.querySelectorAll('#lista-rota-ativa .card')
     ).map(card => parseInt(card.dataset.id));
 
-    rotaAtual = novaOrdem;
+    rotaAtual.locais = novaOrdem;
 
     localStorage.setItem(
         'rota_salva',
