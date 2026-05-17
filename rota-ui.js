@@ -172,6 +172,24 @@ function renderizarRotaAtiva(ids){
         }
     });
 }
+
+function iniciarModoRota(){
+
+    document.getElementById(
+        "lista-rota-ativa"
+    ).style.display = "none";
+
+    const modo = document.getElementById("modo-rota");
+
+    if(!modo) return;
+
+    modo.style.display = "block";
+
+    renderizarModoRota();
+}
+
+window.iniciarModoRota = iniciarModoRota;
+
 function animarSaidaHotel(){
 
     const card = document.getElementById("hotel-card-atual");
