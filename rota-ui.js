@@ -104,11 +104,15 @@ function renderizarRotaAtiva(ids){
 
     const todos = [
         ...locaisBase,
-        ...JSON.parse(localStorage.getItem('locais_extras') || '[]')
+        ...JSON.parse(
+            localStorage.getItem('locais_extras') || '[]'
+        )
     ];
 
     const rota = ids.map(id =>
-        todos.find(l => String(l.id) === String(id))
+        todos.find(
+            l => String(l.id) === String(id)
+        )
     ).filter(Boolean);
 
     container.innerHTML = rota.map((hotel, index) => `
@@ -117,6 +121,10 @@ function renderizarRotaAtiva(ids){
              data-id="${hotel.id}">
 
             <div class="rota-topo">
+
+                <div class="rota-drag">
+                    ☰
+                </div>
 
                 <div class="rota-ordem">
                     ${index + 1}
@@ -139,39 +147,17 @@ function renderizarRotaAtiva(ids){
             <div class="rota-acoes">
 
                 <button class="btn-gps btn-google"
-                        onclick="
-                            abrirNavegacao(
-                                ${hotel.lat},
-                                ${hotel.lng}
-                            )
-                        ">
+                    onclick="
+                        abrirNavegacao(
+                            ${hotel.lat},
+                            ${hotel.lng}
+                        )
+                    ">
 
                     🧭 Navegar
 
                 </button>
-<div class="rota-topo">
 
-    <div class="rota-drag">
-        ☰
-    </div>
-
-    <div class="rota-ordem">
-        ${index + 1}
-    </div>
-
-    <div class="rota-info">
-
-        <h3>
-            ${hotel.nome}
-        </h3>
-
-        <p>
-            ${hotel.regiao || ""}
-        </p>
-
-    </div>
-
-</div>
             </div>
 
         </div>
@@ -180,24 +166,22 @@ function renderizarRotaAtiva(ids){
 
     new Sortable(container, {
 
-    animation: 150,
+        animation: 150,
 
-    handle: '.rota-drag',
+        handle: '.rota-drag',
 
-    onEnd: () => {
+        onEnd: () => {
 
-        const novaOrdem = Array.from(
-            container.querySelectorAll('.rota-item')
-        ).map(el => el.dataset.id);
+            const novaOrdem = Array.from(
+                container.querySelectorAll('.rota-item')
+            ).map(el => el.dataset.id);
 
-        atualizarOrdemRota(novaOrdem);
+            atualizarOrdemRota(novaOrdem);
 
-        renderizarRotaAtiva(novaOrdem);
-    }
-});
+            renderizarRotaAtiva(novaOrdem);
+        }
     });
 }
-
 function iniciarModoRota(){
 
     document.getElementById(
