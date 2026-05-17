@@ -1,6 +1,6 @@
 function renderizarModoRota(){
 
-    const container = document.getElementById("lista-rota-ativa");
+    const container = document.getElementById("modo-rota");
 
     if(!container) return;
 
