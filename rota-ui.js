@@ -210,6 +210,10 @@ function iniciarModoRota(){
 
     modo.style.display = "block";
 
+    registrarChegada(
+        obterHotelAtual()
+    );
+
     renderizarModoRota();
 }
 
