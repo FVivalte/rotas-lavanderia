@@ -113,33 +113,41 @@ function renderizarRotaAtiva(ids){
 
     container.innerHTML = rota.map((hotel, index) => `
 
-        <div class="hotel-card">
+        <div class="hotel-card rota-item"
+             data-id="${hotel.id}">
 
-            <div style="
-                display:flex;
-                justify-content:space-between;
-                align-items:center;
-            ">
+            <div class="rota-topo">
 
-                <div>
+                <div class="rota-ordem">
+                    ${index + 1}
+                </div>
 
-                    <strong>
-                        ${index + 1}. ${hotel.nome}
-                    </strong>
+                <div class="rota-info">
 
-                    <div style="
-                        font-size:0.85rem;
-                        color:#666;
-                    ">
+                    <h3>
+                        ${hotel.nome}
+                    </h3>
+
+                    <p>
                         ${hotel.regiao || ""}
-                    </div>
+                    </p>
 
                 </div>
 
-                <button onclick="
-                    abrirNavegacao(${hotel.lat}, ${hotel.lng})
-                ">
-                    🧭
+            </div>
+
+            <div class="rota-acoes">
+
+                <button class="btn-gps btn-google"
+                        onclick="
+                            abrirNavegacao(
+                                ${hotel.lat},
+                                ${hotel.lng}
+                            )
+                        ">
+
+                    🧭 Navegar
+
                 </button>
 
             </div>
@@ -147,8 +155,23 @@ function renderizarRotaAtiva(ids){
         </div>
 
     `).join("");
-}
 
+    new Sortable(container, {
+
+        animation: 150,
+
+        onEnd: () => {
+
+            const novaOrdem = Array.from(
+                container.querySelectorAll('.rota-item')
+            ).map(el => el.dataset.id);
+
+            atualizarOrdemRota(novaOrdem);
+
+            renderizarRotaAtiva(novaOrdem);
+        }
+    });
+}
 function animarSaidaHotel(){
 
     const card = document.getElementById("hotel-card-atual");
