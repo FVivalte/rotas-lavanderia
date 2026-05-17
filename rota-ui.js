@@ -149,7 +149,29 @@ function renderizarRotaAtiva(ids){
                     🧭 Navegar
 
                 </button>
+<div class="rota-topo">
 
+    <div class="rota-drag">
+        ☰
+    </div>
+
+    <div class="rota-ordem">
+        ${index + 1}
+    </div>
+
+    <div class="rota-info">
+
+        <h3>
+            ${hotel.nome}
+        </h3>
+
+        <p>
+            ${hotel.regiao || ""}
+        </p>
+
+    </div>
+
+</div>
             </div>
 
         </div>
