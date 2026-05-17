@@ -180,18 +180,21 @@ function renderizarRotaAtiva(ids){
 
     new Sortable(container, {
 
-        animation: 150,
+    animation: 150,
 
-        onEnd: () => {
+    handle: '.rota-drag',
 
-            const novaOrdem = Array.from(
-                container.querySelectorAll('.rota-item')
-            ).map(el => el.dataset.id);
+    onEnd: () => {
 
-            atualizarOrdemRota(novaOrdem);
+        const novaOrdem = Array.from(
+            container.querySelectorAll('.rota-item')
+        ).map(el => el.dataset.id);
 
-            renderizarRotaAtiva(novaOrdem);
-        }
+        atualizarOrdemRota(novaOrdem);
+
+        renderizarRotaAtiva(novaOrdem);
+    }
+});
     });
 }
 
