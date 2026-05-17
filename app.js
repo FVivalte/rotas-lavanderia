@@ -25,7 +25,7 @@ window.addEventListener("load", () => {
 
 });
 
-function abrirTudoNoMaps(){
+window.abrirTudoNoMaps = function(){
 
     if(!rotaAtual || rotaAtual.length === 0){
 
@@ -34,29 +34,22 @@ function abrirTudoNoMaps(){
         return;
     }
 
-    const locais = rotaAtual.filter(local =>
-        local.lat &&
-        local.lng
-    );
+    const pontos = rotaAtual
+        .filter(local => local.lat && local.lng)
+        .map(local => `${local.lat},${local.lng}`);
 
-    if(locais.length < 2){
+    if(pontos.length < 2){
 
         alert("Rota insuficiente.");
 
         return;
     }
 
-    const pontos = locais.map(local =>
-        `${local.lat},${local.lng}`
-    );
+    const url =
+        "https://www.google.com/maps/dir/" +
+        pontos.join("/");
 
-    const url = `https://www.google.com/maps/dir/${pontos.join('/')}`;
+    window.open(url, "_blank");
 
-    window.open(url, '_blank');
 }
-
-function abrirTudoNoMaps(){
-
-    alert("teste");
-
 }
