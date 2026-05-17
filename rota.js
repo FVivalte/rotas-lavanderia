@@ -121,4 +121,6 @@ function gerarRota(){
     document.getElementById('view-selecao').style.display = 'none';
 
     document.getElementById('view-rota-ativa').style.display = 'block';
+
+    renderizarRotaAtiva(rotaAtual.locais);
 }
