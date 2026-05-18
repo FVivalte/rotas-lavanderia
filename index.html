@@ -1,184 +1,456 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Rota Pro Búzios</title><link
-rel="stylesheet"
-href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-/><link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="mapa.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Rota Búzios - PWA</title>
+  <meta name="theme-color" content="#0b63b7"/>
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    :root{
+      --blue-900:#063a6b;
+      --blue-700:#0b63b7;
+      --blue-500:#2b9be6;
+      --white:#ffffff;
+      --muted:#f3f7fb;
+      --card-shadow: 0 6px 18px rgba(11,99,183,0.12);
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:linear-gradient(180deg,var(--muted),#eaf6ff);
+      color:var(--blue-900);
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding:20px;
+    }
+    header{
+      width:100%;
+      max-width:980px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:18px;
+    }
+    h1{margin:0;font-size:1.2rem;color:var(--blue-900)}
+    .container{
+      width:100%;
+      max-width:980px;
+      background:var(--white);
+      border-radius:12px;
+      padding:16px;
+      box-shadow:var(--card-shadow);
+    }
+    .controls{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+    button{
+      background:var(--blue-700);
+      color:var(--white);
+      border:0;
+      padding:10px 14px;
+      border-radius:8px;
+      cursor:pointer;
+      font-weight:600;
+    }
+    button.ghost{background:transparent;color:var(--blue-700);border:1px solid rgba(11,99,183,0.12)}
+    .list{margin-top:8px}
+    .hotel{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:10px;
+      border-radius:10px;
+      background:linear-gradient(180deg,#fff,#f8fbff);
+      margin-bottom:8px;
+      border:1px solid rgba(11,99,183,0.06);
+    }
+    .drag-handle{cursor:grab;padding:6px;border-radius:6px;background:var(--muted);color:var(--blue-700);font-weight:700}
+    .hotel-info{flex:1}
+    .hotel-name{font-weight:700}
+    .hotel-region{font-size:0.85rem;color:#4b6b8a}
+    .actions{display:flex;gap:8px;align-items:center}
+    .toggle{
+      display:inline-flex;align-items:center;gap:8px;background:transparent;border-radius:8px;padding:6px 8px;border:1px solid rgba(11,99,183,0.08)
+    }
+    .small{font-size:0.85rem;padding:6px 8px}
+    .route-list{margin-top:12px}
+    .route-item{display:flex;align-items:center;justify-content:space-between;padding:8px;border-radius:8px;background:#f7fbff;margin-bottom:6px}
+    .mode-route{
+      margin-top:14px;padding:12px;border-radius:10px;background:linear-gradient(180deg,#f0f8ff,#ffffff);border:1px solid rgba(11,99,183,0.06)
+    }
+    .next-two{display:flex;gap:8px;margin-top:8px}
+    .card{padding:10px;border-radius:8px;background:var(--white);box-shadow:var(--card-shadow);margin-top:12px}
+    label{display:flex;align-items:center;gap:8px}
+    .report{max-height:260px;overflow:auto;margin-top:10px}
+    .report-row{display:flex;justify-content:space-between;padding:8px;border-bottom:1px dashed #e6f0fb}
+    footer{margin-top:12px;font-size:0.85rem;color:#4b6b8a}
+    @media (max-width:600px){
+      .controls{flex-direction:column}
+      .hotel{flex-direction:column;align-items:flex-start}
+      .actions{width:100%;justify-content:space-between}
+    }
+  </style>
 </head>
-<body><div class="app"><header class="header">
+<body>
+  <header>
+    <h1>Rota Búzios — PWA Local</h1>
+    <div style="text-align:right">
+      <small style="color:#4b6b8a">Offline-ready • Tonalidades de azul</small>
+    </div>
+  </header>
 
-    <div class="header-top">
-
-        <div class="logo">
-            <div class="logo-icon">🗺️</div>
-
-            <div>
-                <h1>Rota Pro Búzios</h1>
-                <p>Controle inteligente de rotas</p>
-            </div>
-        </div>
-
-        <div class="offline">ONLINE</div>
-
+  <main class="container" id="app">
+    <div class="controls">
+      <button id="btn-generate">Gerar rota (ativos)</button>
+      <button id="btn-google" class="ghost">Tudo no Google Maps</button>
+      <button id="btn-mode" class="ghost">Modo Rota</button>
+      <button id="btn-reset" class="ghost">Resetar Ativos</button>
     </div>
 
-    <div class="route-summary">
+    <section>
+      <strong>Lista de hotéis</strong>
+      <div class="list" id="hotelList"></div>
+    </section>
 
-        <div class="summary-card">
-            <span>Hotéis</span>
-            <h2>12</h2>
-        </div>
+    <section class="card" id="routeArea" style="display:none">
+      <strong>Rota (arraste para reordenar)</strong>
+      <div class="route-list" id="routeList"></div>
+      <div style="margin-top:8px;display:flex;gap:8px">
+        <button id="btn-start-route">Iniciar Rota</button>
+        <button id="btn-export" class="ghost">Exportar Relatório (JSON)</button>
+      </div>
+      <div class="report" id="report"></div>
+    </section>
 
-        <div class="summary-card">
-            <span>Entregas</span>
-            <h2>8</h2>
-        </div>
+    <section class="mode-route" id="modeRoute" style="display:none">
+      <strong>Modo Rota</strong>
+      <div id="currentHotel" style="margin-top:8px"></div>
+      <div style="margin-top:8px">
+        <label><input type="checkbox" id="chk-entrega"> <span>Entrega</span></label>
+        <label style="margin-left:12px"><input type="checkbox" id="chk-coleta"> <span>Coleta</span></label>
+      </div>
+      <div style="margin-top:8px">
+        <button id="btn-next">Próximo hotel</button>
+      </div>
+      <div class="next-two" id="nextTwo"></div>
+    </section>
 
-        <div class="summary-card">
-            <span>Coletas</span>
-            <h2>4</h2>
-        </div>
+    <footer>
+      <small>Aplicativo local (PWA). Toque em "Instalar" no navegador para usar como app no celular.</small>
+    </footer>
+  </main>
 
-    </div>
+  <script>
+    // Dados extraídos da planilha (14 itens)
+    const HOTELS = [
+      {id:1,name:"Hotel Aretê",region:"Baía Formosa / Rasa",address:"Alameda Andorinhas – Loteamento Praia Baía Formosa, Armação dos Búzios - RJ",coords:"-22.7490005,-41.9561384",plus:"722V+9GX",priority:1},
+      {id:2,name:"Pousada Manaaki",region:"Praia Rasa",address:"Av. Greta Blanck do Rio, 82 – Praia Rasa, Armação dos Búzios - RJ",coords:"-22.7632675,-41.9422559",plus:"63P5+M3",priority:2},
+      {id:3,name:"Pousada Maré Búzios",region:"Vila Luiza",address:"Rua do Começo, 162 – Vila Luiza, Armação dos Búzios - RJ",coords:"-22.7597922,-41.9441392",plus:"63R4+38",priority:2},
+      {id:4,name:"Casa da Ruth Pousada",region:"Geribá",address:"Rua Gerbert Périssé, 10 – Geribá, Armação dos Búzios - RJ",coords:"-22.7798199,-41.9146731",plus:"63CP+34",priority:2},
+      {id:5,name:"Maravista Hotel e Spa",region:"Geribá",address:"Rua Gerbert Périssé, 276 – Praia de Geribá, Armação dos Búzios - RJ",coords:"-22.7796447,-41.9143854",plus:"63CP+46",priority:2},
+      {id:6,name:"Le Relais La Borie",region:"Geribá",address:"Rua Gerbert Périssé, 554 – Geribá Beach, Armação dos Búzios - RJ",coords:"-22.7783015,-41.9118299",plus:"63CQ+M7",priority:2},
+      {id:7,name:"Carmel",region:"Ferradura",address:"Rua Parque, 17 – Praia da Ferradura, Armação dos Búzios - RJ",coords:"-22.7709027,-41.8910921",plus:"64H5+JH",priority:4},
+      {id:8,name:"Lavanderia LAVILAGOS",region:"Ferradura",address:"Av. José Bento Ribeiro Dantas, 1195 – Ferradura, Armação dos Búzios - RJ",coords:"-22.7625969,-41.8964253",plus:"64P3+XC",priority:2.5},
+      {id:9,name:"Aroma",region:"Village",address:"Rua Quinze, 379-221 – Village de Búzios, Armação dos Búzios - RJ",coords:"-22.7533440,-41.8780750",plus:"64WC+MQ",priority:3},
+      {id:10,name:"Hibiscus Beach",region:"Village",address:"Rua 01, 22 – Village de Búzios, Armação dos Búzios - RJ",coords:"-22.7442026,-41.8758089",plus:"744F+8M",priority:4},
+      {id:11,name:"Condomínio Praia Brava",region:"Village",address:"Rua Dezessete, 2-60 – Village de Búzios, Armação dos Búzios - RJ",coords:"-22.7570727,-41.8766645",plus:"64VF+58",priority:4},
+      {id:12,name:"Vale das Emas",region:"Village",address:"Rua Miguelote Viana – Village de Búzios, Armação dos Búzios - RJ",coords:"-22.7485933,-41.8805990",plus:"7429+HQ",priority:4},
+      {id:13,name:"Mainá",region:"Village",address:"Travessa Vilage, 36 – Village de Búzios, Armação dos Búzios - RJ",coords:"-22.7474848,-41.8793541",plus:"743C+27",priority:4},
+      {id:14,name:"Azeda",region:"Azeda / Ossos",address:"Código Plus: 743C+MM6 – Armação dos Búzios - RJ",coords:"-22.7458674,-41.8783928",plus:"743C+MJ",priority:4}
+    ];
 
-</header>
+    // App state
+    let activeSet = new Set();
+    let routeOrder = []; // array of hotel ids in order
+    let routeReport = []; // {id, arrival, departure, entrega, coleta}
+    let routeStartedAt = null;
+    let currentIndex = 0;
 
-<h2 class="section-title">Ações rápidas</h2>
+    const hotelListEl = document.getElementById('hotelList');
+    const routeArea = document.getElementById('routeArea');
+    const routeListEl = document.getElementById('routeList');
+    const reportEl = document.getElementById('report');
+    const modeRouteEl = document.getElementById('modeRoute');
+    const currentHotelEl = document.getElementById('currentHotel');
+    const nextTwoEl = document.getElementById('nextTwo');
 
-<section class="actions">
+    // Render hotel list
+    function renderHotels(){
+      hotelListEl.innerHTML = '';
+      HOTELS.forEach(h=>{
+        const div = document.createElement('div');
+        div.className='hotel';
+        div.draggable=true;
+        div.dataset.id = h.id;
 
-    <button class="action-btn">
-        <div class="action-icon">🧭</div>
-        <h3>Gerar rota</h3>
-        <p>Organizar sequência automaticamente</p>
-    </button>
+        const drag = document.createElement('div');
+        drag.className='drag-handle';
+        drag.textContent='≡';
+        drag.title='Arrastar para reordenar';
 
-    <button class="action-btn">
-        <div class="action-icon">📍</div>
-        <h3>Tudo no mapa</h3>
-        <p>Visualizar hotéis ativos</p>
-    </button>
+        const info = document.createElement('div');
+        info.className='hotel-info';
+        info.innerHTML = `<div class="hotel-name">${h.name}</div><div class="hotel-region">${h.region} • ${h.address}</div>`;
 
-    <button class="action-btn">
-        <div class="action-icon">🚗</div>
-        <h3>Modo rota</h3>
-        <p>Exibir trajeto atual</p>
-    </button>
+        const actions = document.createElement('div');
+        actions.className='actions';
+        const toggle = document.createElement('button');
+        toggle.className='small';
+        toggle.textContent = activeSet.has(h.id)?'Ativado':'Ativar';
+        toggle.onclick = ()=> {
+          if(activeSet.has(h.id)) activeSet.delete(h.id); else activeSet.add(h.id);
+          toggle.textContent = activeSet.has(h.id)?'Ativado':'Ativar';
+          renderRoutePreview();
+        };
 
-    <button class="action-btn">
-        <div class="action-icon">📄</div>
-        <h3>Relatório final</h3>
-        <p>Resumo completo da rota</p>
-    </button>
+        const infoBtn = document.createElement('button');
+        infoBtn.className='ghost small';
+        infoBtn.textContent='Ver';
+        infoBtn.onclick = ()=> alert(`${h.name}\n${h.address}\nCoords: ${h.coords}\nPlus: ${h.plus}`);
 
-</section>
+        actions.appendChild(toggle);
+        actions.appendChild(infoBtn);
 
-<section class="map-card">
+        div.appendChild(drag);
+        div.appendChild(info);
+        div.appendChild(actions);
 
-    <div class="map-header">
-        <h2 class="section-title">Mapa da rota</h2>
+        // Drag events for reordering in route area (not in main list)
+        div.addEventListener('dragstart', e=>{
+          e.dataTransfer.setData('text/plain', h.id);
+        });
 
-        <div class="map-buttons">
-            <button>Mapa</button>
-            <button>Satélite</button>
-        </div>
-    </div>
+        hotelListEl.appendChild(div);
+      });
+    }
 
-    <div id="map"></div>
+    // Render route preview (activated hotels)
+    function renderRoutePreview(){
+      const active = HOTELS.filter(h=>activeSet.has(h.id));
+      routeListEl.innerHTML = '';
+      if(active.length===0){
+        routeArea.style.display='none';
+        return;
+      }
+      routeArea.style.display='block';
+      // If routeOrder empty or mismatch, initialize by priority then id
+      if(routeOrder.length===0 || routeOrder.length !== active.length){
+        routeOrder = active.map(h=>h.id);
+      } else {
+        // keep only active ones in existing order
+        routeOrder = routeOrder.filter(id=>activeSet.has(id));
+        // append any newly activated
+        active.forEach(h=>{ if(!routeOrder.includes(h.id)) routeOrder.push(h.id); });
+      }
 
-</section>
+      routeOrder.forEach((id, idx)=>{
+        const h = HOTELS.find(x=>x.id===id);
+        const item = document.createElement('div');
+        item.className='route-item';
+        item.draggable=true;
+        item.dataset.id = id;
+        item.innerHTML = `<div><strong>${idx+1}. ${h.name}</strong><div style="font-size:0.85rem;color:#4b6b8a">${h.address}</div></div>
+                          <div style="display:flex;gap:8px;align-items:center">
+                            <button class="ghost small" data-id="${id}" title="Remover">Rem</button>
+                            <span style="cursor:grab">⋮⋮</span>
+                          </div>`;
+        // remove button
+        item.querySelector('button').onclick = (e)=>{
+          activeSet.delete(id);
+          routeOrder = routeOrder.filter(x=>x!==id);
+          renderHotels(); renderRoutePreview();
+        };
 
-<section class="hotels">
+        // drag handlers for reordering
+        item.addEventListener('dragstart', e=>{
+          e.dataTransfer.setData('text/plain', id);
+          item.classList.add('dragging');
+        });
+        item.addEventListener('dragend', e=>{
+          item.classList.remove('dragging');
+        });
+        item.addEventListener('dragover', e=>{
+          e.preventDefault();
+          const dragging = document.querySelector('.dragging');
+          if(!dragging || dragging===item) return;
+          const fromId = parseInt(dragging.dataset.id);
+          const toId = parseInt(item.dataset.id);
+          const fromIndex = routeOrder.indexOf(fromId);
+          const toIndex = routeOrder.indexOf(toId);
+          if(fromIndex<toIndex){
+            item.after(dragging);
+            routeOrder.splice(toIndex+1,0,routeOrder.splice(fromIndex,1)[0]);
+          } else {
+            item.before(dragging);
+            routeOrder.splice(toIndex,0,routeOrder.splice(fromIndex,1)[0]);
+          }
+          renderRoutePreview(); // re-render to update numbers
+        });
 
-    <h2 class="section-title">Hotéis ativos</h2>
+        routeListEl.appendChild(item);
+      });
+    }
 
-    <input type="text" class="search" placeholder="Buscar hotel...">
+    // Build Google Maps directions URL with waypoints
+    function buildGoogleMapsUrl(order){
+      if(order.length===0) return '';
+      // Use first as origin, last as destination, others as waypoints
+      const coords = order.map(id=>HOTELS.find(h=>h.id===id).coords.replace(/\s/g,''));
+      const origin = coords[0];
+      const destination = coords[coords.length-1];
+      const waypoints = coords.slice(1,coords.length-1).join('|');
+      const base = 'https://www.google.com/maps/dir/?api=1';
+      const params = new URLSearchParams();
+      params.set('origin', origin);
+      params.set('destination', destination);
+      if(waypoints) params.set('waypoints', waypoints);
+      params.set('travelmode','driving');
+      return base + '&' + params.toString();
+    }
 
-    <div class="hotel-item">
+    // Start route: initialize report and mode
+    function startRoute(){
+      routeReport = [];
+      routeStartedAt = new Date();
+      currentIndex = 0;
+      // initialize report entries
+      routeOrder.forEach(id=>{
+        routeReport.push({id, arrival:null, departure:null, entrega:false, coleta:false});
+      });
+      renderReport();
+      // enter mode route automatically
+      enterModeRoute();
+    }
 
-        <div class="hotel-left">
+    // Mode route UI
+    function enterModeRoute(){
+      modeRouteEl.style.display='block';
+      updateModeUI();
+    }
+    function exitModeRoute(){
+      modeRouteEl.style.display='none';
+    }
 
-            <div class="drag">☰</div>
+    function updateModeUI(){
+      if(currentIndex >= routeOrder.length){
+        currentHotelEl.innerHTML = `<div><strong>Rota finalizada</strong></div>`;
+        nextTwoEl.innerHTML = '';
+        return;
+      }
+      const id = routeOrder[currentIndex];
+      const h = HOTELS.find(x=>x.id===id);
+      currentHotelEl.innerHTML = `<div style="font-weight:700">${h.name}</div><div style="font-size:0.9rem;color:#4b6b8a">${h.address}</div>`;
+      // set checkboxes from report
+      const entry = routeReport[currentIndex];
+      document.getElementById('chk-entrega').checked = entry.entrega;
+      document.getElementById('chk-coleta').checked = entry.coleta;
+      // show next two
+      nextTwoEl.innerHTML = '';
+      for(let i=1;i<=2;i++){
+        const idx = currentIndex + i;
+        if(idx < routeOrder.length){
+          const nh = HOTELS.find(x=>x.id===routeOrder[idx]);
+          const div = document.createElement('div');
+          div.style.flex='1';
+          div.style.padding='8px';
+          div.style.borderRadius='8px';
+          div.style.background='#fff';
+          div.style.border='1px solid rgba(11,99,183,0.04)';
+          div.innerHTML = `<strong>${nh.name}</strong><div style="font-size:0.85rem;color:#4b6b8a">${nh.address}</div>`;
+          nextTwoEl.appendChild(div);
+        }
+      }
+    }
 
-            <div class="hotel-number">1</div>
+    // Next hotel button handler
+    document.getElementById('btn-next').addEventListener('click', ()=>{
+      if(currentIndex >= routeOrder.length) return;
+      // record times and checkboxes
+      const entrega = document.getElementById('chk-entrega').checked;
+      const coleta = document.getElementById('chk-coleta').checked;
+      const now = new Date();
+      const entry = routeReport[currentIndex];
+      if(!entry.arrival) entry.arrival = now.toISOString();
+      entry.entrega = entrega;
+      entry.coleta = coleta;
+      // set departure as now + 2 minutes (simulated) or immediate
+      entry.departure = new Date(now.getTime() + 2*60000).toISOString();
+      currentIndex++;
+      updateModeUI();
+      renderReport();
+    });
 
-            <div class="hotel-info">
-                <h3>Hotel Atlântico</h3>
-                <p>Centro • Prioridade Alta</p>
-            </div>
+    // Render report
+    function renderReport(){
+      reportEl.innerHTML = '';
+      routeReport.forEach((r, idx)=>{
+        const h = HOTELS.find(x=>x.id===r.id);
+        const row = document.createElement('div');
+        row.className='report-row';
+        row.innerHTML = `<div><strong>${idx+1}. ${h.name}</strong><div style="font-size:0.85rem;color:#4b6b8a">${h.address}</div></div>
+                         <div style="text-align:right">
+                           <div style="font-size:0.85rem">${r.arrival?('Cheg: '+new Date(r.arrival).toLocaleTimeString()):'Cheg: -'}</div>
+                           <div style="font-size:0.85rem">${r.departure?('Sai: '+new Date(r.departure).toLocaleTimeString()):'Sai: -'}</div>
+                           <div style="font-size:0.85rem">${r.entrega?'Entrega':''} ${r.coleta?'Coleta':''}</div>
+                         </div>`;
+        reportEl.appendChild(row);
+      });
+    }
 
-        </div>
+    // Buttons
+    document.getElementById('btn-generate').addEventListener('click', ()=>{
+      renderRoutePreview();
+      alert('Rota gerada localmente. Você pode reordenar arrastando os itens na seção Rota.');
+    });
 
-        <div class="hotel-actions">
-            <div class="tag delivery">Entrega</div>
-            <div class="switch"></div>
-        </div>
+    document.getElementById('btn-google').addEventListener('click', ()=>{
+      if(routeOrder.length===0){ alert('Ative hotéis e gere a rota primeiro.'); return; }
+      const url = buildGoogleMapsUrl(routeOrder);
+      window.open(url,'_blank');
+    });
 
-    </div>
+    document.getElementById('btn-mode').addEventListener('click', ()=>{
+      if(routeOrder.length===0){ alert('Ative hotéis e gere a rota primeiro.'); return; }
+      enterModeRoute();
+    });
 
-    <div class="hotel-item">
+    document.getElementById('btn-start-route').addEventListener('click', ()=>{
+      if(routeOrder.length===0){ alert('Ative hotéis e gere a rota primeiro.'); return; }
+      startRoute();
+    });
 
-        <div class="hotel-left">
+    document.getElementById('btn-export').addEventListener('click', ()=>{
+      const data = {startedAt: routeStartedAt?routeStartedAt.toISOString():null, report: routeReport};
+      const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'relatorio_rota.json';
+      a.click();
+      URL.revokeObjectURL(url);
+    });
 
-            <div class="drag">☰</div>
+    document.getElementById('btn-reset').addEventListener('click', ()=>{
+      if(confirm('Resetar todos os hotéis ativados?')){
+        activeSet.clear();
+        routeOrder = [];
+        routeReport = [];
+        renderHotels(); renderRoutePreview(); renderReport();
+      }
+    });
 
-            <div class="hotel-number">2</div>
+    // Initialize
+    renderHotels();
 
-            <div class="hotel-info">
-                <h3>Pousada Brisa</h3>
-                <p>João Fernandes</p>
-            </div>
+    // Simple service worker registration for PWA offline
+    if('serviceWorker' in navigator){
+      navigator.serviceWorker.register('sw.js').catch(err=>console.warn('SW failed',err));
+    }
 
-        </div>
-
-        <div class="hotel-actions">
-            <div class="tag collect">Coleta</div>
-            <div class="switch"></div>
-        </div>
-
-    </div>
-
-    <div class="hotel-item">
-
-        <div class="hotel-left">
-
-            <div class="drag">☰</div>
-
-            <div class="hotel-number">3</div>
-
-            <div class="hotel-info">
-                <h3>Rio Búzios Resort</h3>
-                <p>Geribá</p>
-            </div>
-
-        </div>
-
-        <div class="hotel-actions">
-            <div class="tag delivery">Entrega</div>
-            <div class="switch"></div>
-        </div>
-
-    </div>
-
-</section>
-
-<div class="footer-space"></div>
-
-</div><div class="bottom-bar">
-    <button class="finish-btn">FINALIZAR ROTA</button>
-</div>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="dados.js"></script>
-<script src="storage.js"></script>
-<script src="ui.js"></script>
-<script src="mapa.js"></script>
-<script src="rotas.js"></script>
-<script src="app.js"></script>
+    // Install manifest (create minimal manifest file dynamically if not present)
+    // Note: For full PWA install prompt behavior, host files on HTTPS or use localhost.
+  </script>
 </body>
 </html>
