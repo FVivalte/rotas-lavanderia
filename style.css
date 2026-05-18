@@ -1,329 +1,531 @@
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-}
+/* =========================================
+   RESET
+========================================= */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root{
-    --blue:#2563eb;
-    --blue-dark:#1e3a8a;
-    --blue-light:#dbeafe;
-    --white:#ffffff;
-    --bg:#f5f9ff;
-    --text:#1e293b;
-    --gray:#64748b;
-    --shadow:0 4px 12px rgba(0,0,0,.08);
-    --radius:18px;
+  --bg:#f0f4f8;
+  --card:#ffffff;
+
+  --accent:#0b63b7;
+  --accent-hover:#084c8e;
+
+  --danger:#ef4444;
+
+  --muted:#64748b;
+
+  --border:#e2e8f0;
+
+  --radius:16px;
+
+  --shadow:
+    0 4px 6px rgba(0,0,0,.05);
+
+  font-family:'Inter',system-ui,sans-serif;
+}
+
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html{
+  scroll-behavior:smooth;
 }
 
 body{
-    font-family:'Inter',sans-serif;
-    background:var(--bg);
-    color:var(--text);
-    padding:14px;
+  background:var(--bg);
+  color:#0f172a;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
 }
+
+/* =========================================
+   APP
+========================================= */
 
 .app{
-    max-width:700px;
-    margin:auto;
+  width:100%;
+  max-width:600px;
+  padding:20px;
+  padding-bottom:90px;
 }
 
-/* HEADER */
+/* =========================================
+   HEADER
+========================================= */
 
-.header{
-    background:linear-gradient(135deg,var(--blue),var(--blue-dark));
-    color:white;
-    border-radius:24px;
-    padding:22px;
-    box-shadow:var(--shadow);
-    margin-bottom:18px;
+header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:24px;
 }
 
-.header-top{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
+h1{
+  display:flex;
+  align-items:center;
+  gap:8px;
+
+  font-size:1.25rem;
+  font-weight:700;
+
+  color:var(--accent);
 }
 
-.logo{
-    display:flex;
-    align-items:center;
-    gap:12px;
+.status-badge{
+  background:#e0f2fe;
+  color:var(--accent);
+
+  padding:4px 10px;
+
+  border-radius:999px;
+
+  font-size:.75rem;
+  font-weight:600;
 }
 
-.logo-icon{
-    width:52px;
-    height:52px;
-    border-radius:16px;
-    background:rgba(255,255,255,.2);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:24px;
+/* =========================================
+   CARDS
+========================================= */
+
+.card{
+  background:var(--card);
+
+  border-radius:var(--radius);
+
+  padding:20px;
+
+  margin-bottom:16px;
+
+  box-shadow:var(--shadow);
+
+  animation:fadeIn .25s ease;
 }
 
-.logo h1{
-    font-size:22px;
-    font-weight:700;
+@keyframes fadeIn{
+
+  from{
+    opacity:0;
+    transform:translateY(8px);
+  }
+
+  to{
+    opacity:1;
+    transform:translateY(0);
+  }
 }
 
-.logo p{
-    font-size:13px;
-    opacity:.85;
+/* =========================================
+   TEXTOS
+========================================= */
+
+.header-text{
+  margin-bottom:16px;
 }
 
-.offline{
-    background:#22c55e;
-    padding:8px 12px;
-    border-radius:999px;
-    font-size:12px;
-    font-weight:600;
+.header-text strong{
+  display:block;
+  font-size:1.1rem;
+  margin-bottom:4px;
 }
 
-/* RESUMO */
-
-.route-summary{
-    margin-top:20px;
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:12px;
+.muted{
+  color:var(--muted);
+  font-size:.85rem;
+  line-height:1.4;
 }
 
-.summary-card{
-    background:rgba(255,255,255,.15);
-    padding:14px;
-    border-radius:18px;
-    backdrop-filter:blur(8px);
+/* =========================================
+   BOTÕES
+========================================= */
+
+.controls{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-bottom:16px;
 }
 
-.summary-card span{
-    font-size:12px;
-    opacity:.8;
+button{
+  background:var(--accent);
+
+  color:#fff;
+
+  border:none;
+
+  padding:12px 16px;
+
+  border-radius:12px;
+
+  font-size:.95rem;
+  font-weight:600;
+
+  font-family:inherit;
+
+  cursor:pointer;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+
+  transition:
+    background .2s,
+    transform .1s;
+
+  flex:1;
+  min-width:120px;
 }
 
-.summary-card h2{
-    margin-top:6px;
-    font-size:22px;
+button:hover{
+  background:var(--accent-hover);
 }
 
-/* TÍTULOS */
-
-.section-title{
-    font-size:18px;
-    margin-bottom:12px;
-    font-weight:700;
+button:active{
+  transform:scale(.97);
 }
 
-/* AÇÕES */
-
-.actions{
-    display:grid;
-    grid-template-columns:repeat(2,1fr);
-    gap:14px;
-    margin-bottom:20px;
+button:disabled{
+  opacity:.6;
+  cursor:not-allowed;
 }
 
-.action-btn{
-    border:none;
-    background:white;
-    border-radius:20px;
-    padding:18px;
-    text-align:left;
-    box-shadow:var(--shadow);
-    transition:.2s;
+button.ghost{
+  background:transparent;
+  color:var(--accent);
+  border:1px solid var(--border);
 }
 
-.action-btn:active{
-    transform:scale(.98);
+button.ghost:hover{
+  background:#f8fafc;
 }
 
-.action-icon{
-    width:52px;
-    height:52px;
-    border-radius:16px;
-    background:var(--blue-light);
-    color:var(--blue);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-size:22px;
-    margin-bottom:12px;
+button.danger{
+  background:transparent;
+  color:var(--danger);
+  border:1px solid #fecaca;
 }
 
-.action-btn h3{
-    font-size:16px;
-    margin-bottom:4px;
+.icon-btn{
+  padding:8px;
+  min-width:auto;
+
+  background:transparent;
+  border:none;
+
+  color:var(--danger);
 }
 
-.action-btn p{
-    font-size:13px;
-    color:var(--gray);
+/* =========================================
+   LISTA DE HOTÉIS
+========================================= */
+
+.list{
+  display:grid;
+  gap:12px;
 }
 
-/* HOTÉIS */
+.item{
+  display:flex;
+  align-items:center;
+  gap:12px;
 
-.hotels{
-    background:white;
-    border-radius:24px;
-    padding:18px;
-    box-shadow:var(--shadow);
+  padding:16px;
+
+  border-radius:12px;
+
+  background:#fff;
+
+  border:1px solid var(--border);
+
+  transition:
+    border-color .2s,
+    transform .15s;
 }
 
-.search{
-    width:100%;
-    border:none;
-    background:#f1f5f9;
-    padding:16px;
-    border-radius:16px;
-    margin-bottom:16px;
-    font-size:15px;
+.item:hover{
+  transform:translateY(-1px);
 }
 
-.hotel-item{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    padding:16px;
-    background:#f8fbff;
-    border-radius:18px;
-    margin-bottom:12px;
+.item:focus-within{
+  border-color:var(--accent);
 }
 
-.hotel-left{
-    display:flex;
-    align-items:center;
-    gap:14px;
+.info{
+  flex:1;
 }
 
-.drag{
-    font-size:20px;
-    color:#94a3b8;
+.name{
+  font-weight:600;
+  margin-bottom:4px;
 }
 
-.hotel-number{
-    width:42px;
-    height:42px;
-    border-radius:14px;
-    background:var(--blue);
-    color:white;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    font-weight:700;
+.addr{
+  font-size:.8rem;
+  color:var(--muted);
 }
 
-.hotel-info h3{
-    font-size:15px;
-}
-
-.hotel-info p{
-    font-size:13px;
-    color:var(--gray);
-    margin-top:3px;
-}
-
-.hotel-actions{
-    display:flex;
-    gap:8px;
-}
-
-.tag{
-    padding:8px 10px;
-    border-radius:999px;
-    font-size:11px;
-    font-weight:700;
-}
-
-.delivery{
-    background:#dbeafe;
-    color:#1d4ed8;
-}
-
-.collect{
-    background:#dcfce7;
-    color:#15803d;
-}
-
-/* SWITCH */
+/* =========================================
+   SWITCH
+========================================= */
 
 .switch{
-    width:48px;
-    height:28px;
-    background:#2563eb;
-    border-radius:999px;
-    position:relative;
+  position:relative;
+  width:50px;
+  height:28px;
+  flex-shrink:0;
 }
 
-.switch::after{
-    content:'';
-    width:22px;
-    height:22px;
-    background:white;
-    border-radius:50%;
-    position:absolute;
-    right:3px;
-    top:3px;
+.switch input{
+  opacity:0;
+  width:0;
+  height:0;
 }
 
-/* FOOTER */
+.slider{
+  position:absolute;
+  inset:0;
 
-.footer-space{
-    height:90px;
+  background:#cbd5e1;
+
+  border-radius:999px;
+
+  transition:.3s;
 }
 
-.bottom-bar{
-    position:fixed;
-    bottom:0;
-    left:0;
-    width:100%;
-    background:white;
+.slider:before{
+  content:"";
+
+  position:absolute;
+
+  left:2px;
+  bottom:2px;
+
+  width:24px;
+  height:24px;
+
+  background:#fff;
+
+  border-radius:50%;
+
+  transition:.3s;
+
+  box-shadow:
+    0 2px 4px rgba(0,0,0,.15);
+}
+
+.switch input:checked + .slider{
+  background:var(--accent);
+}
+
+.switch input:checked + .slider:before{
+  transform:translateX(22px);
+}
+
+/* =========================================
+   ROTA
+========================================= */
+
+.route-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+
+  margin-bottom:20px;
+}
+
+.route-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  padding:14px;
+
+  border-radius:12px;
+
+  background:#fff;
+
+  border:1px solid var(--border);
+
+  transition:
+    transform .15s,
+    border-color .2s;
+}
+
+.route-item:hover{
+  transform:translateY(-1px);
+}
+
+.drag-handle{
+  cursor:grab;
+
+  padding:10px;
+
+  margin-left:-10px;
+
+  color:var(--muted);
+}
+
+.drag-handle:active{
+  cursor:grabbing;
+}
+
+.sortable-ghost{
+  opacity:.45;
+  background:#e0f2fe;
+}
+
+/* =========================================
+   CHECKBOXES
+========================================= */
+
+.custom-checkbox{
+  display:flex;
+  align-items:center;
+  gap:10px;
+
+  cursor:pointer;
+
+  padding:10px 0;
+}
+
+.custom-checkbox input{
+  width:20px;
+  height:20px;
+
+  accent-color:var(--accent);
+
+  cursor:pointer;
+}
+
+/* =========================================
+   HOTEL ATUAL
+========================================= */
+
+#currentHotel{
+  background:var(--accent);
+
+  color:white;
+
+  padding:20px;
+
+  border-radius:12px;
+
+  margin-bottom:20px;
+
+  animation:fadeIn .25s ease;
+}
+
+/* =========================================
+   RELATÓRIO
+========================================= */
+
+.report{
+  max-height:250px;
+
+  overflow-y:auto;
+
+  background:#f8fafc;
+
+  border-radius:12px;
+
+  padding:10px;
+
+  border:1px solid var(--border);
+}
+
+.report-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  padding:12px 8px;
+
+  border-bottom:1px solid var(--border);
+}
+
+.report-row:last-child{
+  border-bottom:none;
+}
+
+.report-time{
+  font-size:.85rem;
+
+  background:#e2e8f0;
+
+  padding:4px 8px;
+
+  border-radius:6px;
+
+  font-weight:500;
+}
+
+/* =========================================
+   UTILITÁRIOS
+========================================= */
+
+.hidden{
+  display:none !important;
+}
+
+/* =========================================
+   FOOTER
+========================================= */
+
+footer{
+  text-align:center;
+
+  color:var(--muted);
+
+  font-size:.8rem;
+
+  margin-top:20px;
+
+  padding-bottom:20px;
+}
+
+/* =========================================
+   SCROLLBAR
+========================================= */
+
+::-webkit-scrollbar{
+  width:8px;
+}
+
+::-webkit-scrollbar-thumb{
+  background:#cbd5e1;
+  border-radius:999px;
+}
+
+/* =========================================
+   RESPONSIVO
+========================================= */
+
+@media (max-width:480px){
+
+  .app{
     padding:14px;
-    box-shadow:0 -4px 12px rgba(0,0,0,.08);
-}
+    padding-bottom:80px;
+  }
 
-.finish-btn{
-    width:100%;
-    border:none;
-    background:linear-gradient(135deg,var(--blue),var(--blue-dark));
-    color:white;
-    padding:18px;
-    border-radius:18px;
-    font-size:16px;
-    font-weight:700;
-}
+  .card{
+    padding:16px;
+  }
 
-/* TOAST */
+  button{
+    min-width:100%;
+  }
 
-.toast{
-    position:fixed;
-    bottom:100px;
-    left:50%;
-    transform:translateX(-50%) translateY(20px);
-    background:#1e293b;
-    color:white;
-    padding:14px 18px;
-    border-radius:14px;
-    font-size:14px;
-    opacity:0;
-    transition:.3s;
-    z-index:9999;
-}
+  .controls{
+    flex-direction:column;
+  }
 
-.toast.show{
-    opacity:1;
-    transform:translateX(-50%) translateY(0);
-}
-
-/* RESPONSIVO */
-
-@media(max-width:480px){
-
-    .route-summary{
-        grid-template-columns:1fr;
-    }
-
-    .actions{
-        grid-template-columns:1fr;
-    }
-
+  h1{
+    font-size:1.1rem;
+  }
 }
