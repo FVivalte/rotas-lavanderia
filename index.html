@@ -3,29 +3,54 @@
 
 <head>
 
-  <meta charset="utf-8" />
+  <meta charset="utf-8"/>
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
+    content="
+      width=device-width,
+      initial-scale=1,
+      maximum-scale=1,
+      user-scalable=0
+    "
   />
 
   <title>Rota Búzios</title>
 
-  <meta name="theme-color" content="#0b63b7"/>
+  <meta
+    name="theme-color"
+    content="#0b63b7"
+  />
 
-  <link rel="manifest" href="manifest.json"/>
+  <link
+    rel="manifest"
+    href="manifest.json"
+  />
 
   <!-- CSS -->
-  <link rel="stylesheet" href="style.css"/>
 
-  <!-- SortableJS -->
+  <link
+    rel="stylesheet"
+    href="style.css"
+  />
+
+  <!-- LEAFLET -->
+
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet/dist/leaflet.css"
+  />
+
+  <!-- SORTABLE -->
+
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 
-  <!-- Lucide -->
+  <!-- LUCIDE -->
+
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- jsPDF -->
+  <!-- JSPDF -->
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 </head>
@@ -60,7 +85,7 @@
 
     <section id="screen-select">
 
-      <!-- CARD FIXO 1 -->
+      <!-- CONTROLES -->
 
       <section class="card sticky-top">
 
@@ -81,7 +106,7 @@
 
             <i data-lucide="trash-2"></i>
 
-           🚮 Limpar
+            🚮 Limpar
 
           </button>
 
@@ -89,7 +114,7 @@
 
       </section>
 
-      <!-- CARD FIXO 2 -->
+      <!-- HOTÉIS -->
 
       <section class="card hotels-card">
 
@@ -157,6 +182,19 @@
     </section>
 
     <!-- ========================= -->
+    <!-- MAPA -->
+    <!-- ========================= -->
+
+    <section class="card">
+
+      <div
+        id="map"
+        class="map"
+      ></div>
+
+    </section>
+
+    <!-- ========================= -->
     <!-- TELA ROTA -->
     <!-- ========================= -->
 
@@ -175,7 +213,8 @@
 
         <div class="muted">
 
-          Segure e arraste para mudar a ordem.
+          Segure e arraste
+          para mudar a ordem.
 
         </div>
 
@@ -275,7 +314,7 @@
 
       </div>
 
-      <!-- HOTEL ATUAL -->
+      <!-- HOTEL -->
 
       <div id="currentHotel"></div>
 
@@ -400,25 +439,17 @@
 
   <!-- LEAFLET -->
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-<!-- JSPDF -->
+  <!-- APP -->
 
-<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="dados.js"></script>
 
-<!-- LUCIDE -->
+  <script src="mapa.js"></script>
 
-<script src="https://unpkg.com/lucide@latest"></script>
+  <script src="relatorio.js"></script>
 
-<!-- APP -->
-
-<script src="dados.js"></script>
-
-<script src="mapa.js"></script>
-
-<script src="relatorio.js"></script>
-
-<script src="app.js"></script>
+  <script src="app.js"></script>
 
 </body>
 </html>
