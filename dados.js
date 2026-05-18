@@ -237,6 +237,25 @@ let HOTELS =
   carregarHoteis();
 
 // =========================
+// RELATÓRIO DA ROTA
+// =========================
+
+let routeReport = [];
+
+// =========================
+// CONFIGURAÇÕES DO APP
+// =========================
+
+const APP_CONFIG = {
+
+  city: 'Armação dos Búzios',
+
+  driver: 'Motorista',
+
+  pdfName: 'rota-buzios.pdf'
+};
+
+// =========================
 // SALVA HOTÉIS
 // =========================
 
@@ -373,6 +392,12 @@ function resetarHoteis(){
 // =========================
 
 window.HOTELS = HOTELS;
+
+window.routeReport =
+  routeReport;
+
+window.APP_CONFIG =
+  APP_CONFIG;
 
 window.adicionarHotel =
   adicionarHotel;
