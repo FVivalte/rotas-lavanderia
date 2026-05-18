@@ -1,10 +1,36 @@
 // =========================
-// INICIALIZAÇÃO
+// INIT
 // =========================
 
 lucide.createIcons();
 
+// =========================
+// ELEMENTOS
+// =========================
 
+const screenSelect =
+  document.getElementById('screen-select');
+
+const screenRoute =
+  document.getElementById('screen-route');
+
+const screenMode =
+  document.getElementById('screen-mode');
+
+const hotelList =
+  document.getElementById('hotelList');
+
+const routeList =
+  document.getElementById('routeList');
+
+const reportMode =
+  document.getElementById('reportMode');
+
+const photoInput =
+  document.getElementById('photoInput');
+
+const photoPreview =
+  document.getElementById('photoPreview');
 
 // =========================
 // ESTADO
@@ -39,26 +65,6 @@ let currentPhotos = [];
 let gpsWatchId = null;
 
 // =========================
-// TELAS
-// =========================
-
-const screenSelect =
-  document.getElementById('screen-select');
-
-const screenRoute =
-  document.getElementById('screen-route');
-
-const screenMode =
-  document.getElementById('screen-mode');
-
-// =========================
-// ELEMENTOS
-// =========================
-
-const photoInput =
-  document.getElementById('photoInput');
-
-// =========================
 // SAVE
 // =========================
 
@@ -86,7 +92,7 @@ function saveState(){
 }
 
 // =========================
-// TROCAR TELA
+// TROCA TELA
 // =========================
 
 function showScreen(id){
@@ -96,6 +102,7 @@ function showScreen(id){
     screenRoute,
     screenMode
   ].forEach(el => {
+
     el.classList.add('hidden');
   });
 
@@ -106,61 +113,85 @@ function showScreen(id){
 }
 
 // =========================
-// TELA SELEÇÃO
+// RENDER HOTÉIS
 // =========================
 
-function renderSelection(){
+function renderSelection(filter = ''){
 
-  const list =
-    document.getElementById('hotelList');
+  hotelList.innerHTML = '';
 
-  list.innerHTML = '';
+  const termo =
+    filter.toLowerCase();
 
-  HOTELS.forEach(h => {
+  HOTELS
+    .filter(h => {
 
-    const div =
-      document.createElement('div');
+      return (
+        h.name
+          .toLowerCase()
+          .includes(termo)
 
-    div.className = 'item';
+        ||
 
-    div.innerHTML = `
+        h.region
+          .toLowerCase()
+          .includes(termo)
+      );
+    })
 
-      <div class="info">
+    .forEach(h => {
 
-        <div class="name">
-          ${h.name}
+      const div =
+        document.createElement('div');
+
+      div.className = 'item';
+
+      div.innerHTML = `
+
+        <div class="info">
+
+          <div class="name">
+
+            ${h.name}
+
+          </div>
+
+          <div class="addr">
+
+            ${h.region}
+            •
+            ${h.address}
+
+          </div>
+
         </div>
 
-        <div class="addr">
-          ${h.region} • ${h.address}
-        </div>
+        <label class="switch">
 
-      </div>
+          <input
+            type="checkbox"
+            data-id="${h.id}"
+            ${activeSet.has(h.id) ? 'checked' : ''}
+          >
 
-      <label class="switch">
+          <span class="slider"></span>
 
-        <input
-          type="checkbox"
-          data-id="${h.id}"
-          ${activeSet.has(h.id) ? 'checked' : ''}
-        >
+        </label>
+      `;
 
-        <span class="slider"></span>
+      hotelList.appendChild(div);
+    });
 
-      </label>
-    `;
-
-    list.appendChild(div);
-  });
-
-  list
+  hotelList
     .querySelectorAll('input')
     .forEach(cb => {
 
       cb.addEventListener('change', e => {
 
         const id =
-          Number(e.target.dataset.id);
+          Number(
+            e.target.dataset.id
+          );
 
         if(e.target.checked){
 
@@ -174,387 +205,161 @@ function renderSelection(){
         saveState();
       });
     });
-}
-
-// =========================
-// RENDER ROTA
-// =========================
-
-function renderRoute(){
-
-  const list =
-    document.getElementById('routeList');
-
-  list.innerHTML = '';
-
-  routeOrder.forEach((id, idx) => {
-
-    const h =
-      HOTELS.find(x => x.id === id);
-
-    if(!h) return;
-
-    const div =
-      document.createElement('div');
-
-    div.className = 'route-item';
-
-    div.dataset.id = id;
-
-    div.innerHTML = `
-
-      <div style="display:flex;align-items:center;">
-
-        <div class="drag-handle">
-          <i data-lucide="grip-vertical"></i>
-        </div>
-
-        <div>
-
-          <strong>
-            ${idx + 1}. ${h.name}
-          </strong>
-
-          <div class="muted">
-            ${h.address}
-          </div>
-
-        </div>
-
-      </div>
-
-      <button
-        class="icon-btn remove-btn"
-        data-id="${id}"
-      >
-        <i data-lucide="x"></i>
-      </button>
-    `;
-
-    list.appendChild(div);
-  });
 
   lucide.createIcons();
-
-  if(sortableInstance){
-
-    sortableInstance.destroy();
-  }
-
-  sortableInstance =
-    new Sortable(list, {
-
-      handle:'.drag-handle',
-
-      animation:150,
-
-      onEnd:() => {
-
-        routeOrder =
-          Array
-            .from(list.children)
-            .map(el =>
-              Number(el.dataset.id)
-            );
-
-        saveState();
-
-        renderRoute();
-      }
-    });
-
-  document
-    .querySelectorAll('.remove-btn')
-    .forEach(btn => {
-
-      btn.addEventListener('click', e => {
-
-        const id =
-          Number(
-            e.currentTarget.dataset.id
-          );
-
-        activeSet.delete(id);
-
-        routeOrder =
-          routeOrder.filter(x => x !== id);
-
-        saveState();
-
-        renderSelection();
-
-        renderRoute();
-      });
-    });
-
-  document.getElementById(
-    'activeCount'
-  ).innerText =
-    `${routeOrder.length} paradas`;
 }
 
 // =========================
-// GPS
+// BUSCA
 // =========================
 
-function iniciarGPS(){
+document
+  .getElementById('searchHotel')
+  ?.addEventListener('input', e => {
 
-  if(!navigator.geolocation){
-    return;
-  }
-
-  if(gpsWatchId){
-
-    navigator
-      .geolocation
-      .clearWatch(gpsWatchId);
-  }
-
-  gpsWatchId =
-    navigator.geolocation.watchPosition(
-
-      pos => {
-
-        const currentEntry =
-          routeReport[currentIndex];
-
-        if(!currentEntry) return;
-
-        if(!currentEntry.chegada){
-
-          currentEntry.chegada =
-            new Date().toISOString();
-
-          currentEntry.gps = {
-
-            latitude:
-              pos.coords.latitude,
-
-            longitude:
-              pos.coords.longitude
-          };
-
-          saveState();
-
-          renderReportMode();
-        }
-      },
-
-      err => {
-        console.log(err);
-      },
-
-      {
-        enableHighAccuracy:true,
-        maximumAge:1000,
-        timeout:10000
-      }
+    renderSelection(
+      e.target.value
     );
-}
+  });
 
 // =========================
-// MODO VIAGEM
+// ADD HOTEL
 // =========================
 
-function updateModeUI(){
+document
+  .getElementById('btn-add-hotel')
+  ?.addEventListener('click', () => {
 
-  const currentEl =
-    document.getElementById(
-      'currentHotel'
-    );
+    const name =
+      prompt('Nome do hotel');
 
-  if(currentIndex >= routeOrder.length){
+    if(!name) return;
 
-    currentEl.innerHTML = `
+    const region =
+      prompt('Região');
 
-      <div style="text-align:center;">
+    if(!region) return;
 
-        <i
-          data-lucide="flag"
-          style="width:48px;height:48px;"
-        ></i>
+    const address =
+      prompt('Endereço');
 
-        <h2>
-          Viagem Finalizada!
-        </h2>
+    if(!address) return;
 
-      </div>
-    `;
+    const coords =
+      prompt(
+        'Coordenadas GPS\nEx:\n-22.000,-41.000'
+      );
 
-    document
-      .getElementById('btn-next')
-      .disabled = true;
+    adicionarHotel({
 
-  }else{
+      name,
+      region,
+      address,
+      coords
+    });
 
-    const h =
+    renderSelection();
+  });
+
+// =========================
+// EDIT HOTEL
+// =========================
+
+document
+  .getElementById('btn-edit-hotel')
+  ?.addEventListener('click', () => {
+
+    const id =
+      Number(
+        prompt(
+          'ID do hotel para editar'
+        )
+      );
+
+    if(!id) return;
+
+    const hotel =
       HOTELS.find(
-        x => x.id === routeOrder[currentIndex]
+        h => h.id === id
       );
 
-    currentEl.innerHTML = `
+    if(!hotel){
 
-      <div style="opacity:.8;margin-bottom:4px;">
-        Parada ${currentIndex + 1}
-      </div>
+      alert('Hotel não encontrado');
 
-      <h2 style="margin:0;">
-        ${h.name}
-      </h2>
-
-      <div style="margin-top:4px;">
-        ${h.address}
-      </div>
-
-      <div class="gps-badge">
-        GPS ativo
-      </div>
-    `;
-
-    document.getElementById(
-      'chk-entrega'
-    ).checked = false;
-
-    document.getElementById(
-      'chk-coleta'
-    ).checked = false;
-  }
-
-  lucide.createIcons();
-
-  renderReportMode();
-}
-
-// =========================
-// RELATÓRIO
-// =========================
-
-function renderReportMode(){
-
-  const reportDiv =
-    document.getElementById('reportMode');
-
-  reportDiv.innerHTML = '';
-
-  routeReport.forEach((r, idx) => {
-
-    if(!r.chegada) return;
-
-    const h =
-      HOTELS.find(x => x.id === r.id);
-
-    if(!h) return;
-
-    const chegada =
-      new Date(r.chegada)
-        .toLocaleTimeString([], {
-          hour:'2-digit',
-          minute:'2-digit'
-        });
-
-    const saida =
-      r.saida
-      ? new Date(r.saida)
-          .toLocaleTimeString([], {
-            hour:'2-digit',
-            minute:'2-digit'
-          })
-      : '--:--';
-
-    let tags = [];
-
-    if(r.entrega){
-      tags.push('Entrega');
+      return;
     }
 
-    if(r.coleta){
-      tags.push('Coleta');
-    }
+    const name =
+      prompt(
+        'Nome',
+        hotel.name
+      );
 
-    reportDiv.innerHTML += `
+    const region =
+      prompt(
+        'Região',
+        hotel.region
+      );
 
-      <div class="report-row">
+    const address =
+      prompt(
+        'Endereço',
+        hotel.address
+      );
 
-        <div>
+    const coords =
+      prompt(
+        'Coordenadas',
+        hotel.coords
+      );
 
-          <strong>
-            ${idx + 1}. ${h.name}
-          </strong>
+    editarHotel(id, {
 
-          <div class="muted">
-            ${tags.join(' • ') || 'Sem serviço'}
-          </div>
+      name,
+      region,
+      address,
+      coords
+    });
 
-          <div
-            class="muted"
-            style="margin-top:4px;font-size:.75rem;"
-          >
-            Chegada: ${chegada}
-            •
-            Saída: ${saida}
-          </div>
-
-          <div
-            class="muted"
-            style="font-size:.75rem;"
-          >
-            ${r.fotos.length} foto(s)
-          </div>
-
-        </div>
-
-      </div>
-    `;
+    renderSelection();
   });
-}
 
 // =========================
-// FOTOS
+// REMOVER HOTEL
 // =========================
 
-photoInput?.addEventListener(
-  'change',
-  async e => {
+document
+  .getElementById('btn-remove-hotel')
+  ?.addEventListener('click', () => {
 
-    const files =
-      Array.from(e.target.files);
-
-    currentPhotos = [];
-
-    const preview =
-      document.getElementById(
-        'photoPreview'
+    const id =
+      Number(
+        prompt(
+          'ID do hotel para remover'
+        )
       );
 
-    preview.innerHTML = '';
+    if(!id) return;
 
-    for(const file of files){
+    const confirmar =
+      confirm(
+        'Remover hotel?'
+      );
 
-      const reader =
-        new FileReader();
+    if(!confirmar) return;
 
-      reader.onload = ev => {
+    removerHotel(id);
 
-        currentPhotos.push(
-          ev.target.result
-        );
+    activeSet.delete(id);
 
-        const img =
-          document.createElement('img');
+    renderSelection();
 
-        img.src =
-          ev.target.result;
-
-        preview.appendChild(img);
-      };
-
-      reader.readAsDataURL(file);
-    }
-  }
-);
+    saveState();
+  });
 
 // =========================
-// CRIAR ROTA
+// GERAR ROTA
 // =========================
 
 document
@@ -578,6 +383,241 @@ document
 
     showScreen('screen-route');
   });
+
+// =========================
+// RENDER ROTA
+// =========================
+
+function renderRoute(){
+
+  routeList.innerHTML = '';
+
+  routeOrder.forEach((id, idx) => {
+
+    const h =
+      HOTELS.find(
+        x => x.id === id
+      );
+
+    if(!h) return;
+
+    const div =
+      document.createElement('div');
+
+    div.className = 'route-item';
+
+    div.dataset.id = id;
+
+    div.innerHTML = `
+
+      <div style="display:flex;align-items:center;">
+
+        <div class="drag-handle">
+
+          <i data-lucide="grip-vertical"></i>
+
+        </div>
+
+        <div>
+
+          <strong>
+
+            ${idx + 1}.
+            ${h.name}
+
+          </strong>
+
+          <div class="muted">
+
+            ${h.address}
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <button
+        class="icon-btn remove-btn"
+        data-id="${id}"
+      >
+
+        <i data-lucide="x"></i>
+
+      </button>
+    `;
+
+    routeList.appendChild(div);
+  });
+
+  lucide.createIcons();
+
+  if(sortableInstance){
+
+    sortableInstance.destroy();
+  }
+
+  sortableInstance =
+    new Sortable(routeList, {
+
+      handle:'.drag-handle',
+
+      animation:150,
+
+      onEnd:() => {
+
+        routeOrder =
+          Array
+            .from(routeList.children)
+            .map(el =>
+              Number(el.dataset.id)
+            );
+
+        saveState();
+
+        renderRoute();
+      }
+    });
+
+  document
+    .querySelectorAll('.remove-btn')
+    .forEach(btn => {
+
+      btn.addEventListener('click', e => {
+
+        const id =
+          Number(
+            e.currentTarget.dataset.id
+          );
+
+        routeOrder =
+          routeOrder.filter(
+            x => x !== id
+          );
+
+        activeSet.delete(id);
+
+        saveState();
+
+        renderRoute();
+
+        renderSelection();
+      });
+    });
+
+  document
+    .getElementById('activeCount')
+    .innerText =
+      `${routeOrder.length} paradas`;
+}
+
+// =========================
+// GOOGLE MAPS
+// =========================
+
+document
+  .getElementById('btn-google')
+  ?.addEventListener('click', () => {
+
+    if(routeOrder.length === 0){
+
+      return;
+    }
+
+    const coords =
+      routeOrder.map(id => {
+
+        return HOTELS
+          .find(h => h.id === id)
+          .coords;
+      });
+
+    const origin =
+      coords[0];
+
+    const destination =
+      coords[
+        coords.length - 1
+      ];
+
+    const waypoints =
+      coords
+        .slice(1, coords.length - 1)
+        .join('|');
+
+    const url =
+
+      `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}${waypoints ? '&waypoints=' + waypoints : ''}&travelmode=driving`;
+
+    window.open(url, '_blank');
+  });
+
+// =========================
+// GPS
+// =========================
+
+function iniciarGPS(){
+
+  if(!navigator.geolocation){
+
+    return;
+  }
+
+  if(gpsWatchId){
+
+    navigator
+      .geolocation
+      .clearWatch(gpsWatchId);
+  }
+
+  gpsWatchId =
+    navigator.geolocation.watchPosition(
+
+      pos => {
+
+        const currentEntry =
+          routeReport[currentIndex];
+
+        if(!currentEntry){
+
+          return;
+        }
+
+        if(!currentEntry.chegada){
+
+          currentEntry.chegada =
+            new Date().toISOString();
+
+          currentEntry.gps = {
+
+            latitude:
+              pos.coords.latitude,
+
+            longitude:
+              pos.coords.longitude
+          };
+
+          saveState();
+
+          renderReportMode();
+        }
+      },
+
+      err => {
+
+        console.log(err);
+      },
+
+      {
+
+        enableHighAccuracy:true,
+
+        maximumAge:1000,
+
+        timeout:10000
+      }
+    );
+}
 
 // =========================
 // INICIAR VIAGEM
@@ -623,6 +663,127 @@ document
   });
 
 // =========================
+// UI VIAGEM
+// =========================
+
+function updateModeUI(){
+
+  const currentEl =
+    document.getElementById(
+      'currentHotel'
+    );
+
+  if(currentIndex >= routeOrder.length){
+
+    currentEl.innerHTML = `
+
+      <div style="text-align:center;">
+
+        <i
+          data-lucide="flag"
+          style="width:48px;height:48px;"
+        ></i>
+
+        <h2>
+
+          Viagem Finalizada!
+
+        </h2>
+
+      </div>
+    `;
+
+    document
+      .getElementById('btn-next')
+      .disabled = true;
+
+  }else{
+
+    const h =
+      HOTELS.find(
+        x => x.id === routeOrder[currentIndex]
+      );
+
+    currentEl.innerHTML = `
+
+      <div style="opacity:.8;">
+
+        Parada
+        ${currentIndex + 1}
+        de
+        ${routeOrder.length}
+
+      </div>
+
+      <h2 style="margin:8px 0;">
+
+        ${h.name}
+
+      </h2>
+
+      <div>
+
+        ${h.address}
+
+      </div>
+
+      <div class="gps-badge">
+
+        GPS ativo
+
+      </div>
+    `;
+  }
+
+  lucide.createIcons();
+
+  renderReportMode();
+}
+
+// =========================
+// FOTO
+// =========================
+
+photoInput
+  ?.addEventListener(
+    'change',
+    e => {
+
+      const files =
+        Array.from(
+          e.target.files
+        );
+
+      currentPhotos = [];
+
+      photoPreview.innerHTML = '';
+
+      files.forEach(file => {
+
+        const reader =
+          new FileReader();
+
+        reader.onload = ev => {
+
+          currentPhotos.push(
+            ev.target.result
+          );
+
+          const img =
+            document.createElement('img');
+
+          img.src =
+            ev.target.result;
+
+          photoPreview.appendChild(img);
+        };
+
+        reader.readAsDataURL(file);
+      });
+    }
+  );
+
+// =========================
 // PRÓXIMO
 // =========================
 
@@ -646,26 +807,16 @@ document
         'chk-coleta'
       ).checked;
 
-    entry.fotos = [...currentPhotos];
+    entry.fotos =
+      [...currentPhotos];
 
     currentIndex++;
 
     currentPhotos = [];
 
-    if(photoInput){
+    photoPreview.innerHTML = '';
 
-      photoInput.value = '';
-    }
-
-    const preview =
-      document.getElementById(
-        'photoPreview'
-      );
-
-    if(preview){
-
-      preview.innerHTML = '';
-    }
+    photoInput.value = '';
 
     saveState();
 
@@ -673,40 +824,103 @@ document
   });
 
 // =========================
-// GOOGLE MAPS
+// RELATÓRIO
 // =========================
 
-document
-  .getElementById('btn-google')
-  ?.addEventListener('click', () => {
+function renderReportMode(){
 
-    if(routeOrder.length === 0){
+  reportMode.innerHTML = '';
+
+  routeReport.forEach((r, idx) => {
+
+    if(!r.chegada){
+
       return;
     }
 
-    const coords =
-      routeOrder.map(id =>
-        HOTELS
-          .find(h => h.id === id)
-          .coords
+    const h =
+      HOTELS.find(
+        x => x.id === r.id
       );
 
-    const origin = coords[0];
+    const chegada =
+      new Date(r.chegada)
+        .toLocaleTimeString([], {
 
-    const destination =
-      coords[coords.length - 1];
+          hour:'2-digit',
 
-    const waypoints =
-      coords
-        .slice(1, coords.length - 1)
-        .join('|');
+          minute:'2-digit'
+        });
 
-    const url =
+    const saida =
+      r.saida
+      ? new Date(r.saida)
+          .toLocaleTimeString([], {
 
-      `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}${waypoints ? '&waypoints=' + waypoints : ''}&travelmode=driving`;
+            hour:'2-digit',
 
-    window.open(url, '_blank');
+            minute:'2-digit'
+          })
+      : '--:--';
+
+    let tags = [];
+
+    if(r.entrega){
+
+      tags.push('Entrega');
+    }
+
+    if(r.coleta){
+
+      tags.push('Coleta');
+    }
+
+    reportMode.innerHTML += `
+
+      <div class="report-row">
+
+        <strong>
+
+          ${idx + 1}.
+          ${h.name}
+
+        </strong>
+
+        <div class="muted">
+
+          ${tags.join(' • ') || 'Sem serviço'}
+
+        </div>
+
+        <div
+          class="muted"
+          style="margin-top:4px;"
+        >
+
+          Chegada:
+          ${chegada}
+
+          •
+
+          Saída:
+          ${saida}
+
+        </div>
+
+        <div
+          class="muted"
+          style="margin-top:4px;"
+        >
+
+          Fotos:
+          ${r.fotos.length}
+
+        </div>
+
+      </div>
+    `;
   });
+}
 
 // =========================
 // PDF
@@ -714,15 +928,13 @@ document
 
 document
   .getElementById('btn-pdf')
-  ?.addEventListener('click', async () => {
+  ?.addEventListener('click', () => {
 
     const { jsPDF } =
       window.jspdf;
 
     const doc =
       new jsPDF();
-
-    doc.setFont('helvetica');
 
     doc.setFontSize(22);
 
@@ -736,49 +948,62 @@ document
     doc.setFontSize(11);
 
     doc.text(
+
       `Data: ${new Date().toLocaleDateString('pt-BR')}`,
+
       14,
+
       30
     );
 
     let y = 45;
 
-    for(let i = 0; i < routeReport.length; i++){
+    routeReport.forEach((r, idx) => {
 
-      const r = routeReport[i];
+      if(!r.chegada){
 
-      if(!r.chegada) continue;
+        return;
+      }
 
       const h =
-        HOTELS.find(x => x.id === r.id);
-
-      if(!h) continue;
+        HOTELS.find(
+          x => x.id === r.id
+        );
 
       doc.roundedRect(
+
         10,
+
         y - 6,
+
         190,
+
         36,
+
         4,
+
         4
       );
 
       doc.setFontSize(13);
 
       doc.text(
-        `${i + 1}. ${h.name}`,
+
+        `${idx + 1}. ${h.name}`,
+
         14,
+
         y
       );
-
-      doc.setFontSize(10);
 
       y += 8;
 
       const chegada =
         new Date(r.chegada)
           .toLocaleTimeString([], {
+
             hour:'2-digit',
+
             minute:'2-digit'
           });
 
@@ -786,10 +1011,14 @@ document
         r.saida
         ? new Date(r.saida)
             .toLocaleTimeString([], {
+
               hour:'2-digit',
+
               minute:'2-digit'
             })
         : '--:--';
+
+      doc.setFontSize(10);
 
       doc.text(
         `Chegada: ${chegada}`,
@@ -810,61 +1039,41 @@ document
       let servicos = [];
 
       if(r.entrega){
+
         servicos.push('Entrega');
       }
 
       if(r.coleta){
+
         servicos.push('Coleta');
       }
 
-      if(servicos.length === 0){
-        servicos.push('Sem serviço');
-      }
-
       doc.text(
-        `Serviços: ${servicos.join(', ')}`,
+
+        `Serviços: ${servicos.join(', ') || 'Sem serviço'}`,
+
         16,
+
         y
       );
 
-      y += 10;
+      y += 14;
 
-      for(const foto of r.fotos.slice(0,2)){
-
-        try{
-
-          doc.addImage(
-            foto,
-            'JPEG',
-            16,
-            y,
-            40,
-            40
-          );
-
-          y += 45;
-
-        }catch(err){
-
-          console.log(err);
-        }
-      }
-
-      y += 10;
-
-      if(y > 240){
+      if(y > 250){
 
         doc.addPage();
 
         y = 20;
       }
-    }
+    });
 
-    doc.save('rota-buzios.pdf');
+    doc.save(
+      'rota-buzios.pdf'
+    );
   });
 
 // =========================
-// BOTÃO VOLTAR
+// VOLTAR
 // =========================
 
 document
@@ -884,10 +1093,11 @@ document
 
     const confirmar =
       confirm(
-        'Apagar tudo e recomeçar?'
+        'Apagar tudo?'
       );
 
     if(!confirmar){
+
       return;
     }
 
@@ -915,7 +1125,7 @@ document
   ?.addEventListener('click', () => {
 
     alert(
-      'Relatório salvo.'
+      'Rota finalizada.'
     );
 
     showScreen('screen-select');
@@ -928,9 +1138,17 @@ document
 renderSelection();
 
 if(
-  routeOrder.length > 0 &&
-  currentIndex < routeOrder.length &&
+
+  routeOrder.length > 0
+
+  &&
+
+  currentIndex < routeOrder.length
+
+  &&
+
   currentIndex > 0
+
 ){
 
   showScreen('screen-mode');
@@ -949,3 +1167,5 @@ if('serviceWorker' in navigator){
     .register('sw.js')
     .catch(() => {});
 }
+
+lucide.createIcons();
