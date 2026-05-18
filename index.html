@@ -1,6 +1,8 @@
 <!doctype html>
 <html lang="pt-BR">
+
 <head>
+
   <meta charset="utf-8" />
 
   <meta
@@ -8,219 +10,399 @@
     content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
   />
 
-  <title>Rota Búzios — Entregas</title>
+  <title>Rota Búzios</title>
 
   <meta name="theme-color" content="#0b63b7"/>
 
-  <link rel="manifest" href="manifest.json" />
+  <link rel="manifest" href="manifest.json"/>
 
-  <!-- Sortable -->
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css"/>
+
+  <!-- SortableJS -->
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 
   <!-- Lucide -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <!-- PDF -->
+  <!-- jsPDF -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<div class="app">
+  <div class="app">
 
-  <header>
-    <h1>
-      <i data-lucide="map"></i>
-      Rota Búzios
-    </h1>
+    <!-- HEADER -->
 
-    <div class="status-badge">
-      Offline PWA
-    </div>
-  </header>
+    <header>
 
-  <!-- SELEÇÃO -->
+      <h1>
 
-  <section id="screen-select" class="card">
+        <i data-lucide="map"></i>
 
-    <div class="header-text">
-      <strong>Selecione os hotéis</strong>
-      <div class="muted">
-        Ative os pontos de parada para a rota.
+        Rota Búzios
+
+      </h1>
+
+      <div class="status-badge">
+
+        Offline PWA
+
       </div>
-    </div>
 
-    <div class="controls">
+    </header>
 
-      <button id="btn-generate">
-        <i data-lucide="route"></i>
-        Criar Rota
-      </button>
+    <!-- ========================= -->
+    <!-- TELA SELEÇÃO -->
+    <!-- ========================= -->
 
-      <button id="btn-reset" class="ghost">
-        <i data-lucide="trash-2"></i>
-        Limpar
-      </button>
+    <section id="screen-select">
 
-    </div>
+      <!-- CARD FIXO 1 -->
 
-    <div class="list" id="hotelList"></div>
+      <section class="card sticky-top">
 
-  </section>
+        <div class="controls">
 
-  <!-- ROTA -->
+          <button id="btn-generate">
 
-  <section id="screen-route" class="card hidden">
+            <i data-lucide="route"></i>
 
-    <div class="header-text">
-      <strong>Organize a rota</strong>
+            Criar rota
 
-      <div class="muted">
-        Segure e arraste para mudar a ordem.
-      </div>
-    </div>
+          </button>
 
-    <div class="controls">
+          <button
+            id="btn-reset"
+            class="ghost"
+          >
 
-      <button id="btn-start-route">
-        <i data-lucide="play"></i>
-        Iniciar
-      </button>
+            <i data-lucide="trash-2"></i>
 
-      <button id="btn-google" class="ghost">
-        <i data-lucide="map-pin"></i>
-        Maps
-      </button>
+            Limpar
 
-    </div>
+          </button>
 
-    <div class="route-list" id="routeList"></div>
+        </div>
 
-    <div style="display:flex;justify-content:space-between;align-items:center;">
+      </section>
 
-      <button id="btn-back" class="ghost" style="flex:0 1 auto;">
-        <i data-lucide="arrow-left"></i>
-        Voltar
-      </button>
+      <!-- CARD FIXO 2 -->
 
-      <span class="status-badge" id="activeCount"></span>
+      <section class="card hotels-card">
 
-    </div>
+        <!-- AÇÕES -->
 
-  </section>
+        <div class="hotel-actions">
 
-  <!-- MODO ROTA -->
+          <button id="btn-add-hotel">
 
-  <section id="screen-mode" class="card hidden">
+            <i data-lucide="plus"></i>
 
-    <div
-      class="header-text"
-      style="display:flex;justify-content:space-between;align-items:center;"
+            Add
+
+          </button>
+
+          <button
+            id="btn-edit-hotel"
+            class="ghost"
+          >
+
+            <i data-lucide="pencil"></i>
+
+            Edit
+
+          </button>
+
+          <button
+            id="btn-remove-hotel"
+            class="danger"
+          >
+
+            <i data-lucide="trash"></i>
+
+            Remover
+
+          </button>
+
+        </div>
+
+        <!-- BUSCA -->
+
+        <div class="search-area">
+
+          <input
+            type="text"
+            id="searchHotel"
+            placeholder="Pesquisar hotel..."
+          />
+
+        </div>
+
+        <!-- LISTA -->
+
+        <div class="hotel-scroll">
+
+          <div
+            class="list"
+            id="hotelList"
+          ></div>
+
+        </div>
+
+      </section>
+
+    </section>
+
+    <!-- ========================= -->
+    <!-- TELA ROTA -->
+    <!-- ========================= -->
+
+    <section
+      id="screen-route"
+      class="card hidden"
     >
 
-      <div>
-        <strong>Modo Viagem</strong>
+      <div class="header-text">
+
+        <strong>
+
+          Organize a rota
+
+        </strong>
 
         <div class="muted">
-          Registre os serviços.
+
+          Segure e arraste para mudar a ordem.
+
         </div>
+
       </div>
 
-      <button
-        id="btn-finish"
-        class="ghost"
-        style="flex:0 1 auto;"
-      >
-        Encerrar
-      </button>
+      <div class="controls">
 
-    </div>
+        <button id="btn-start-route">
 
-    <div
-      id="currentHotel"
-      style="
-        background:var(--accent);
-        color:white;
-        padding:20px;
-        border-radius:12px;
-        margin-bottom:20px;
-      "
-    ></div>
+          <i data-lucide="play"></i>
 
-    <div
-      style="
-        background:#f8fafc;
-        border:1px solid var(--border);
-        padding:16px;
-        border-radius:12px;
-        margin-bottom:20px;
-      "
+          Iniciar viagem
+
+        </button>
+
+        <button
+          id="btn-google"
+          class="ghost"
+        >
+
+          <i data-lucide="map-pin"></i>
+
+          Ver no Maps
+
+        </button>
+
+      </div>
+
+      <div
+        id="routeList"
+        class="route-list"
+      ></div>
+
+      <div class="bottom-actions">
+
+        <button
+          id="btn-back"
+          class="ghost"
+        >
+
+          <i data-lucide="arrow-left"></i>
+
+          Voltar
+
+        </button>
+
+        <span
+          class="status-badge"
+          id="activeCount"
+        >
+
+          0 ativos
+
+        </span>
+
+      </div>
+
+    </section>
+
+    <!-- ========================= -->
+    <!-- TELA VIAGEM -->
+    <!-- ========================= -->
+
+    <section
+      id="screen-mode"
+      class="card hidden"
     >
 
-      <label class="custom-checkbox">
-        <input type="checkbox" id="chk-entrega">
-        <span>Entrega</span>
-      </label>
+      <!-- TOPO -->
 
-      <label class="custom-checkbox">
-        <input type="checkbox" id="chk-coleta">
-        <span>Coleta</span>
-      </label>
+      <div class="mode-header">
 
-<div style="margin-top:20px;">
+        <div>
 
-  <div class="muted" style="margin-bottom:8px; font-weight:600;">
-    Fotos da parada
+          <strong>
+
+            Modo viagem
+
+          </strong>
+
+          <div class="muted">
+
+            Registro em tempo real
+
+          </div>
+
+        </div>
+
+        <button
+          id="btn-finish"
+          class="ghost small-btn"
+        >
+
+          Encerrar
+
+        </button>
+
+      </div>
+
+      <!-- HOTEL ATUAL -->
+
+      <div id="currentHotel"></div>
+
+      <!-- SERVIÇOS -->
+
+      <div class="service-card">
+
+        <label class="custom-checkbox">
+
+          <input
+            type="checkbox"
+            id="chk-entrega"
+          />
+
+          <span>
+
+            Foi feita entrega
+
+          </span>
+
+        </label>
+
+        <label class="custom-checkbox">
+
+          <input
+            type="checkbox"
+            id="chk-coleta"
+          />
+
+          <span>
+
+            Foi feita coleta
+
+          </span>
+
+        </label>
+
+      </div>
+
+      <!-- FOTOS -->
+
+      <div class="photo-card">
+
+        <div class="photo-header">
+
+          <strong>
+
+            Fotos dos rols
+
+          </strong>
+
+        </div>
+
+        <input
+          type="file"
+          id="photoInput"
+          accept="image/*"
+          capture="environment"
+          multiple
+        />
+
+        <div
+          id="photoPreview"
+          class="photo-preview"
+        ></div>
+
+      </div>
+
+      <!-- AÇÕES -->
+
+      <div class="controls">
+
+        <button id="btn-next">
+
+          <i data-lucide="check-circle"></i>
+
+          Confirmar e próximo
+
+        </button>
+
+      </div>
+
+      <!-- RELATÓRIO -->
+
+      <div class="report-header">
+
+        <strong>
+
+          Histórico da rota
+
+        </strong>
+
+        <button
+          id="btn-pdf"
+          class="ghost"
+        >
+
+          <i data-lucide="file-text"></i>
+
+          PDF
+
+        </button>
+
+      </div>
+
+      <div
+        id="reportMode"
+        class="report"
+      ></div>
+
+    </section>
+
+    <!-- FOOTER -->
+
+    <footer>
+
+      Feito para PWA • Offline
+
+    </footer>
+
   </div>
 
-  <input
-    type="file"
-    id="photoInput"
-    accept="image/*"
-    capture="environment"
-    multiple
-    style="margin-bottom:12px;"
-  >
+  <!-- DADOS -->
+  <script src="dados.js"></script>
 
-  <div id="photoPreview" class="photo-preview"></div>
-
-</div>
-
-      <button id="btn-next" style="margin-top:16px;width:100%;">
-        <i data-lucide="check-circle"></i>
-        Confirmar
-      </button>
-
-    </div>
-
-    <div
-      class="header-text"
-      style="display:flex;justify-content:space-between;align-items:center;"
-    >
-
-      <strong>Histórico</strong>
-
-      <button
-        id="btn-pdf"
-        class="ghost"
-        style="flex:0 1 auto;"
-      >
-        <i data-lucide="file-text"></i>
-        PDF
-      </button>
-
-    </div>
-
-    <div class="report" id="reportMode"></div>
-
-  </section>
-
-</div>
-
-<script src="dados.js"></script>
-<script src="app.js"></script>
+  <!-- APP -->
+  <script src="app.js"></script>
 
 </body>
 </html>
