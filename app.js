@@ -1,4 +1,12 @@
+// =========================
+// INICIALIZAÇÃO
+// =========================
+
 lucide.createIcons();
+
+// =========================
+// HOTÉIS
+// =========================
 
 const HOTELS = [
       {id:1,name:"Hotel Aretê",region:"Baía Formosa / Rasa",address:"Alameda Andorinhas – Loteamento Praia Baía Formosa, Armação dos Búzios - RJ",coords:"-22.7490005,-41.9561384"},
@@ -17,21 +25,63 @@ const HOTELS = [
       {id:14,name:"Azeda",region:"Azeda / Ossos",address:"Código Plus: 743C+MM6 – Armação dos Búzios - RJ",coords:"-22.7458674,-41.8783928"}
     ];
 
+// =========================
+// ESTADO
+// =========================
+
 let activeSet =
-  new Set(JSON.parse(localStorage.getItem('rota_ativos')) || []);
+  new Set(
+    JSON.parse(
+      localStorage.getItem('rota_ativos')
+    ) || []
+  );
 
 let routeOrder =
-  JSON.parse(localStorage.getItem('rota_ordem')) || [];
+  JSON.parse(
+    localStorage.getItem('rota_ordem')
+  ) || [];
 
 let routeReport =
-  JSON.parse(localStorage.getItem('rota_relatorio')) || [];
+  JSON.parse(
+    localStorage.getItem('rota_relatorio')
+  ) || [];
 
 let currentIndex =
-  parseInt(localStorage.getItem('rota_index')) || 0;
+  parseInt(
+    localStorage.getItem('rota_index')
+  ) || 0;
 
 let sortableInstance = null;
 
-const saveState = () => {
+let currentPhotos = [];
+
+let gpsWatchId = null;
+
+// =========================
+// TELAS
+// =========================
+
+const screenSelect =
+  document.getElementById('screen-select');
+
+const screenRoute =
+  document.getElementById('screen-route');
+
+const screenMode =
+  document.getElementById('screen-mode');
+
+// =========================
+// ELEMENTOS
+// =========================
+
+const photoInput =
+  document.getElementById('photoInput');
+
+// =========================
+// SAVE
+// =========================
+
+function saveState(){
 
   localStorage.setItem(
     'rota_ativos',
@@ -52,30 +102,31 @@ const saveState = () => {
     'rota_index',
     currentIndex.toString()
   );
-};
+}
 
-const showScreen = (id) => {
+// =========================
+// TROCAR TELA
+// =========================
+
+function showScreen(id){
 
   [
     screenSelect,
     screenRoute,
     screenMode
-  ].forEach(el => el.classList.add('hidden'));
+  ].forEach(el => {
+    el.classList.add('hidden');
+  });
 
   document
     .getElementById(id)
     .classList
     .remove('hidden');
-};
+}
 
-const screenSelect =
-  document.getElementById('screen-select');
-
-const screenRoute =
-  document.getElementById('screen-route');
-
-const screenMode =
-  document.getElementById('screen-mode');
+// =========================
+// TELA SELEÇÃO
+// =========================
 
 function renderSelection(){
 
@@ -100,7 +151,7 @@ function renderSelection(){
         </div>
 
         <div class="addr">
-          ${h.address}
+          ${h.region} • ${h.address}
         </div>
 
       </div>
@@ -121,54 +172,32 @@ function renderSelection(){
     list.appendChild(div);
   });
 
-  list.querySelectorAll('input').forEach(cb => {
+  list
+    .querySelectorAll('input')
+    .forEach(cb => {
 
-    cb.addEventListener('change', e => {
+      cb.addEventListener('change', e => {
 
-      const id =
-        Number(e.target.dataset.id);
+        const id =
+          Number(e.target.dataset.id);
 
-      if(e.target.checked){
-        activeSet.add(id);
-      }else{
-        activeSet.delete(id);
-      }
+        if(e.target.checked){
 
-      saveState();
+          activeSet.add(id);
+
+        }else{
+
+          activeSet.delete(id);
+        }
+
+        saveState();
+      });
     });
-  });
 }
 
-document
-  .getElementById('btn-generate')
-  .addEventListener('click', () => {
-
-    if(activeSet.size === 0){
-      alert('Selecione ao menos um hotel.');
-      return;
-    }
-
-    if(routeOrder.length === 0){
-
-      routeOrder = [...activeSet];
-
-    }else{
-
-      const existing =
-        routeOrder.filter(id => activeSet.has(id));
-
-      const newOnes =
-        [...activeSet].filter(id => !existing.includes(id));
-
-      routeOrder = [...existing, ...newOnes];
-    }
-
-    saveState();
-
-    renderRoute();
-
-    showScreen('screen-route');
-});
+// =========================
+// RENDER ROTA
+// =========================
 
 function renderRoute(){
 
@@ -227,6 +256,7 @@ function renderRoute(){
   lucide.createIcons();
 
   if(sortableInstance){
+
     sortableInstance.destroy();
   }
 
@@ -242,101 +272,115 @@ function renderRoute(){
         routeOrder =
           Array
             .from(list.children)
-            .map(el => Number(el.dataset.id));
+            .map(el =>
+              Number(el.dataset.id)
+            );
 
         saveState();
 
         renderRoute();
       }
-  });
-
-  document.querySelectorAll('.remove-btn').forEach(btn => {
-
-    btn.addEventListener('click', e => {
-
-      const id =
-        Number(e.currentTarget.dataset.id);
-
-      activeSet.delete(id);
-
-      routeOrder =
-        routeOrder.filter(x => x !== id);
-
-      saveState();
-
-      renderSelection();
-
-      renderRoute();
     });
-  });
 
   document
-    .getElementById('activeCount')
-    .innerText = `${routeOrder.length} paradas`;
+    .querySelectorAll('.remove-btn')
+    .forEach(btn => {
+
+      btn.addEventListener('click', e => {
+
+        const id =
+          Number(
+            e.currentTarget.dataset.id
+          );
+
+        activeSet.delete(id);
+
+        routeOrder =
+          routeOrder.filter(x => x !== id);
+
+        saveState();
+
+        renderSelection();
+
+        renderRoute();
+      });
+    });
+
+  document.getElementById(
+    'activeCount'
+  ).innerText =
+    `${routeOrder.length} paradas`;
 }
 
-document
-  .getElementById('btn-google')
-  .addEventListener('click', () => {
+// =========================
+// GPS
+// =========================
 
-    const validHotels = routeOrder
-      .map(id => HOTELS.find(h => h.id === id))
-      .filter(h => h && h.coords);
+function iniciarGPS(){
 
-    if(validHotels.length === 0){
-      alert('Nenhuma coordenada válida.');
-      return;
-    }
+  if(!navigator.geolocation){
+    return;
+  }
 
-    const coords =
-      validHotels.map(h => h.coords);
+  if(gpsWatchId){
 
-    const origin = coords[0];
+    navigator
+      .geolocation
+      .clearWatch(gpsWatchId);
+  }
 
-    const destination =
-      coords[coords.length - 1];
+  gpsWatchId =
+    navigator.geolocation.watchPosition(
 
-    const waypoints =
-      coords.slice(1, coords.length - 1).join('|');
+      pos => {
 
-    const url =
-      `https://www.google.com/maps/dir/?api=1`
-      + `&origin=${origin}`
-      + `&destination=${destination}`
-      + `${waypoints ? '&waypoints=' + waypoints : ''}`
-      + `&travelmode=driving`;
+        const currentEntry =
+          routeReport[currentIndex];
 
-    window.open(url, '_blank');
-});
+        if(!currentEntry) return;
 
-document
-  .getElementById('btn-start-route')
-  .addEventListener('click', () => {
+        if(!currentEntry.chegada){
 
-    if(routeReport.length !== routeOrder.length){
+          currentEntry.chegada =
+            new Date().toISOString();
 
-      routeReport =
-        routeOrder.map(id => ({
-          id,
-          time:null,
-          entrega:false,
-          coleta:false
-        }));
+          currentEntry.gps = {
 
-      currentIndex = 0;
+            latitude:
+              pos.coords.latitude,
 
-      saveState();
-    }
+            longitude:
+              pos.coords.longitude
+          };
 
-    updateModeUI();
+          saveState();
 
-    showScreen('screen-mode');
-});
+          renderReportMode();
+        }
+      },
+
+      err => {
+        console.log(err);
+      },
+
+      {
+        enableHighAccuracy:true,
+        maximumAge:1000,
+        timeout:10000
+      }
+    );
+}
+
+// =========================
+// MODO VIAGEM
+// =========================
 
 function updateModeUI(){
 
   const currentEl =
-    document.getElementById('currentHotel');
+    document.getElementById(
+      'currentHotel'
+    );
 
   if(currentIndex >= routeOrder.length){
 
@@ -349,7 +393,9 @@ function updateModeUI(){
           style="width:48px;height:48px;"
         ></i>
 
-        <h2>Viagem Finalizada!</h2>
+        <h2>
+          Viagem Finalizada!
+        </h2>
 
       </div>
     `;
@@ -361,7 +407,9 @@ function updateModeUI(){
   }else{
 
     const h =
-      HOTELS.find(x => x.id === routeOrder[currentIndex]);
+      HOTELS.find(
+        x => x.id === routeOrder[currentIndex]
+      );
 
     currentEl.innerHTML = `
 
@@ -376,11 +424,19 @@ function updateModeUI(){
       <div style="margin-top:4px;">
         ${h.address}
       </div>
+
+      <div class="gps-badge">
+        GPS ativo
+      </div>
     `;
 
-    document.getElementById('chk-entrega').checked = false;
+    document.getElementById(
+      'chk-entrega'
+    ).checked = false;
 
-    document.getElementById('chk-coleta').checked = false;
+    document.getElementById(
+      'chk-coleta'
+    ).checked = false;
   }
 
   lucide.createIcons();
@@ -388,28 +444,9 @@ function updateModeUI(){
   renderReportMode();
 }
 
-document
-  .getElementById('btn-next')
-  .addEventListener('click', () => {
-
-    const entry =
-      routeReport[currentIndex];
-
-    entry.time =
-      new Date().toISOString();
-
-    entry.entrega =
-      document.getElementById('chk-entrega').checked;
-
-    entry.coleta =
-      document.getElementById('chk-coleta').checked;
-
-    currentIndex++;
-
-    saveState();
-
-    updateModeUI();
-});
+// =========================
+// RELATÓRIO
+// =========================
 
 function renderReportMode(){
 
@@ -420,24 +457,38 @@ function renderReportMode(){
 
   routeReport.forEach((r, idx) => {
 
-    if(!r.time) return;
+    if(!r.chegada) return;
 
     const h =
       HOTELS.find(x => x.id === r.id);
 
     if(!h) return;
 
-    const timeStr =
-      new Date(r.time).toLocaleTimeString([],{
-        hour:'2-digit',
-        minute:'2-digit'
-      });
+    const chegada =
+      new Date(r.chegada)
+        .toLocaleTimeString([], {
+          hour:'2-digit',
+          minute:'2-digit'
+        });
+
+    const saida =
+      r.saida
+      ? new Date(r.saida)
+          .toLocaleTimeString([], {
+            hour:'2-digit',
+            minute:'2-digit'
+          })
+      : '--:--';
 
     let tags = [];
 
-    if(r.entrega) tags.push('Entrega');
+    if(r.entrega){
+      tags.push('Entrega');
+    }
 
-    if(r.coleta) tags.push('Coleta');
+    if(r.coleta){
+      tags.push('Coleta');
+    }
 
     reportDiv.innerHTML += `
 
@@ -453,10 +504,22 @@ function renderReportMode(){
             ${tags.join(' • ') || 'Sem serviço'}
           </div>
 
-        </div>
+          <div
+            class="muted"
+            style="margin-top:4px;font-size:.75rem;"
+          >
+            Chegada: ${chegada}
+            •
+            Saída: ${saida}
+          </div>
 
-        <div class="report-time">
-          ${timeStr}
+          <div
+            class="muted"
+            style="font-size:.75rem;"
+          >
+            ${r.fotos.length} foto(s)
+          </div>
+
         </div>
 
       </div>
@@ -464,127 +527,439 @@ function renderReportMode(){
   });
 }
 
+// =========================
+// FOTOS
+// =========================
+
+photoInput?.addEventListener(
+  'change',
+  async e => {
+
+    const files =
+      Array.from(e.target.files);
+
+    currentPhotos = [];
+
+    const preview =
+      document.getElementById(
+        'photoPreview'
+      );
+
+    preview.innerHTML = '';
+
+    for(const file of files){
+
+      const reader =
+        new FileReader();
+
+      reader.onload = ev => {
+
+        currentPhotos.push(
+          ev.target.result
+        );
+
+        const img =
+          document.createElement('img');
+
+        img.src =
+          ev.target.result;
+
+        preview.appendChild(img);
+      };
+
+      reader.readAsDataURL(file);
+    }
+  }
+);
+
+// =========================
+// CRIAR ROTA
+// =========================
+
+document
+  .getElementById('btn-generate')
+  ?.addEventListener('click', () => {
+
+    if(activeSet.size === 0){
+
+      alert(
+        'Selecione ao menos um hotel.'
+      );
+
+      return;
+    }
+
+    routeOrder = [...activeSet];
+
+    saveState();
+
+    renderRoute();
+
+    showScreen('screen-route');
+  });
+
+// =========================
+// INICIAR VIAGEM
+// =========================
+
+document
+  .getElementById('btn-start-route')
+  ?.addEventListener('click', () => {
+
+    if(
+      routeReport.length !==
+      routeOrder.length
+    ){
+
+      routeReport =
+        routeOrder.map(id => ({
+
+          id,
+
+          chegada:null,
+
+          saida:null,
+
+          entrega:false,
+
+          coleta:false,
+
+          fotos:[],
+
+          gps:null
+        }));
+
+      currentIndex = 0;
+
+      saveState();
+    }
+
+    iniciarGPS();
+
+    updateModeUI();
+
+    showScreen('screen-mode');
+  });
+
+// =========================
+// PRÓXIMO
+// =========================
+
+document
+  .getElementById('btn-next')
+  ?.addEventListener('click', () => {
+
+    const entry =
+      routeReport[currentIndex];
+
+    entry.saida =
+      new Date().toISOString();
+
+    entry.entrega =
+      document.getElementById(
+        'chk-entrega'
+      ).checked;
+
+    entry.coleta =
+      document.getElementById(
+        'chk-coleta'
+      ).checked;
+
+    entry.fotos = [...currentPhotos];
+
+    currentIndex++;
+
+    currentPhotos = [];
+
+    if(photoInput){
+
+      photoInput.value = '';
+    }
+
+    const preview =
+      document.getElementById(
+        'photoPreview'
+      );
+
+    if(preview){
+
+      preview.innerHTML = '';
+    }
+
+    saveState();
+
+    updateModeUI();
+  });
+
+// =========================
+// GOOGLE MAPS
+// =========================
+
+document
+  .getElementById('btn-google')
+  ?.addEventListener('click', () => {
+
+    if(routeOrder.length === 0){
+      return;
+    }
+
+    const coords =
+      routeOrder.map(id =>
+        HOTELS
+          .find(h => h.id === id)
+          .coords
+      );
+
+    const origin = coords[0];
+
+    const destination =
+      coords[coords.length - 1];
+
+    const waypoints =
+      coords
+        .slice(1, coords.length - 1)
+        .join('|');
+
+    const url =
+
+      `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}${waypoints ? '&waypoints=' + waypoints : ''}&travelmode=driving`;
+
+    window.open(url, '_blank');
+  });
+
+// =========================
+// PDF
+// =========================
+
 document
   .getElementById('btn-pdf')
-  .addEventListener('click', () => {
+  ?.addEventListener('click', async () => {
 
-    const { jsPDF } = window.jspdf;
+    const { jsPDF } =
+      window.jspdf;
 
-    const doc = new jsPDF();
+    const doc =
+      new jsPDF();
 
-    doc.setFontSize(18);
+    doc.setFont('helvetica');
 
-    doc.text('Relatório de Rota', 14, 20);
+    doc.setFontSize(22);
 
-    let y = 35;
+    doc.text(
+      'RELATÓRIO DE ROTA',
+      105,
+      20,
+      { align:'center' }
+    );
 
-    routeReport.forEach((r, idx) => {
+    doc.setFontSize(11);
 
-      if(!r.time) return;
+    doc.text(
+      `Data: ${new Date().toLocaleDateString('pt-BR')}`,
+      14,
+      30
+    );
+
+    let y = 45;
+
+    for(let i = 0; i < routeReport.length; i++){
+
+      const r = routeReport[i];
+
+      if(!r.chegada) continue;
 
       const h =
         HOTELS.find(x => x.id === r.id);
 
-      if(!h) return;
+      if(!h) continue;
 
-      const hora =
-        new Date(r.time).toLocaleTimeString([],{
-          hour:'2-digit',
-          minute:'2-digit'
-        });
+      doc.roundedRect(
+        10,
+        y - 6,
+        190,
+        36,
+        4,
+        4
+      );
+
+      doc.setFontSize(13);
+
+      doc.text(
+        `${i + 1}. ${h.name}`,
+        14,
+        y
+      );
+
+      doc.setFontSize(10);
+
+      y += 8;
+
+      const chegada =
+        new Date(r.chegada)
+          .toLocaleTimeString([], {
+            hour:'2-digit',
+            minute:'2-digit'
+          });
+
+      const saida =
+        r.saida
+        ? new Date(r.saida)
+            .toLocaleTimeString([], {
+              hour:'2-digit',
+              minute:'2-digit'
+            })
+        : '--:--';
+
+      doc.text(
+        `Chegada: ${chegada}`,
+        16,
+        y
+      );
+
+      y += 6;
+
+      doc.text(
+        `Saída: ${saida}`,
+        16,
+        y
+      );
+
+      y += 6;
 
       let servicos = [];
 
-      if(r.entrega) servicos.push('Entrega');
+      if(r.entrega){
+        servicos.push('Entrega');
+      }
 
-      if(r.coleta) servicos.push('Coleta');
+      if(r.coleta){
+        servicos.push('Coleta');
+      }
 
       if(servicos.length === 0){
         servicos.push('Sem serviço');
       }
 
       doc.text(
-        `${idx + 1}. ${h.name}`,
-        14,
-        y
-      );
-
-      y += 6;
-
-      doc.text(
-        `Horário: ${hora}`,
-        20,
-        y
-      );
-
-      y += 6;
-
-      doc.text(
         `Serviços: ${servicos.join(', ')}`,
-        20,
+        16,
         y
       );
 
-      y += 12;
+      y += 10;
 
-      if(y > 270){
+      for(const foto of r.fotos.slice(0,2)){
+
+        try{
+
+          doc.addImage(
+            foto,
+            'JPEG',
+            16,
+            y,
+            40,
+            40
+          );
+
+          y += 45;
+
+        }catch(err){
+
+          console.log(err);
+        }
+      }
+
+      y += 10;
+
+      if(y > 240){
+
         doc.addPage();
+
         y = 20;
       }
-    });
+    }
 
     doc.save('rota-buzios.pdf');
-});
+  });
+
+// =========================
+// BOTÃO VOLTAR
+// =========================
 
 document
   .getElementById('btn-back')
-  .addEventListener('click', () => {
+  ?.addEventListener('click', () => {
+
     showScreen('screen-select');
-});
+  });
+
+// =========================
+// RESET
+// =========================
 
 document
   .getElementById('btn-reset')
-  .addEventListener('click', () => {
+  ?.addEventListener('click', () => {
 
-    if(confirm('Apagar tudo?')){
+    const confirmar =
+      confirm(
+        'Apagar tudo e recomeçar?'
+      );
 
-      [
-        'rota_ativos',
-        'rota_ordem',
-        'rota_relatorio',
-        'rota_index'
-      ].forEach(k => localStorage.removeItem(k));
-
-      activeSet.clear();
-
-      routeOrder = [];
-
-      routeReport = [];
-
-      currentIndex = 0;
-
-      renderSelection();
+    if(!confirmar){
+      return;
     }
-});
+
+    localStorage.clear();
+
+    activeSet.clear();
+
+    routeOrder = [];
+
+    routeReport = [];
+
+    currentIndex = 0;
+
+    renderSelection();
+
+    showScreen('screen-select');
+  });
+
+// =========================
+// FINALIZAR
+// =========================
 
 document
   .getElementById('btn-finish')
-  .addEventListener('click', () => {
+  ?.addEventListener('click', () => {
 
-    alert('Rota finalizada.');
+    alert(
+      'Relatório salvo.'
+    );
 
     showScreen('screen-select');
-});
+  });
+
+// =========================
+// BOOT
+// =========================
 
 renderSelection();
 
 if(
   routeOrder.length > 0 &&
-  currentIndex < routeOrder.length
+  currentIndex < routeOrder.length &&
+  currentIndex > 0
 ){
+
   showScreen('screen-mode');
+
   updateModeUI();
 }
+
+// =========================
+// SERVICE WORKER
+// =========================
 
 if('serviceWorker' in navigator){
 
