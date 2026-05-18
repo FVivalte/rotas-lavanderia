@@ -2,209 +2,475 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"
+  />
+
   <title>Rota Búzios — Entregas</title>
+
   <meta name="theme-color" content="#0b63b7"/>
+
   <link rel="manifest" href="manifest.json" />
-  
-  <!-- SortableJS para Drag & Drop funcionar bem em Celulares -->
+
+  <!-- Sortable -->
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-  <!-- Lucide Icons para um visual moderno -->
+
+  <!-- Lucide -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
+  <!-- PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
   <style>
+
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-    :root {
-      --bg: #f0f4f8;
-      --card: #ffffff;
-      --accent: #0b63b7;
-      --accent-hover: #084c8e;
-      --danger: #ef4444;
-      --muted: #64748b;
-      --border: #e2e8f0;
-      --radius: 16px;
-      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    :root{
+      --bg:#f0f4f8;
+      --card:#ffffff;
+      --accent:#0b63b7;
+      --danger:#ef4444;
+      --muted:#64748b;
+      --border:#e2e8f0;
+      --radius:16px;
+
+      font-family:'Inter',system-ui,sans-serif;
     }
 
-    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-    
-    body {
-      margin: 0;
-      background-color: var(--bg);
-      color: #0f172a;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
+    *{
+      box-sizing:border-box;
+      -webkit-tap-highlight-color:transparent;
     }
 
-    .app {
-      width: 100%;
-      max-width: 600px; /* Mais focado para mobile */
-      padding: 20px;
-      padding-bottom: 80px; /* Espaço para botões no fim da tela */
+    body{
+      margin:0;
+      background:var(--bg);
+      color:#0f172a;
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
     }
 
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 24px;
+    .app{
+      width:100%;
+      max-width:600px;
+      padding:20px;
+      padding-bottom:80px;
     }
 
-    h1 { margin: 0; font-size: 1.25rem; font-weight: 700; color: var(--accent); display: flex; align-items: center; gap: 8px; }
-    .status-badge { background: #e0f2fe; color: var(--accent); padding: 4px 8px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
-
-    .card {
-      background: var(--card);
-      border-radius: var(--radius);
-      padding: 20px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
-      margin-bottom: 16px;
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-bottom:24px;
     }
 
-    .header-text { margin-bottom: 16px; }
-    .header-text strong { display: block; font-size: 1.1rem; margin-bottom: 4px; }
-    .muted { color: var(--muted); font-size: 0.85rem; line-height: 1.4; }
-
-    /* Botões Modernizados */
-    .controls { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 16px; }
-    button {
-      background: var(--accent); color: #fff; border: 0; padding: 12px 16px; border-radius: 12px;
-      cursor: pointer; font-weight: 600; font-size: 0.95rem; font-family: inherit;
-      display: flex; align-items: center; justify-content: center; gap: 8px;
-      transition: all 0.2s; flex: 1; min-width: 120px;
+    h1{
+      margin:0;
+      font-size:1.25rem;
+      font-weight:700;
+      color:var(--accent);
+      display:flex;
+      align-items:center;
+      gap:8px;
     }
-    button:active { transform: scale(0.97); }
-    button.ghost { background: transparent; color: var(--accent); border: 1px solid var(--border); }
-    button.ghost:active { background: #f8fafc; }
-    button.danger { background: transparent; color: var(--danger); border: 1px solid #fee2e2; }
 
-    /* Lista de Hotéis */
-    .list { display: grid; gap: 12px; }
-    .item {
-      display: flex; align-items: center; gap: 12px; padding: 16px; border-radius: 12px;
-      background: #fff; border: 1px solid var(--border); transition: border-color 0.2s;
+    .status-badge{
+      background:#e0f2fe;
+      color:var(--accent);
+      padding:4px 8px;
+      border-radius:20px;
+      font-size:.75rem;
+      font-weight:600;
     }
-    .item:focus-within { border-color: var(--accent); }
-    .info { flex: 1; }
-    .name { font-weight: 600; margin-bottom: 4px; font-size: 1rem; }
-    .addr { font-size: 0.8rem; color: var(--muted); }
 
-    /* Toggle Switch Moderno (Estilo iOS) */
-    .switch { position: relative; width: 50px; height: 28px; display: inline-block; flex-shrink: 0; }
-    .switch input { opacity: 0; width: 0; height: 0; }
-    .slider { position: absolute; cursor: pointer; inset: 0; background: #cbd5e1; border-radius: 28px; transition: .3s; }
-    .slider:before { content: ""; position: absolute; left: 2px; bottom: 2px; width: 24px; height: 24px; background: #fff; border-radius: 50%; transition: .3s; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    input:checked + .slider { background: var(--accent); }
-    input:checked + .slider:before { transform: translateX(22px); }
-
-    /* Rota (Drag & Drop) */
-    .route-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;}
-    .route-item {
-      display: flex; align-items: center; justify-content: space-between; padding: 14px;
-      border-radius: 12px; background: #fff; border: 1px solid var(--border);
-      box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    .card{
+      background:var(--card);
+      border-radius:var(--radius);
+      padding:20px;
+      margin-bottom:16px;
+      box-shadow:0 4px 6px rgba(0,0,0,.05);
     }
-    .drag-handle { cursor: grab; padding: 10px; color: var(--muted); margin-left: -10px; }
-    .drag-handle:active { cursor: grabbing; }
-    .sortable-ghost { opacity: 0.4; background: #e0f2fe; } /* Efeito ao arrastar */
 
-    /* Checkboxes Customizados */
-    .custom-checkbox { display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px 0;}
-    .custom-checkbox input { width: 20px; height: 20px; accent-color: var(--accent); cursor: pointer; }
+    .header-text{
+      margin-bottom:16px;
+    }
 
-    /* Relatórios */
-    .report { max-height: 250px; overflow-y: auto; background: #f8fafc; border-radius: 12px; padding: 10px; border: 1px solid var(--border); }
-    .report-row { display: flex; justify-content: space-between; padding: 12px 8px; border-bottom: 1px solid var(--border); align-items: center;}
-    .report-row:last-child { border-bottom: none; }
-    .report-time { font-size: 0.85rem; background: #e2e8f0; padding: 4px 8px; border-radius: 6px; font-weight: 500;}
+    .header-text strong{
+      display:block;
+      font-size:1.1rem;
+      margin-bottom:4px;
+    }
 
-    /* Utilitários */
-    .hidden { display: none !important; }
-    .icon-btn { padding: 8px; min-width: auto; border: none; background: transparent; color: var(--danger); }
-    
-    footer { text-align: center; color: var(--muted); font-size: 0.8rem; margin-top: 20px; padding-bottom: 20px;}
+    .muted{
+      color:var(--muted);
+      font-size:.85rem;
+      line-height:1.4;
+    }
+
+    .controls{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:16px;
+    }
+
+    button{
+      background:var(--accent);
+      color:#fff;
+      border:0;
+      padding:12px 16px;
+      border-radius:12px;
+      cursor:pointer;
+      font-weight:600;
+      font-size:.95rem;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      flex:1;
+    }
+
+    button.ghost{
+      background:transparent;
+      color:var(--accent);
+      border:1px solid var(--border);
+    }
+
+    .list{
+      display:grid;
+      gap:12px;
+    }
+
+    .item{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:16px;
+      border-radius:12px;
+      background:#fff;
+      border:1px solid var(--border);
+    }
+
+    .info{
+      flex:1;
+    }
+
+    .name{
+      font-weight:600;
+      margin-bottom:4px;
+    }
+
+    .addr{
+      font-size:.8rem;
+      color:var(--muted);
+    }
+
+    .switch{
+      position:relative;
+      width:50px;
+      height:28px;
+    }
+
+    .switch input{
+      opacity:0;
+      width:0;
+      height:0;
+    }
+
+    .slider{
+      position:absolute;
+      inset:0;
+      background:#cbd5e1;
+      border-radius:28px;
+      transition:.3s;
+    }
+
+    .slider:before{
+      content:"";
+      position:absolute;
+      left:2px;
+      bottom:2px;
+      width:24px;
+      height:24px;
+      background:#fff;
+      border-radius:50%;
+      transition:.3s;
+    }
+
+    input:checked + .slider{
+      background:var(--accent);
+    }
+
+    input:checked + .slider:before{
+      transform:translateX(22px);
+    }
+
+    .route-list{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      margin-bottom:20px;
+    }
+
+    .route-item{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px;
+      border-radius:12px;
+      background:#fff;
+      border:1px solid var(--border);
+    }
+
+    .drag-handle{
+      cursor:grab;
+      padding:10px;
+      color:var(--muted);
+      margin-left:-10px;
+    }
+
+    .sortable-ghost{
+      opacity:.4;
+      background:#e0f2fe;
+    }
+
+    .custom-checkbox{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 0;
+    }
+
+    .custom-checkbox input{
+      width:20px;
+      height:20px;
+      accent-color:var(--accent);
+    }
+
+    .report{
+      max-height:250px;
+      overflow-y:auto;
+      background:#f8fafc;
+      border-radius:12px;
+      padding:10px;
+      border:1px solid var(--border);
+    }
+
+    .report-row{
+      display:flex;
+      justify-content:space-between;
+      padding:12px 8px;
+      border-bottom:1px solid var(--border);
+    }
+
+    .report-row:last-child{
+      border-bottom:none;
+    }
+
+    .report-time{
+      font-size:.85rem;
+      background:#e2e8f0;
+      padding:4px 8px;
+      border-radius:6px;
+    }
+
+    .hidden{
+      display:none !important;
+    }
+
+    .icon-btn{
+      padding:8px;
+      background:transparent;
+      border:none;
+      color:var(--danger);
+      min-width:auto;
+    }
+
   </style>
 </head>
+
 <body>
-  <div class="app">
-    <header>
-      <h1><i data-lucide="map"></i> Rota Búzios</h1>
-      <div class="status-badge">Offline PWA</div>
-    </header>
 
-    <!-- TELA 1: SELEÇÃO -->
-    <section id="screen-select" class="card">
-      <div class="header-text">
-        <strong>Selecione os hotéis</strong>
-        <div class="muted">Ative os pontos de parada para a rota de hoje.</div>
+<div class="app">
+
+  <header>
+    <h1>
+      <i data-lucide="map"></i>
+      Rota Búzios
+    </h1>
+
+    <div class="status-badge">
+      Offline PWA
+    </div>
+  </header>
+
+  <!-- SELEÇÃO -->
+
+  <section id="screen-select" class="card">
+
+    <div class="header-text">
+      <strong>Selecione os hotéis</strong>
+      <div class="muted">
+        Ative os pontos de parada para a rota.
       </div>
-      
-      <div class="controls">
-        <button id="btn-generate"><i data-lucide="route"></i> Criar Rota</button>
-        <button id="btn-reset" class="ghost"><i data-lucide="trash-2"></i> Limpar</button>
+    </div>
+
+    <div class="controls">
+
+      <button id="btn-generate">
+        <i data-lucide="route"></i>
+        Criar Rota
+      </button>
+
+      <button id="btn-reset" class="ghost">
+        <i data-lucide="trash-2"></i>
+        Limpar
+      </button>
+
+    </div>
+
+    <div class="list" id="hotelList"></div>
+
+  </section>
+
+  <!-- ROTA -->
+
+  <section id="screen-route" class="card hidden">
+
+    <div class="header-text">
+      <strong>Organize a rota</strong>
+
+      <div class="muted">
+        Segure e arraste para mudar a ordem.
       </div>
+    </div>
 
-      <div class="list" id="hotelList"></div>
-    </section>
+    <div class="controls">
 
-    <!-- TELA 2: ROTA GERADA -->
-    <section id="screen-route" class="card hidden">
-      <div class="header-text">
-        <strong>Organize a Rota</strong>
-        <div class="muted">Segure e arraste as linhas para mudar a ordem.</div>
-      </div>
+      <button id="btn-start-route">
+        <i data-lucide="play"></i>
+        Iniciar
+      </button>
 
-      <div class="controls">
-        <button id="btn-start-route"><i data-lucide="play"></i> Iniciar Viagem</button>
-        <button id="btn-google" class="ghost"><i data-lucide="map-pin"></i> Ver no Maps</button>
-      </div>
+      <button id="btn-google" class="ghost">
+        <i data-lucide="map-pin"></i>
+        Maps
+      </button>
 
-      <div class="route-list" id="routeList"></div>
+    </div>
 
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
-        <button id="btn-back" class="ghost" style="flex: 0 1 auto;"><i data-lucide="arrow-left"></i> Voltar</button>
-        <span class="status-badge" id="activeCount">0 ativos</span>
-      </div>
-    </section>
+    <div class="route-list" id="routeList"></div>
 
-    <!-- TELA 3: MODO ROTA -->
-    <section id="screen-mode" class="card hidden">
-      <div class="header-text" style="display: flex; justify-content: space-between; align-items: flex-start;">
-        <div>
-          <strong>Modo Viagem</strong>
-          <div class="muted">Registre os serviços em cada parada.</div>
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+
+      <button id="btn-back" class="ghost" style="flex:0 1 auto;">
+        <i data-lucide="arrow-left"></i>
+        Voltar
+      </button>
+
+      <span class="status-badge" id="activeCount"></span>
+
+    </div>
+
+  </section>
+
+  <!-- MODO ROTA -->
+
+  <section id="screen-mode" class="card hidden">
+
+    <div
+      class="header-text"
+      style="display:flex;justify-content:space-between;align-items:center;"
+    >
+
+      <div>
+        <strong>Modo Viagem</strong>
+
+        <div class="muted">
+          Registre os serviços.
         </div>
-        <button id="btn-finish" class="ghost" style="min-width: auto; padding: 8px 12px; font-size: 0.85rem;">Encerrar</button>
       </div>
 
-      <div id="currentHotel" style="background: var(--accent); color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px;">
-        <!-- Preenchido via JS -->
-      </div>
+      <button
+        id="btn-finish"
+        class="ghost"
+        style="flex:0 1 auto;"
+      >
+        Encerrar
+      </button>
 
-      <div style="background: #f8fafc; border: 1px solid var(--border); padding: 16px; border-radius: 12px; margin-bottom: 20px;">
-        <label class="custom-checkbox"><input type="checkbox" id="chk-entrega"> <span>Foi feita Entrega</span></label>
-        <label class="custom-checkbox"><input type="checkbox" id="chk-coleta"> <span>Foi feita Coleta</span></label>
-        
-        <button id="btn-next" style="width: 100%; margin-top: 16px; padding: 16px;"><i data-lucide="check-circle"></i> Confirmar e Próximo</button>
-      </div>
+    </div>
 
-      <div class="header-text">
-        <strong>Histórico da Rota</strong>
-      </div>
-      <div class="report" id="reportMode"></div>
-    </section>
+    <div
+      id="currentHotel"
+      style="
+        background:var(--accent);
+        color:white;
+        padding:20px;
+        border-radius:12px;
+        margin-bottom:20px;
+      "
+    ></div>
 
-    <footer>Feito para PWA • Adicione à tela inicial</footer>
-  </div>
+    <div
+      style="
+        background:#f8fafc;
+        border:1px solid var(--border);
+        padding:16px;
+        border-radius:12px;
+        margin-bottom:20px;
+      "
+    >
 
-  <script>
-    // Inicializa ícones Lucide
-    lucide.createIcons();
+      <label class="custom-checkbox">
+        <input type="checkbox" id="chk-entrega">
+        <span>Entrega</span>
+      </label>
 
-    // Dados base
-    const HOTELS = [
+      <label class="custom-checkbox">
+        <input type="checkbox" id="chk-coleta">
+        <span>Coleta</span>
+      </label>
+
+      <button id="btn-next" style="margin-top:16px;width:100%;">
+        <i data-lucide="check-circle"></i>
+        Confirmar
+      </button>
+
+    </div>
+
+    <div
+      class="header-text"
+      style="display:flex;justify-content:space-between;align-items:center;"
+    >
+
+      <strong>Histórico</strong>
+
+      <button
+        id="btn-pdf"
+        class="ghost"
+        style="flex:0 1 auto;"
+      >
+        <i data-lucide="file-text"></i>
+        PDF
+      </button>
+
+    </div>
+
+    <div class="report" id="reportMode"></div>
+
+  </section>
+
+</div>
+
+<script>
+
+lucide.createIcons();
+
+const HOTELS = [
       {id:1,name:"Hotel Aretê",region:"Baía Formosa / Rasa",address:"Alameda Andorinhas – Loteamento Praia Baía Formosa, Armação dos Búzios - RJ",coords:"-22.7490005,-41.9561384"},
       {id:2,name:"Pousada Manaaki",region:"Praia Rasa",address:"Av. Greta Blanck do Rio, 82 – Praia Rasa, Armação dos Búzios - RJ",coords:"-22.7632675,-41.9422559"},
       {id:3,name:"Pousada Maré Búzios",region:"Vila Luiza",address:"Rua do Começo, 162 – Vila Luiza, Armação dos Búzios - RJ",coords:"-22.7597922,-41.9441392"},
@@ -221,227 +487,584 @@
       {id:14,name:"Azeda",region:"Azeda / Ossos",address:"Código Plus: 743C+MM6 – Armação dos Búzios - RJ",coords:"-22.7458674,-41.8783928"}
     ];
 
-    // Estado e LocalStorage para persistência de dados
-    let activeSet = new Set(JSON.parse(localStorage.getItem('rota_ativos')) || []);
-    let routeOrder = JSON.parse(localStorage.getItem('rota_ordem')) || [];
-    let routeReport = JSON.parse(localStorage.getItem('rota_relatorio')) || [];
-    let currentIndex = parseInt(localStorage.getItem('rota_index')) || 0;
+let activeSet =
+  new Set(JSON.parse(localStorage.getItem('rota_ativos')) || []);
 
-    const saveState = () => {
-      localStorage.setItem('rota_ativos', JSON.stringify([...activeSet]));
-      localStorage.setItem('rota_ordem', JSON.stringify(routeOrder));
-      localStorage.setItem('rota_relatorio', JSON.stringify(routeReport));
-      localStorage.setItem('rota_index', currentIndex.toString());
-    };
+let routeOrder =
+  JSON.parse(localStorage.getItem('rota_ordem')) || [];
 
-    // Telas
-    const screenSelect = document.getElementById('screen-select');
-    const screenRoute = document.getElementById('screen-route');
-    const screenMode = document.getElementById('screen-mode');
-    
-    // Switch de telas
-    const showScreen = (id) => {
-      [screenSelect, screenRoute, screenMode].forEach(el => el.classList.add('hidden'));
-      document.getElementById(id).classList.remove('hidden');
-    };
+let routeReport =
+  JSON.parse(localStorage.getItem('rota_relatorio')) || [];
 
-    // Renderiza Tela 1
-    function renderSelection() {
-      const list = document.getElementById('hotelList');
-      list.innerHTML = '';
-      HOTELS.forEach(h => {
-        const div = document.createElement('div');
-        div.className = 'item';
-        div.innerHTML = `
-          <div class="info">
-            <div class="name">${h.name}</div>
-            <div class="addr">${h.region} • ${h.address}</div>
-          </div>
-          <label class="switch">
-            <input type="checkbox" data-id="${h.id}" ${activeSet.has(h.id) ? 'checked' : ''}>
-            <span class="slider"></span>
-          </label>`;
-        list.appendChild(div);
-      });
+let currentIndex =
+  parseInt(localStorage.getItem('rota_index')) || 0;
 
-      list.querySelectorAll('input').forEach(cb => {
-        cb.addEventListener('change', (e) => {
-          const id = Number(e.target.dataset.id);
-          if(e.target.checked) activeSet.add(id); else activeSet.delete(id);
-          saveState();
-        });
-      });
-    }
+let sortableInstance = null;
 
-    // Gera Rota e vai pra Tela 2
-    document.getElementById('btn-generate').addEventListener('click', () => {
-      if(activeSet.size === 0) return alert('Selecione ao menos um hotel.');
-      
-      // Só sobrescreve a ordem se for a primeira vez ou se mudou de ideia
-      const currentActiveArray = [...activeSet];
-      routeOrder = currentActiveArray.filter(id => HOTELS.some(h => h.id === id));
+const saveState = () => {
+
+  localStorage.setItem(
+    'rota_ativos',
+    JSON.stringify([...activeSet])
+  );
+
+  localStorage.setItem(
+    'rota_ordem',
+    JSON.stringify(routeOrder)
+  );
+
+  localStorage.setItem(
+    'rota_relatorio',
+    JSON.stringify(routeReport)
+  );
+
+  localStorage.setItem(
+    'rota_index',
+    currentIndex.toString()
+  );
+};
+
+const showScreen = (id) => {
+
+  [
+    screenSelect,
+    screenRoute,
+    screenMode
+  ].forEach(el => el.classList.add('hidden'));
+
+  document
+    .getElementById(id)
+    .classList
+    .remove('hidden');
+};
+
+const screenSelect =
+  document.getElementById('screen-select');
+
+const screenRoute =
+  document.getElementById('screen-route');
+
+const screenMode =
+  document.getElementById('screen-mode');
+
+function renderSelection(){
+
+  const list =
+    document.getElementById('hotelList');
+
+  list.innerHTML = '';
+
+  HOTELS.forEach(h => {
+
+    const div =
+      document.createElement('div');
+
+    div.className = 'item';
+
+    div.innerHTML = `
+
+      <div class="info">
+
+        <div class="name">
+          ${h.name}
+        </div>
+
+        <div class="addr">
+          ${h.address}
+        </div>
+
+      </div>
+
+      <label class="switch">
+
+        <input
+          type="checkbox"
+          data-id="${h.id}"
+          ${activeSet.has(h.id) ? 'checked' : ''}
+        >
+
+        <span class="slider"></span>
+
+      </label>
+    `;
+
+    list.appendChild(div);
+  });
+
+  list.querySelectorAll('input').forEach(cb => {
+
+    cb.addEventListener('change', e => {
+
+      const id =
+        Number(e.target.dataset.id);
+
+      if(e.target.checked){
+        activeSet.add(id);
+      }else{
+        activeSet.delete(id);
+      }
+
       saveState();
-      
-      renderRoute();
-      showScreen('screen-route');
     });
+  });
+}
 
-    // Renderiza Tela 2 (Com SortableJS)
-    function renderRoute() {
-      const list = document.getElementById('routeList');
-      list.innerHTML = '';
-      
-      routeOrder.forEach((id, idx) => {
-        const h = HOTELS.find(x => x.id === id);
-        const div = document.createElement('div');
-        div.className = 'route-item';
-        div.dataset.id = id;
-        div.innerHTML = `
-          <div style="display:flex; align-items:center;">
-            <div class="drag-handle"><i data-lucide="grip-vertical"></i></div>
-            <div>
-              <strong>${idx + 1}. ${h.name}</strong>
-              <div class="muted">${h.address}</div>
-            </div>
-          </div>
-          <button class="icon-btn remove-btn" data-id="${id}"><i data-lucide="x"></i></button>`;
-        list.appendChild(div);
-      });
-      lucide.createIcons();
+document
+  .getElementById('btn-generate')
+  .addEventListener('click', () => {
 
-      // Ativa SortableJS para Drag and Drop no Mobile
-      new Sortable(list, {
-        handle: '.drag-handle',
-        animation: 150,
-        onEnd: function () {
-          // Atualiza o array baseado na nova ordem visual DOM
-          routeOrder = Array.from(list.children).map(el => Number(el.dataset.id));
-          saveState();
-          renderRoute(); // Re-renderiza para atualizar os números
-        }
-      });
-
-      // Lógica de remover da rota
-      document.querySelectorAll('.remove-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const id = Number(e.currentTarget.dataset.id);
-          activeSet.delete(id);
-          routeOrder = routeOrder.filter(x => x !== id);
-          saveState();
-          renderSelection();
-          renderRoute();
-        });
-      });
-
-      document.getElementById('activeCount').innerText = `${routeOrder.length} paradas`;
+    if(activeSet.size === 0){
+      alert('Selecione ao menos um hotel.');
+      return;
     }
 
-    // Abre Google Maps
-    document.getElementById('btn-google').addEventListener('click', () => {
-      const coords = routeOrder.map(id => HOTELS.find(h => h.id === id).coords.replace(/\s/g,''));
-      const origin = coords[0];
-      const destination = coords[coords.length-1];
-      const waypoints = coords.slice(1,coords.length-1).join('|');
-      const url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${destination}${waypoints ? '&waypoints='+waypoints : ''}&travelmode=driving`;
-      window.open(url, '_blank');
-    });
+    if(routeOrder.length === 0){
 
-    // Inicia a Viagem (Tela 3)
-    document.getElementById('btn-start-route').addEventListener('click', () => {
-      // Cria relatório vazio apenas se não existir
-      if(routeReport.length !== routeOrder.length) {
-        routeReport = routeOrder.map(id => ({id, time: null, entrega: false, coleta: false}));
-        currentIndex = 0;
+      routeOrder = [...activeSet];
+
+    }else{
+
+      const existing =
+        routeOrder.filter(id => activeSet.has(id));
+
+      const newOnes =
+        [...activeSet].filter(id => !existing.includes(id));
+
+      routeOrder = [...existing, ...newOnes];
+    }
+
+    saveState();
+
+    renderRoute();
+
+    showScreen('screen-route');
+});
+
+function renderRoute(){
+
+  const list =
+    document.getElementById('routeList');
+
+  list.innerHTML = '';
+
+  routeOrder.forEach((id, idx) => {
+
+    const h =
+      HOTELS.find(x => x.id === id);
+
+    if(!h) return;
+
+    const div =
+      document.createElement('div');
+
+    div.className = 'route-item';
+
+    div.dataset.id = id;
+
+    div.innerHTML = `
+
+      <div style="display:flex;align-items:center;">
+
+        <div class="drag-handle">
+          <i data-lucide="grip-vertical"></i>
+        </div>
+
+        <div>
+
+          <strong>
+            ${idx + 1}. ${h.name}
+          </strong>
+
+          <div class="muted">
+            ${h.address}
+          </div>
+
+        </div>
+
+      </div>
+
+      <button
+        class="icon-btn remove-btn"
+        data-id="${id}"
+      >
+        <i data-lucide="x"></i>
+      </button>
+    `;
+
+    list.appendChild(div);
+  });
+
+  lucide.createIcons();
+
+  if(sortableInstance){
+    sortableInstance.destroy();
+  }
+
+  sortableInstance =
+    new Sortable(list, {
+
+      handle:'.drag-handle',
+
+      animation:150,
+
+      onEnd:() => {
+
+        routeOrder =
+          Array
+            .from(list.children)
+            .map(el => Number(el.dataset.id));
+
         saveState();
-      }
-      updateModeUI();
-      showScreen('screen-mode');
-    });
 
-    // Atualiza a interface durante a viagem
-    function updateModeUI() {
-      const currentEl = document.getElementById('currentHotel');
-      
-      if (currentIndex >= routeOrder.length) {
-        currentEl.innerHTML = `<h2 style="margin:0"><i data-lucide="flag"></i> Viagem Finalizada!</h2>`;
-        document.getElementById('btn-next').disabled = true;
-      } else {
-        const h = HOTELS.find(x => x.id === routeOrder[currentIndex]);
-        currentEl.innerHTML = `
-          <div style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 4px;">Parada ${currentIndex + 1} de ${routeOrder.length}</div>
-          <h2 style="margin:0; font-size:1.4rem;">${h.name}</h2>
-          <div style="margin-top:4px; opacity: 0.9;">${h.address}</div>
-        `;
-        document.getElementById('chk-entrega').checked = false;
-        document.getElementById('chk-coleta').checked = false;
-        document.getElementById('btn-next').disabled = false;
+        renderRoute();
       }
-      lucide.createIcons();
-      renderReportMode();
-    }
+  });
 
-    // Botão "Confirmar e Próximo"
-    document.getElementById('btn-next').addEventListener('click', () => {
-      const entry = routeReport[currentIndex];
-      entry.time = new Date().toISOString(); // Grava a hora real de agora
-      entry.entrega = document.getElementById('chk-entrega').checked;
-      entry.coleta = document.getElementById('chk-coleta').checked;
-      
-      currentIndex++;
+  document.querySelectorAll('.remove-btn').forEach(btn => {
+
+    btn.addEventListener('click', e => {
+
+      const id =
+        Number(e.currentTarget.dataset.id);
+
+      activeSet.delete(id);
+
+      routeOrder =
+        routeOrder.filter(x => x !== id);
+
       saveState();
-      updateModeUI();
+
+      renderSelection();
+
+      renderRoute();
     });
+  });
 
-    // Renderiza Relatório na Tela 3
-    function renderReportMode() {
-      const reportDiv = document.getElementById('reportMode');
-      reportDiv.innerHTML = '';
-      
-      routeReport.forEach((r, idx) => {
-        if(!r.time) return; // Só mostra quem já foi visitado
-        const h = HOTELS.find(x => x.id === r.id);
-        const timeStr = new Date(r.time).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        
-        let tags = [];
-        if(r.entrega) tags.push('Entrg');
-        if(r.coleta) tags.push('Col');
+  document
+    .getElementById('activeCount')
+    .innerText = `${routeOrder.length} paradas`;
+}
 
-        reportDiv.innerHTML += `
-          <div class="report-row">
-            <div>
-              <strong>${idx+1}. ${h.name}</strong>
-              <div class="muted" style="font-size:0.75rem">${tags.length ? tags.join(' • ') : 'Sem serviço'}</div>
-            </div>
-            <div class="report-time">${timeStr}</div>
-          </div>`;
-      });
+document
+  .getElementById('btn-google')
+  .addEventListener('click', () => {
+
+    const validHotels = routeOrder
+      .map(id => HOTELS.find(h => h.id === id))
+      .filter(h => h && h.coords);
+
+    if(validHotels.length === 0){
+      alert('Nenhuma coordenada válida.');
+      return;
     }
 
-    // Botões de Navegação Simples
-    document.getElementById('btn-back').addEventListener('click', () => showScreen('screen-select'));
-    document.getElementById('btn-reset').addEventListener('click', () => {
-      if(confirm('Apagar tudo e recomeçar?')) {
-        localStorage.clear();
-        activeSet.clear(); routeOrder = []; routeReport = []; currentIndex = 0;
-        renderSelection();
+    const coords =
+      validHotels.map(h => h.coords);
+
+    const origin = coords[0];
+
+    const destination =
+      coords[coords.length - 1];
+
+    const waypoints =
+      coords.slice(1, coords.length - 1).join('|');
+
+    const url =
+      `https://www.google.com/maps/dir/?api=1`
+      + `&origin=${origin}`
+      + `&destination=${destination}`
+      + `${waypoints ? '&waypoints=' + waypoints : ''}`
+      + `&travelmode=driving`;
+
+    window.open(url, '_blank');
+});
+
+document
+  .getElementById('btn-start-route')
+  .addEventListener('click', () => {
+
+    if(routeReport.length !== routeOrder.length){
+
+      routeReport =
+        routeOrder.map(id => ({
+          id,
+          time:null,
+          entrega:false,
+          coleta:false
+        }));
+
+      currentIndex = 0;
+
+      saveState();
+    }
+
+    updateModeUI();
+
+    showScreen('screen-mode');
+});
+
+function updateModeUI(){
+
+  const currentEl =
+    document.getElementById('currentHotel');
+
+  if(currentIndex >= routeOrder.length){
+
+    currentEl.innerHTML = `
+
+      <div style="text-align:center;">
+
+        <i
+          data-lucide="flag"
+          style="width:48px;height:48px;"
+        ></i>
+
+        <h2>Viagem Finalizada!</h2>
+
+      </div>
+    `;
+
+    document
+      .getElementById('btn-next')
+      .disabled = true;
+
+  }else{
+
+    const h =
+      HOTELS.find(x => x.id === routeOrder[currentIndex]);
+
+    currentEl.innerHTML = `
+
+      <div style="opacity:.8;margin-bottom:4px;">
+        Parada ${currentIndex + 1}
+      </div>
+
+      <h2 style="margin:0;">
+        ${h.name}
+      </h2>
+
+      <div style="margin-top:4px;">
+        ${h.address}
+      </div>
+    `;
+
+    document.getElementById('chk-entrega').checked = false;
+
+    document.getElementById('chk-coleta').checked = false;
+  }
+
+  lucide.createIcons();
+
+  renderReportMode();
+}
+
+document
+  .getElementById('btn-next')
+  .addEventListener('click', () => {
+
+    const entry =
+      routeReport[currentIndex];
+
+    entry.time =
+      new Date().toISOString();
+
+    entry.entrega =
+      document.getElementById('chk-entrega').checked;
+
+    entry.coleta =
+      document.getElementById('chk-coleta').checked;
+
+    currentIndex++;
+
+    saveState();
+
+    updateModeUI();
+});
+
+function renderReportMode(){
+
+  const reportDiv =
+    document.getElementById('reportMode');
+
+  reportDiv.innerHTML = '';
+
+  routeReport.forEach((r, idx) => {
+
+    if(!r.time) return;
+
+    const h =
+      HOTELS.find(x => x.id === r.id);
+
+    if(!h) return;
+
+    const timeStr =
+      new Date(r.time).toLocaleTimeString([],{
+        hour:'2-digit',
+        minute:'2-digit'
+      });
+
+    let tags = [];
+
+    if(r.entrega) tags.push('Entrega');
+
+    if(r.coleta) tags.push('Coleta');
+
+    reportDiv.innerHTML += `
+
+      <div class="report-row">
+
+        <div>
+
+          <strong>
+            ${idx + 1}. ${h.name}
+          </strong>
+
+          <div class="muted">
+            ${tags.join(' • ') || 'Sem serviço'}
+          </div>
+
+        </div>
+
+        <div class="report-time">
+          ${timeStr}
+        </div>
+
+      </div>
+    `;
+  });
+}
+
+document
+  .getElementById('btn-pdf')
+  .addEventListener('click', () => {
+
+    const { jsPDF } = window.jspdf;
+
+    const doc = new jsPDF();
+
+    doc.setFontSize(18);
+
+    doc.text('Relatório de Rota', 14, 20);
+
+    let y = 35;
+
+    routeReport.forEach((r, idx) => {
+
+      if(!r.time) return;
+
+      const h =
+        HOTELS.find(x => x.id === r.id);
+
+      if(!h) return;
+
+      const hora =
+        new Date(r.time).toLocaleTimeString([],{
+          hour:'2-digit',
+          minute:'2-digit'
+        });
+
+      let servicos = [];
+
+      if(r.entrega) servicos.push('Entrega');
+
+      if(r.coleta) servicos.push('Coleta');
+
+      if(servicos.length === 0){
+        servicos.push('Sem serviço');
+      }
+
+      doc.text(
+        `${idx + 1}. ${h.name}`,
+        14,
+        y
+      );
+
+      y += 6;
+
+      doc.text(
+        `Horário: ${hora}`,
+        20,
+        y
+      );
+
+      y += 6;
+
+      doc.text(
+        `Serviços: ${servicos.join(', ')}`,
+        20,
+        y
+      );
+
+      y += 12;
+
+      if(y > 270){
+        doc.addPage();
+        y = 20;
       }
     });
-    document.getElementById('btn-finish').addEventListener('click', () => {
-      alert('Relatório salvo internamente. Você pode voltar para a tela inicial.');
-      showScreen('screen-select');
-    });
 
-    // Boot inicial
-    renderSelection();
-    
-    // Se o usuário atualizou a página no meio de uma rota, tenta restaurar a tela correta
-    if(routeOrder.length > 0 && currentIndex < routeOrder.length && currentIndex > 0) {
-       showScreen('screen-mode');
-       updateModeUI();
+    doc.save('rota-buzios.pdf');
+});
+
+document
+  .getElementById('btn-back')
+  .addEventListener('click', () => {
+    showScreen('screen-select');
+});
+
+document
+  .getElementById('btn-reset')
+  .addEventListener('click', () => {
+
+    if(confirm('Apagar tudo?')){
+
+      [
+        'rota_ativos',
+        'rota_ordem',
+        'rota_relatorio',
+        'rota_index'
+      ].forEach(k => localStorage.removeItem(k));
+
+      activeSet.clear();
+
+      routeOrder = [];
+
+      routeReport = [];
+
+      currentIndex = 0;
+
+      renderSelection();
     }
+});
 
-    // Service Worker
-    if('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(()=>{});
-  </script>
+document
+  .getElementById('btn-finish')
+  .addEventListener('click', () => {
+
+    alert('Rota finalizada.');
+
+    showScreen('screen-select');
+});
+
+renderSelection();
+
+if(
+  routeOrder.length > 0 &&
+  currentIndex < routeOrder.length
+){
+  showScreen('screen-mode');
+  updateModeUI();
+}
+
+if('serviceWorker' in navigator){
+
+  navigator
+    .serviceWorker
+    .register('sw.js')
+    .catch(() => {});
+}
+
+</script>
+
 </body>
 </html>
