@@ -529,3 +529,41 @@ footer{
     font-size:1.1rem;
   }
 }
+
+/* =========================================
+   FOTO
+========================================= */
+
+
+.photo-preview{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:10px;
+}
+
+.photo-preview img{
+  width:90px;
+  height:90px;
+  object-fit:cover;
+  border-radius:12px;
+  border:1px solid var(--border);
+}
+
+.gps-badge{
+  background:#dcfce7;
+  color:#166534;
+
+  padding:6px 10px;
+
+  border-radius:999px;
+
+  font-size:.75rem;
+  font-weight:600;
+
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+
+  margin-top:10px;
+}
