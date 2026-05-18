@@ -71,9 +71,6 @@
     .hotel-name{font-weight:700}
     .hotel-region{font-size:0.85rem;color:#4b6b8a}
     .actions{display:flex;gap:8px;align-items:center}
-    .toggle{
-      display:inline-flex;align-items:center;gap:8px;background:transparent;border-radius:8px;padding:6px 8px;border:1px solid rgba(11,99,183,0.08)
-    }
     .small{font-size:0.85rem;padding:6px 8px}
     .route-list{margin-top:12px}
     .route-item{display:flex;align-items:center;justify-content:space-between;padding:8px;border-radius:8px;background:#f7fbff;margin-bottom:6px}
@@ -86,6 +83,44 @@
     .report{max-height:260px;overflow:auto;margin-top:10px}
     .report-row{display:flex;justify-content:space-between;padding:8px;border-bottom:1px dashed #e6f0fb}
     footer{margin-top:12px;font-size:0.85rem;color:#4b6b8a}
+
+    /* Toggle switch styles */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 46px;
+      height: 26px;
+    }
+    .switch input { display:none; }
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #d6eaf8;
+      transition: .2s;
+      border-radius: 26px;
+      border: 1px solid rgba(11,99,183,0.08);
+    }
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      top: 2.5px;
+      background-color: white;
+      transition: .2s;
+      border-radius: 50%;
+      box-shadow: 0 2px 6px rgba(11,99,183,0.12);
+    }
+    input:checked + .slider {
+      background-color: var(--blue-700);
+      border-color: rgba(11,99,183,0.18);
+    }
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+
     @media (max-width:600px){
       .controls{flex-direction:column}
       .hotel{flex-direction:column;align-items:flex-start}
@@ -176,7 +211,7 @@
     const currentHotelEl = document.getElementById('currentHotel');
     const nextTwoEl = document.getElementById('nextTwo');
 
-    // Render hotel list
+    // Render hotel list with Toggle Switch
     function renderHotels(){
       hotelListEl.innerHTML = '';
       HOTELS.forEach(h=>{
@@ -196,28 +231,36 @@
 
         const actions = document.createElement('div');
         actions.className='actions';
-        const toggle = document.createElement('button');
-        toggle.className='small';
-        toggle.textContent = activeSet.has(h.id)?'Ativado':'Ativar';
-        toggle.onclick = ()=> {
-          if(activeSet.has(h.id)) activeSet.delete(h.id); else activeSet.add(h.id);
-          toggle.textContent = activeSet.has(h.id)?'Ativado':'Ativar';
+
+        // Toggle switch element
+        const switchWrap = document.createElement('label');
+        switchWrap.className = 'switch';
+        const input = document.createElement('input');
+        input.type = 'checkbox';
+        input.checked = activeSet.has(h.id);
+        input.setAttribute('aria-label', `Ativar ${h.name}`);
+        input.addEventListener('change', (e)=>{
+          if(e.target.checked) activeSet.add(h.id); else activeSet.delete(h.id);
           renderRoutePreview();
-        };
+        });
+        const slider = document.createElement('span');
+        slider.className = 'slider';
+        switchWrap.appendChild(input);
+        switchWrap.appendChild(slider);
 
         const infoBtn = document.createElement('button');
         infoBtn.className='ghost small';
         infoBtn.textContent='Ver';
         infoBtn.onclick = ()=> alert(`${h.name}\n${h.address}\nCoords: ${h.coords}\nPlus: ${h.plus}`);
 
-        actions.appendChild(toggle);
+        actions.appendChild(switchWrap);
         actions.appendChild(infoBtn);
 
         div.appendChild(drag);
         div.appendChild(info);
         div.appendChild(actions);
 
-        // Drag events for reordering in route area (not in main list)
+        // Drag events for potential future use
         div.addEventListener('dragstart', e=>{
           e.dataTransfer.setData('text/plain', h.id);
         });
@@ -235,7 +278,7 @@
         return;
       }
       routeArea.style.display='block';
-      // If routeOrder empty or mismatch, initialize by priority then id
+      // If routeOrder empty or mismatch, initialize by activation order
       if(routeOrder.length===0 || routeOrder.length !== active.length){
         routeOrder = active.map(h=>h.id);
       } else {
@@ -296,7 +339,6 @@
     // Build Google Maps directions URL with waypoints
     function buildGoogleMapsUrl(order){
       if(order.length===0) return '';
-      // Use first as origin, last as destination, others as waypoints
       const coords = order.map(id=>HOTELS.find(h=>h.id===id).coords.replace(/\s/g,''));
       const origin = coords[0];
       const destination = coords[coords.length-1];
@@ -315,12 +357,10 @@
       routeReport = [];
       routeStartedAt = new Date();
       currentIndex = 0;
-      // initialize report entries
       routeOrder.forEach(id=>{
         routeReport.push({id, arrival:null, departure:null, entrega:false, coleta:false});
       });
       renderReport();
-      // enter mode route automatically
       enterModeRoute();
     }
 
@@ -342,11 +382,9 @@
       const id = routeOrder[currentIndex];
       const h = HOTELS.find(x=>x.id===id);
       currentHotelEl.innerHTML = `<div style="font-weight:700">${h.name}</div><div style="font-size:0.9rem;color:#4b6b8a">${h.address}</div>`;
-      // set checkboxes from report
       const entry = routeReport[currentIndex];
       document.getElementById('chk-entrega').checked = entry.entrega;
       document.getElementById('chk-coleta').checked = entry.coleta;
-      // show next two
       nextTwoEl.innerHTML = '';
       for(let i=1;i<=2;i++){
         const idx = currentIndex + i;
@@ -367,7 +405,6 @@
     // Next hotel button handler
     document.getElementById('btn-next').addEventListener('click', ()=>{
       if(currentIndex >= routeOrder.length) return;
-      // record times and checkboxes
       const entrega = document.getElementById('chk-entrega').checked;
       const coleta = document.getElementById('chk-coleta').checked;
       const now = new Date();
@@ -375,7 +412,6 @@
       if(!entry.arrival) entry.arrival = now.toISOString();
       entry.entrega = entrega;
       entry.coleta = coleta;
-      // set departure as now + 2 minutes (simulated) or immediate
       entry.departure = new Date(now.getTime() + 2*60000).toISOString();
       currentIndex++;
       updateModeUI();
@@ -448,9 +484,6 @@
     if('serviceWorker' in navigator){
       navigator.serviceWorker.register('sw.js').catch(err=>console.warn('SW failed',err));
     }
-
-    // Install manifest (create minimal manifest file dynamically if not present)
-    // Note: For full PWA install prompt behavior, host files on HTTPS or use localhost.
   </script>
 </body>
 </html>
