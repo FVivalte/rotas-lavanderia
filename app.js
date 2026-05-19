@@ -61,6 +61,7 @@ function fileToBase64(file){
 
 function renderHotelList(){
 
+  console.log(HOTELS);
   hotelList.innerHTML = '';
 
   HOTELS.forEach(h => {
