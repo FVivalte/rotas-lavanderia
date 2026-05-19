@@ -59,22 +59,11 @@ function fileToBase64(file){
 // RENDER HOTÉIS
 // =========================
 
+// =========================
+// RENDER HOTÉIS
+// =========================
+
 function renderHotelList(){
-
-  console.log(
-    'HOTELS:',
-    HOTELS
-  );
-
-  console.log(
-    'hotelList:',
-    hotelList
-  );
-
-  if(!hotelList){
-
-    return;
-  }
 
   hotelList.innerHTML = '';
 
@@ -82,8 +71,6 @@ function renderHotelList(){
 
     const div =
       document.createElement('div');
-
-    // USA CSS ANTIGO
 
     div.className = 'item';
 
@@ -104,6 +91,20 @@ function renderHotelList(){
         </div>
 
       </div>
+
+      <!-- SWITCH -->
+
+      <label class="switch">
+
+        <input
+          type="checkbox"
+          class="hotel-check"
+          data-id="${h.id}"
+        />
+
+        <span class="slider"></span>
+
+      </label>
     `;
 
     hotelList.appendChild(div);
