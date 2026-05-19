@@ -150,6 +150,35 @@
 
     <footer>Instale como PWA para usar no celular • Servir via HTTPS para instalar</footer>
 
+<div id="hotelModal" class="modal">
+
+  <div class="modal-content">
+
+    <h3>Novo hotel</h3>
+
+    <input type="text" id="newName" placeholder="Nome">
+
+    <input type="text" id="newRegion" placeholder="Região">
+
+    <input type="text" id="newAddress" placeholder="Endereço">
+
+    <input type="text" id="newCoords" placeholder="Latitude,Longitude">
+
+    <div class="modal-actions">
+
+      <button id="saveHotel">
+        Salvar
+      </button>
+
+      <button id="closeModal" class="ghost">
+        Cancelar
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
   </div>
 
 <script src="dados.js"></script>
@@ -586,34 +615,6 @@ document.getElementById('btn-open-maps').addEventListener('click', ()=>{
       navigator.serviceWorker.register('sw.js').catch(()=>{/* ignore */});
     }
   </script>
-<div id="hotelModal" class="modal">
 
-  <div class="modal-content">
-
-    <h3>Novo hotel</h3>
-
-    <input type="text" id="newName" placeholder="Nome">
-
-    <input type="text" id="newRegion" placeholder="Região">
-
-    <input type="text" id="newAddress" placeholder="Endereço">
-
-    <input type="text" id="newCoords" placeholder="Latitude,Longitude">
-
-    <div class="modal-actions">
-
-      <button id="saveHotel">
-        Salvar
-      </button>
-
-      <button id="closeModal" class="ghost">
-        Cancelar
-      </button>
-
-    </div>
-
-  </div>
-
-</div>
 </body>
 </html>
