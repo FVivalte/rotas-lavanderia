@@ -192,16 +192,20 @@
     let arrivalConfirmed = false;
 
     // Elementos
-    const screenSelect = document.getElementById('screen-select');
-    const screenRoute = document.getElementById('screen-route');
-    const screenMode = document.getElementById('screen-mode');
-    const hotelListEl = document.getElementById('hotelList');
-    const routeListEl = document.getElementById('routeList');
-    const reportEl = document.getElementById('report');
-    const reportEl = document.getElementById('report') || document.createElement('div');
-    const currentHotelEl = document.getElementById('currentHotel');
-    const nextTwoEl = document.getElementById('nextTwo');
-    const activeCountEl = document.getElementById('activeCount');
+const screenSelect = document.getElementById('screen-select');
+const screenRoute = document.getElementById('screen-route');
+const screenMode = document.getElementById('screen-mode');
+const hotelListEl = document.getElementById('hotelList');
+const routeListEl = document.getElementById('routeList');
+
+const reportEl =
+  document.getElementById('report')
+  || document.createElement('div');
+
+const reportModeEl = document.getElementById('reportMode');
+const currentHotelEl = document.getElementById('currentHotel');
+const nextTwoEl = document.getElementById('nextTwo');
+const activeCountEl = document.getElementById('activeCount');
 
     // Render seleção (Tela 1)
     function renderSelection(){
