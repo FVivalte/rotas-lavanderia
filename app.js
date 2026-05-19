@@ -2,19 +2,59 @@
 // ELEMENTOS
 // =========================
 
-const btnGenerate =
+const btnCreate =
   document.getElementById(
-    'btn-generate'
+    'btn-create'
   );
 
-const btnReset =
+const btnClear =
   document.getElementById(
-    'btn-reset'
+    'btn-clear'
+  );
+
+const btnBack =
+  document.getElementById(
+    'btn-back'
+  );
+
+const btnStartRoute =
+  document.getElementById(
+    'btn-start-route'
+  );
+
+const btnNext =
+  document.getElementById(
+    'btn-next'
   );
 
 const hotelList =
   document.getElementById(
     'hotelList'
+  );
+
+const routeList =
+  document.getElementById(
+    'routeList'
+  );
+
+const screenSelect =
+  document.getElementById(
+    'screen-select'
+  );
+
+const screenRoute =
+  document.getElementById(
+    'screen-route'
+  );
+
+const screenMode =
+  document.getElementById(
+    'screen-mode'
+  );
+
+const currentHotel =
+  document.getElementById(
+    'currentHotel'
   );
 
 const photoInput =
@@ -27,8 +67,18 @@ const photoPreview =
     'photoPreview'
   );
 
+const chkEntrega =
+  document.getElementById(
+    'chk-entrega'
+  );
+
+const chkColeta =
+  document.getElementById(
+    'chk-coleta'
+  );
+
 // =========================
-// HOTEL ATUAL
+// INDEX HOTEL ATUAL
 // =========================
 
 let currentRouteIndex = 0;
@@ -54,10 +104,6 @@ function fileToBase64(file){
     reader.onerror = reject;
   });
 }
-
-// =========================
-// RENDER HOTÉIS
-// =========================
 
 // =========================
 // RENDER HOTÉIS
@@ -92,8 +138,6 @@ function renderHotelList(){
 
       </div>
 
-      <!-- SWITCH -->
-
       <label class="switch">
 
         <input
@@ -112,18 +156,170 @@ function renderHotelList(){
 }
 
 // =========================
+// RENDER ROTA
+// =========================
+
+function renderRouteList(){
+
+  routeList.innerHTML = '';
+
+  routeReport.forEach((r, index) => {
+
+    const h =
+      HOTELS.find(
+        x => x.id === r.id
+      );
+
+    const div =
+      document.createElement('div');
+
+    div.className =
+      'route-item';
+
+    div.innerHTML = `
+
+      <div>
+
+        <strong>
+
+          ${index + 1}.
+          ${h.name}
+
+        </strong>
+
+        <div class="muted">
+
+          ${h.region}
+
+        </div>
+
+      </div>
+
+      <i
+        data-lucide="grip"
+        class="drag-handle"
+      ></i>
+    `;
+
+    routeList.appendChild(div);
+  });
+
+  // SORTABLE
+
+  new Sortable(
+
+    routeList,
+
+    {
+
+      animation:150,
+
+      handle:'.drag-handle',
+
+      onEnd(){
+
+        const novaRota = [];
+
+        [
+          ...routeList.children
+        ].forEach(item => {
+
+          const texto =
+            item.innerText;
+
+          const hotel =
+            HOTELS.find(
+              h =>
+                texto.includes(
+                  h.name
+                )
+            );
+
+          const rota =
+            routeReport.find(
+              r =>
+                r.id === hotel.id
+            );
+
+          novaRota.push(rota);
+        });
+
+        routeReport = novaRota;
+      }
+    }
+  );
+
+  lucide.createIcons();
+}
+
+// =========================
+// HOTEL ATUAL
+// =========================
+
+function renderCurrentHotel(){
+
+  const r =
+    routeReport[
+      currentRouteIndex
+    ];
+
+  if(!r){
+
+    return;
+  }
+
+  const h =
+    HOTELS.find(
+      x => x.id === r.id
+    );
+
+  currentHotel.innerHTML = `
+
+    <h2>
+
+      ${currentRouteIndex + 1}.
+      ${h.name}
+
+    </h2>
+
+    <div class="gps-badge">
+
+      ${h.region}
+
+    </div>
+  `;
+
+  chkEntrega.checked =
+    r.entrega;
+
+  chkColeta.checked =
+    r.coleta;
+
+  photoPreview.innerHTML = '';
+
+  r.fotos.forEach(f => {
+
+    const img =
+      document.createElement('img');
+
+    img.src = f;
+
+    photoPreview.appendChild(img);
+  });
+}
+
+// =========================
 // FOTOS
 // =========================
 
 async function handlePhotos(){
 
-  if(
-
-    !routeReport[
+  const r =
+    routeReport[
       currentRouteIndex
-    ]
+    ];
 
-  ){
+  if(!r){
 
     return;
   }
@@ -131,9 +327,9 @@ async function handlePhotos(){
   const files =
     [...photoInput.files];
 
-  photoPreview.innerHTML = '';
-
   const imagens = [];
+
+  photoPreview.innerHTML = '';
 
   for(const file of files){
 
@@ -153,9 +349,7 @@ async function handlePhotos(){
     photoPreview.appendChild(img);
   }
 
-  routeReport[
-    currentRouteIndex
-  ].fotos = imagens;
+  r.fotos = imagens;
 
   renderReportMode();
 }
@@ -164,7 +358,49 @@ async function handlePhotos(){
 // EVENTOS
 // =========================
 
-btnGenerate?.addEventListener(
+// CRIAR ROTA
+
+btnCreate?.addEventListener(
+
+  'click',
+
+  () => {
+
+    createRoute();
+
+    renderRouteList();
+
+    screenSelect.classList.add(
+      'hidden'
+    );
+
+    screenRoute.classList.remove(
+      'hidden'
+    );
+  }
+);
+
+// VOLTAR
+
+btnBack?.addEventListener(
+
+  'click',
+
+  () => {
+
+    screenRoute.classList.add(
+      'hidden'
+    );
+
+    screenSelect.classList.remove(
+      'hidden'
+    );
+  }
+);
+
+// INICIAR VIAGEM
+
+btnStartRoute?.addEventListener(
 
   'click',
 
@@ -172,11 +408,76 @@ btnGenerate?.addEventListener(
 
     currentRouteIndex = 0;
 
-    createRoute();
+    screenRoute.classList.add(
+      'hidden'
+    );
+
+    screenMode.classList.remove(
+      'hidden'
+    );
+
+    renderCurrentHotel();
   }
 );
 
-btnReset?.addEventListener(
+// PRÓXIMO HOTEL
+
+btnNext?.addEventListener(
+
+  'click',
+
+  () => {
+
+    const r =
+      routeReport[
+        currentRouteIndex
+      ];
+
+    if(r){
+
+      r.entrega =
+        chkEntrega.checked;
+
+      r.coleta =
+        chkColeta.checked;
+
+      r.saida =
+        new Date();
+    }
+
+    currentRouteIndex++;
+
+    if(
+
+      currentRouteIndex >=
+      routeReport.length
+
+    ){
+
+      alert(
+        'Rota finalizada!'
+      );
+
+      screenMode.classList.add(
+        'hidden'
+      );
+
+      screenSelect.classList.remove(
+        'hidden'
+      );
+
+      return;
+    }
+
+    renderCurrentHotel();
+
+    renderReportMode();
+  }
+);
+
+// LIMPAR
+
+btnClear?.addEventListener(
 
   'click',
 
@@ -186,11 +487,17 @@ btnReset?.addEventListener(
 
     routeReport = [];
 
+    currentRouteIndex = 0;
+
+    routeList.innerHTML = '';
+
     reportMode.innerHTML = '';
 
     photoPreview.innerHTML = '';
   }
 );
+
+// FOTO
 
 photoInput?.addEventListener(
 
