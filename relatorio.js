@@ -137,6 +137,12 @@ function renderReportMode(){
 
 function gerarPDF(){
 
+
+alert('PDF NOVO');
+
+
+
+
   const { jsPDF } =
     window.jspdf;
 
