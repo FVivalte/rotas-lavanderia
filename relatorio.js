@@ -1,279 +1,653 @@
 // =========================
-// MAPA
+// ELEMENTO RELATÓRIO
 // =========================
 
-let map;
-
-let markers = [];
-
-let routeLine;
-
-// =========================
-// INICIAR MAPA
-// =========================
-
-function initMap(){
-
-  map = L.map('map').setView(
-
-    [-22.757, -41.889],
-
-    13
+const reportMode =
+  document.getElementById(
+    'reportMode'
   );
 
-  L.tileLayer(
+// =========================
+// RELATÓRIO VISUAL
+// =========================
 
-    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+function renderReportMode(){
+
+  if(!reportMode){
+
+    return;
+  }
+
+  reportMode.innerHTML = '';
+
+  routeReport.forEach((r, idx) => {
+
+    if(!r.chegada){
+
+      return;
+    }
+
+    const h =
+      HOTELS.find(
+        x => x.id === r.id
+      );
+
+    if(!h){
+
+      return;
+    }
+
+    const chegada =
+      new Date(r.chegada)
+      .toLocaleTimeString([], {
+
+        hour:'2-digit',
+
+        minute:'2-digit'
+      });
+
+    const saida =
+      r.saida
+      ? new Date(r.saida)
+        .toLocaleTimeString([], {
+
+          hour:'2-digit',
+
+          minute:'2-digit'
+        })
+      : '--:--';
+
+    let tags = [];
+
+    if(r.entrega){
+
+      tags.push('Entrega');
+    }
+
+    if(r.coleta){
+
+      tags.push('Coleta');
+    }
+
+    reportMode.innerHTML += `
+
+      <div class="report-row">
+
+        <strong>
+
+          ${idx + 1}.
+          ${h.name}
+
+        </strong>
+
+        <div class="muted">
+
+          ${h.region}
+
+        </div>
+
+        <div class="muted">
+
+          ${h.address}
+
+        </div>
+
+        <div
+          class="muted"
+          style="margin-top:6px;"
+        >
+
+          ${tags.join(' • ') || 'Sem serviço'}
+
+        </div>
+
+        <div
+          class="muted"
+          style="margin-top:4px;"
+        >
+
+          Chegada:
+          ${chegada}
+
+          •
+
+          Saída:
+          ${saida}
+
+        </div>
+
+        <div
+          class="muted"
+          style="margin-top:4px;"
+        >
+
+          Fotos:
+          ${r.fotos?.length || 0}
+
+        </div>
+
+      </div>
+    `;
+  });
+}
+
+// =========================
+// GERAR PDF
+// =========================
+
+function gerarPDF(){
+
+  const { jsPDF } =
+    window.jspdf;
+
+  const doc =
+    new jsPDF({
+
+      orientation:'portrait',
+
+      unit:'mm',
+
+      format:'a4'
+    });
+
+  let y = 20;
+
+  // =========================
+  // HEADER
+  // =========================
+
+  y =
+    desenharHeaderPDF(
+      doc,
+      y
+    );
+
+  // =========================
+  // HOTÉIS
+  // =========================
+
+  routeReport.forEach((r, idx) => {
+
+    if(!r.chegada){
+
+      return;
+    }
+
+    y =
+      quebrarPaginaPDF(
+        doc,
+        y
+      );
+
+    y =
+      desenharHotelCardPDF(
+
+        doc,
+
+        r,
+
+        idx,
+
+        y
+      );
+  });
+
+  // =========================
+  // FOOTER
+  // =========================
+
+  desenharFooterPDF(doc);
+
+  // =========================
+  // SALVAR
+  // =========================
+
+  salvarPDF(doc);
+}
+
+// =========================
+// HEADER PDF
+// =========================
+
+function desenharHeaderPDF(
+  doc,
+  y
+){
+
+  doc.setFillColor(
+    20,
+    20,
+    20
+  );
+
+  doc.rect(
+    0,
+    0,
+    210,
+    30,
+    'F'
+  );
+
+  doc.setTextColor(
+    255,
+    255,
+    255
+  );
+
+  doc.setFontSize(22);
+
+  doc.text(
+
+    'RELATÓRIO DE ROTA',
+
+    105,
+
+    18,
 
     {
-      attribution:
-        '© OpenStreetMap'
+      align:'center'
     }
+  );
 
-  ).addTo(map);
+  doc.setFontSize(10);
 
-  renderHotels();
+  doc.text(
+
+    APP_CONFIG.city,
+
+    14,
+
+    38
+  );
+
+  doc.text(
+
+    `Motorista: ${APP_CONFIG.driver}`,
+
+    14,
+
+    44
+  );
+
+  doc.text(
+
+    `Data: ${
+      new Date()
+      .toLocaleDateString(
+        'pt-BR'
+      )
+    }`,
+
+    150,
+
+    38
+  );
+
+  doc.text(
+
+    `Total: ${
+      routeReport.length
+    } hotéis`,
+
+    150,
+
+    44
+  );
+
+  return 55;
 }
 
 // =========================
-// RENDERIZAR HOTÉIS
+// CARD HOTEL PDF
 // =========================
 
-function renderHotels(){
+function desenharHotelCardPDF(
 
-  clearMarkers();
+  doc,
 
-  HOTELS.forEach(h => {
+  r,
 
-    let lat;
-    let lng;
+  idx,
 
-    // =========================
-    // CONVERTE COORDS
-    // =========================
+  y
+){
 
-    if(h.coords){
+  const h =
+    HOTELS.find(
+      x => x.id === r.id
+    );
 
-      const partes =
-        h.coords.split(',');
+  if(!h){
 
-      lat =
-        parseFloat(partes[0]);
+    return y;
+  }
 
-      lng =
-        parseFloat(partes[1]);
+  // =========================
+  // CARD
+  // =========================
 
-    }else{
+  doc.setFillColor(
+    248,
+    248,
+    248
+  );
 
-      lat = h.lat;
-      lng = h.lng;
+  doc.roundedRect(
+
+    10,
+
+    y,
+
+    190,
+
+    58,
+
+    4,
+
+    4,
+
+    'F'
+  );
+
+  // =========================
+  // TÍTULO
+  // =========================
+
+  doc.setTextColor(
+    20,
+    20,
+    20
+  );
+
+  doc.setFontSize(14);
+
+  doc.text(
+
+    `${idx + 1}. ${h.name}`,
+
+    16,
+
+    y + 10
+  );
+
+  // =========================
+  // REGIÃO
+  // =========================
+
+  doc.setFontSize(10);
+
+  doc.text(
+
+    h.region,
+
+    16,
+
+    y + 18
+  );
+
+  // =========================
+  // ENDEREÇO
+  // =========================
+
+  doc.setFontSize(9);
+
+  doc.text(
+
+    h.address,
+
+    16,
+
+    y + 26,
+
+    {
+      maxWidth: 110
     }
+  );
 
-    // =========================
-    // CRIA MARKER
-    // =========================
+  // =========================
+  // HORÁRIOS
+  // =========================
 
-    const marker = L.marker([
+  const chegada =
+    new Date(r.chegada)
+    .toLocaleTimeString([], {
 
-      lat,
-      lng
+      hour:'2-digit',
 
-    ])
-
-    .addTo(map)
-
-    .bindPopup(`
-
-      <strong>
-        ${h.name}
-      </strong>
-
-      <br>
-
-      ${h.region}
-
-      <br>
-
-      ${h.address}
-    `);
-
-    markers.push(marker);
-  });
-}
-
-// =========================
-// LIMPAR MARCADORES
-// =========================
-
-function clearMarkers(){
-
-  markers.forEach(marker => {
-
-    map.removeLayer(marker);
-  });
-
-  markers = [];
-}
-
-// =========================
-// CRIAR ROTA
-// =========================
-
-function createRoute(){
-
-  clearRoute();
-
-  routeReport = [];
-
-  const coords = [];
-
-  HOTELS.forEach(h => {
-
-    let lat;
-    let lng;
-
-    // =========================
-    // CONVERTE COORDS
-    // =========================
-
-    if(h.coords){
-
-      const partes =
-        h.coords.split(',');
-
-      lat =
-        parseFloat(partes[0]);
-
-      lng =
-        parseFloat(partes[1]);
-
-    }else{
-
-      lat = h.lat;
-      lng = h.lng;
-    }
-
-    // =========================
-    // ARRAY DA ROTA
-    // =========================
-
-    coords.push([
-
-      lat,
-      lng
-    ]);
-
-    // =========================
-    // RELATÓRIO
-    // =========================
-
-    routeReport.push({
-
-      id: h.id,
-
-      chegada:
-        new Date(),
-
-      saida:
-        null,
-
-      entrega:
-        false,
-
-      coleta:
-        false,
-
-      fotos: []
+      minute:'2-digit'
     });
-  });
+
+  const saida =
+    r.saida
+    ? new Date(r.saida)
+      .toLocaleTimeString([], {
+
+        hour:'2-digit',
+
+        minute:'2-digit'
+      })
+    : '--:--';
+
+  doc.setFontSize(10);
+
+  doc.text(
+
+    `Chegada: ${chegada}`,
+
+    16,
+
+    y + 40
+  );
+
+  doc.text(
+
+    `Saída: ${saida}`,
+
+    70,
+
+    y + 40
+  );
 
   // =========================
-  // DESENHAR LINHA
+  // SERVIÇOS
   // =========================
 
-  drawRoute(coords);
+  let servicos = [];
+
+  if(r.entrega){
+
+    servicos.push(
+      'Entrega'
+    );
+  }
+
+  if(r.coleta){
+
+    servicos.push(
+      'Coleta'
+    );
+  }
+
+  doc.text(
+
+    `Serviços: ${
+      servicos.join(', ')
+      || 'Sem serviço'
+    }`,
+
+    16,
+
+    y + 48
+  );
 
   // =========================
-  // RELATÓRIO VISUAL
+  // FOTO
   // =========================
+
+  doc.setDrawColor(
+    180
+  );
+
+  doc.rect(
+
+    145,
+
+    y + 8,
+
+    40,
+
+    40
+  );
+
+  // FOTO REAL
 
   if(
 
-    typeof renderReportMode
-    === 'function'
+    r.fotos &&
+    r.fotos.length > 0
 
   ){
 
-    renderReportMode();
+    try{
+
+      doc.addImage(
+
+        r.fotos[0],
+
+        'JPEG',
+
+        145,
+
+        y + 8,
+
+        40,
+
+        40
+      );
+
+    }catch(e){
+
+      console.error(e);
+
+      doc.text(
+
+        'Erro foto',
+
+        154,
+
+        y + 30
+      );
+    }
+
+  }else{
+
+    doc.setFontSize(10);
+
+    doc.text(
+
+      'SEM FOTO',
+
+      152,
+
+      y + 30
+    );
+  }
+
+  return y + 68;
+}
+
+// =========================
+// QUEBRA PÁGINA
+// =========================
+
+function quebrarPaginaPDF(
+  doc,
+  y
+){
+
+  if(y > 230){
+
+    doc.addPage();
+
+    return 20;
+  }
+
+  return y;
+}
+
+// =========================
+// FOOTER PDF
+// =========================
+
+function desenharFooterPDF(doc){
+
+  const paginas =
+    doc.getNumberOfPages();
+
+  for(
+
+    let i = 1;
+
+    i <= paginas;
+
+    i++
+
+  ){
+
+    doc.setPage(i);
+
+    doc.setFontSize(8);
+
+    doc.setTextColor(
+      120
+    );
+
+    doc.text(
+
+      `Página ${i} de ${paginas}`,
+
+      105,
+
+      290,
+
+      {
+        align:'center'
+      }
+    );
   }
 }
 
 // =========================
-// DESENHAR ROTA
+// SALVAR PDF
 // =========================
 
-function drawRoute(coords){
+function salvarPDF(doc){
 
-  routeLine = L.polyline(
+  doc.save(
 
-    coords,
-
-    {
-      weight: 5
-    }
-
-  ).addTo(map);
-
-  map.fitBounds(
-
-    routeLine.getBounds()
+    APP_CONFIG.pdfName
   );
 }
 
 // =========================
-// LIMPAR ROTA
+// EVENTO PDF
 // =========================
 
-function clearRoute(){
+document
+  .getElementById('btn-pdf')
+  ?.addEventListener(
 
-  if(routeLine){
+    'click',
 
-    map.removeLayer(
-      routeLine
-    );
-  }
-}
-
-// =========================
-// CENTRALIZAR MAPA
-// =========================
-
-function focusMap(){
-
-  if(routeLine){
-
-    map.fitBounds(
-
-      routeLine.getBounds()
-    );
-  }
-}
+    gerarPDF
+  );
 
 // =========================
 // EXPORT GLOBAL
 // =========================
 
-window.initMap =
-  initMap;
+window.renderReportMode =
+  renderReportMode;
 
-window.renderHotels =
-  renderHotels;
-
-window.createRoute =
-  createRoute;
-
-window.clearRoute =
-  clearRoute;
-
-window.focusMap =
-  focusMap;
+window.gerarPDF =
+  gerarPDF;
