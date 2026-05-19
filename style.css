@@ -498,3 +498,96 @@ footer{
   display:flex;
   gap:10px;
 }
+
+/* ===== RELATÓRIO ===== */
+
+.report-header{
+  padding:16px;
+  background:#ffffff;
+  border-bottom:1px solid #ddd;
+  position:sticky;
+  top:0;
+  z-index:10;
+}
+
+.report-header h1{
+  font-size:18px;
+  font-weight:700;
+  line-height:1.4;
+}
+
+.report-route-list{
+  padding:16px;
+}
+
+.report-item{
+  background:#fff;
+  border-radius:14px;
+  padding:14px;
+  margin-bottom:16px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.08);
+}
+
+.report-top-line{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  align-items:center;
+  margin-bottom:12px;
+}
+
+.report-order{
+  font-weight:700;
+  font-size:18px;
+}
+
+.report-hotel-name{
+  font-weight:600;
+  font-size:17px;
+}
+
+.report-time{
+  width:100%;
+  font-size:15px;
+  color:#444;
+}
+
+.report-photos{
+  display:flex;
+  gap:10px;
+  overflow-x:auto;
+  padding-top:8px;
+}
+
+.report-photo-box{
+  min-width:110px;
+}
+
+.report-photo-box img{
+  width:110px;
+  height:110px;
+  object-fit:cover;
+  border-radius:10px;
+  border:1px solid #ddd;
+}
+
+.report-photo-label{
+  text-align:center;
+  margin-top:6px;
+  font-size:13px;
+}
+
+.report-bottom-actions{
+  padding:16px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+.report-bottom-actions button{
+  height:48px;
+  border:none;
+  border-radius:12px;
+  font-size:16px;
+  font-weight:700;
+}
