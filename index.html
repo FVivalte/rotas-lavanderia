@@ -22,19 +22,29 @@
     content="#0b63b7"
   />
 
+  <!-- CSS -->
+
   <link
     rel="stylesheet"
     href="style.css"
   />
+
+  <!-- LEAFLET -->
 
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet/dist/leaflet.css"
   />
 
+  <!-- SORTABLE -->
+
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 
+  <!-- LUCIDE -->
+
   <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- JSPDF -->
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -44,34 +54,161 @@
 
   <div class="app">
 
+    <!-- ========================= -->
+    <!-- HEADER -->
+    <!-- ========================= -->
+
     <header>
 
       <h1>
+
+        <i data-lucide="map"></i>
 
         🫧Rota Búzios🚚
 
       </h1>
 
+      <div class="status-badge">
+
+        Offline PWA
+
+      </div>
+
     </header>
 
-    <!-- CONTROLES -->
+    <!-- ========================= -->
+    <!-- TELA SELEÇÃO -->
+    <!-- ========================= -->
 
-    <section class="card">
+    <section id="screen-select">
+
+      <!-- CARD CONTROLES -->
+
+      <section class="card sticky-top">
+
+        <div class="controls">
+
+          <button id="btn-create">
+
+            <i data-lucide="route"></i>
+
+            Criar rota
+
+          </button>
+
+          <button
+            id="btn-clear"
+            class="ghost"
+          >
+
+            <i data-lucide="trash-2"></i>
+
+            Limpar
+
+          </button>
+
+        </div>
+
+      </section>
+
+      <!-- CARD HOTÉIS -->
+
+      <section class="card hotels-card">
+
+        <!-- BUSCA -->
+
+        <div class="search-area">
+
+          <input
+            type="text"
+            id="searchHotel"
+            placeholder="Pesquisar hotel..."
+          />
+
+        </div>
+
+        <!-- LISTA -->
+
+        <div class="hotel-scroll">
+
+          <div
+            id="hotelList"
+            class="list"
+          ></div>
+
+        </div>
+
+      </section>
+
+      <!-- MAPA -->
+
+      <section class="card">
+
+        <div
+          id="map"
+          style="
+            height:320px;
+            border-radius:14px;
+            overflow:hidden;
+          "
+        ></div>
+
+      </section>
+
+    </section>
+
+    <!-- ========================= -->
+    <!-- TELA ROTA -->
+    <!-- ========================= -->
+
+    <section
+      id="screen-route"
+      class="card hidden"
+    >
+
+      <div class="header-text">
+
+        <strong>
+
+          Organize a rota
+
+        </strong>
+
+        <div class="muted">
+
+          Segure e arraste para mudar a ordem.
+
+        </div>
+
+      </div>
+
+      <!-- LISTA ROTA -->
+
+      <div
+        id="routeList"
+        class="route-list"
+      ></div>
+
+      <!-- BOTÕES -->
 
       <div class="controls">
 
-        <button id="btn-generate">
+        <button id="btn-start-route">
 
-          Criar rota
+          <i data-lucide="play"></i>
+
+          Iniciar viagem
 
         </button>
 
         <button
-          id="btn-reset"
+          id="btn-back"
           class="ghost"
         >
 
-          Limpar
+          <i data-lucide="arrow-left"></i>
+
+          Voltar
 
         </button>
 
@@ -79,92 +216,130 @@
 
     </section>
 
-    <!-- HOTÉIS -->
+    <!-- ========================= -->
+    <!-- TELA VIAGEM -->
+    <!-- ========================= -->
 
-    <section class="card">
-
-      <div class="hotel-scroll">
-
-  <div
-    id="hotelList"
-    class="hotel-list"
-  ></div>
-
-</div>
-<section
-  id="screen-route"
-  class="card hidden"
->
-
-  <div class="header-text">
-
-    <strong>
-
-      Organize a rota
-
-    </strong>
-
-  </div>
-
-  <div
-    id="routeList"
-    class="route-list"
-  ></div>
-
-  <div class="controls">
-
-    <button id="btn-start-route">
-
-      Iniciar viagem
-
-    </button>
-
-    <button
-      id="btn-back"
-      class="ghost"
+    <section
+      id="screen-mode"
+      class="card hidden"
     >
 
-      Voltar
+      <!-- HEADER -->
 
-    </button>
+      <div class="mode-header">
 
-  </div>
+        <div>
 
-</section>
-    </section>
+          <strong>
 
-    <!-- MAPA -->
+            Modo viagem
 
-    <section class="card">
+          </strong>
 
-      <div
-        id="map"
-        class="map"
-      ></div>
+          <div class="muted">
 
-    </section>
+            Registro em tempo real
 
-    <!-- FOTOS -->
+          </div>
 
-    <section class="card">
+        </div>
 
-      <input
-        type="file"
-        id="photoInput"
-        accept="image/*"
-        multiple
-      />
+        <button
+          id="btn-finish"
+          class="ghost small-btn"
+        >
 
-      <div
-        id="photoPreview"
-        class="photo-preview"
-      ></div>
+          Encerrar
 
-    </section>
+        </button>
 
-    <!-- RELATÓRIO -->
+      </div>
 
-    <section class="card">
+      <!-- HOTEL ATUAL -->
+
+      <div id="currentHotel"></div>
+
+      <!-- SERVIÇOS -->
+
+      <div class="service-card">
+
+        <label class="custom-checkbox">
+
+          <input
+            type="checkbox"
+            id="chk-entrega"
+          />
+
+          <span>
+
+            Foi feita entrega
+
+          </span>
+
+        </label>
+
+        <label class="custom-checkbox">
+
+          <input
+            type="checkbox"
+            id="chk-coleta"
+          />
+
+          <span>
+
+            Foi feita coleta
+
+          </span>
+
+        </label>
+
+      </div>
+
+      <!-- FOTOS -->
+
+      <div class="photo-card">
+
+        <div class="photo-header">
+
+          <strong>
+
+            Fotos dos rols
+
+          </strong>
+
+        </div>
+
+        <input
+          type="file"
+          id="photoInput"
+          accept="image/*"
+          capture="environment"
+          multiple
+        />
+
+        <div
+          id="photoPreview"
+          class="photo-preview"
+        ></div>
+
+      </div>
+
+      <!-- BOTÃO PRÓXIMO -->
+
+      <div class="controls">
+
+        <button id="btn-next">
+
+          <i data-lucide="check-circle"></i>
+
+          Confirmar e próximo
+
+        </button>
+
+      </div>
+
+      <!-- RELATÓRIO -->
 
       <div class="report-header">
 
@@ -179,6 +354,8 @@
           class="ghost"
         >
 
+          <i data-lucide="file-text"></i>
+
           PDF
 
         </button>
@@ -192,13 +369,27 @@
 
     </section>
 
+    <!-- ========================= -->
+    <!-- FOOTER -->
+    <!-- ========================= -->
+
+    <footer>
+
+      Feito para PWA • Offline
+
+    </footer>
+
   </div>
 
+  <!-- ========================= -->
   <!-- LEAFLET -->
+  <!-- ========================= -->
 
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
+  <!-- ========================= -->
   <!-- APP -->
+  <!-- ========================= -->
 
   <script src="dados.js"></script>
 
