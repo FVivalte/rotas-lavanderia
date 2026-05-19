@@ -409,3 +409,37 @@ footer{
   color:var(--muted);
   line-height:1.5;
 }
+
+/* =========================
+   MOBILE DRAG
+========================= */
+
+.route-item.dragging-mobile{
+  opacity:.5;
+  transform:scale(.98);
+}
+
+.drag{
+  cursor:grab;
+  user-select:none;
+  touch-action:none;
+
+  padding:10px;
+
+  border-radius:10px;
+
+  background:#eef6ff;
+
+  font-size:1.2rem;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  min-width:42px;
+  min-height:42px;
+}
+
+.route-item.over{
+  border:2px dashed var(--primary);
+}
