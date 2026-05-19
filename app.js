@@ -34,7 +34,7 @@ const photoPreview =
 let currentRouteIndex = 0;
 
 // =========================
-// FILE -> BASE64
+// BASE64
 // =========================
 
 function fileToBase64(file){
@@ -51,23 +51,15 @@ function fileToBase64(file){
       resolve(reader.result);
     };
 
-    reader.onerror = error => {
-
-      reject(error);
-    };
+    reader.onerror = reject;
   });
 }
 
 // =========================
-// RENDER LISTA HOTÉIS
+// HOTÉIS LISTA
 // =========================
 
 function renderHotelList(){
-
-  if(!hotelList){
-
-    return;
-  }
 
   hotelList.innerHTML = '';
 
@@ -81,19 +73,15 @@ function renderHotelList(){
 
     item.innerHTML = `
 
-      <div class="hotel-info">
+      <strong>
 
-        <strong>
+        ${h.name}
 
-          ${h.name}
+      </strong>
 
-        </strong>
+      <div>
 
-        <div class="muted">
-
-          ${h.region}
-
-        </div>
+        ${h.region}
 
       </div>
     `;
@@ -109,8 +97,6 @@ function renderHotelList(){
 async function handlePhotos(){
 
   if(
-
-    !photoInput ||
 
     !routeReport[
       currentRouteIndex
@@ -135,10 +121,6 @@ async function handlePhotos(){
 
     imagens.push(base64);
 
-    // =========================
-    // PREVIEW
-    // =========================
-
     const img =
       document.createElement('img');
 
@@ -150,27 +132,16 @@ async function handlePhotos(){
     photoPreview.appendChild(img);
   }
 
-  // =========================
-  // SALVA NO HOTEL ATUAL
-  // =========================
-
   routeReport[
     currentRouteIndex
   ].fotos = imagens;
 
-  console.log(
-
-    routeReport[
-      currentRouteIndex
-    ]
-  );
+  renderReportMode();
 }
 
 // =========================
 // EVENTOS
 // =========================
-
-// CRIAR ROTA
 
 btnGenerate?.addEventListener(
 
@@ -181,12 +152,8 @@ btnGenerate?.addEventListener(
     currentRouteIndex = 0;
 
     createRoute();
-
-    renderReportMode();
   }
 );
-
-// LIMPAR ROTA
 
 btnReset?.addEventListener(
 
@@ -198,23 +165,11 @@ btnReset?.addEventListener(
 
     routeReport = [];
 
-    currentRouteIndex = 0;
-
-    if(
-
-      typeof renderReportMode
-      === 'function'
-
-    ){
-
-      reportMode.innerHTML = '';
-    }
+    reportMode.innerHTML = '';
 
     photoPreview.innerHTML = '';
   }
 );
-
-// INPUT FOTO
 
 photoInput?.addEventListener(
 
@@ -224,28 +179,7 @@ photoInput?.addEventListener(
 );
 
 // =========================
-// BOTÃO PRÓXIMO
-// =========================
-
-const btnNext =
-  document.getElementById(
-    'btn-next'
-  );
-
-btnNext?.addEventListener(
-
-  'click',
-
-  () => {
-
-    currentRouteIndex++;
-
-    renderReportMode();
-  }
-);
-
-// =========================
-// START APP
+// INIT
 // =========================
 
 window.addEventListener(
@@ -254,15 +188,9 @@ window.addEventListener(
 
   () => {
 
-    // MAPA
-
     initMap();
 
-    // HOTÉIS
-
     renderHotelList();
-
-    // ÍCONES
 
     lucide.createIcons();
   }
