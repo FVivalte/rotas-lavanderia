@@ -42,6 +42,34 @@ body{
 }
 
 /* =========================
+   FOTOS
+========================= */
+
+.photo-preview{
+
+  display:flex;
+
+  gap:10px;
+
+  flex-wrap:wrap;
+
+  margin-top:12px;
+}
+
+.preview-image{
+
+  width:90px;
+
+  height:90px;
+
+  object-fit:cover;
+
+  border-radius:12px;
+
+  border:2px solid #ddd;
+}
+
+/* =========================
    APP
 ========================= */
 
