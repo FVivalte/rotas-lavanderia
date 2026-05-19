@@ -23,33 +23,18 @@
   />
 
   <link
-    rel="manifest"
-    href="manifest.json"
-  />
-
-  <!-- CSS -->
-
-  <link
     rel="stylesheet"
     href="style.css"
   />
-
-  <!-- LEAFLET -->
 
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet/dist/leaflet.css"
   />
 
-  <!-- SORTABLE -->
-
   <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
 
-  <!-- LUCIDE -->
-
   <script src="https://unpkg.com/lucide@latest"></script>
-
-  <!-- JSPDF -->
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -59,131 +44,53 @@
 
   <div class="app">
 
-    <!-- HEADER -->
-
     <header>
 
       <h1>
 
-        <i data-lucide="map"></i>
-
-        Rota Búzios
+        🫧Rota Búzios🚚
 
       </h1>
 
-      <div class="status-badge">
+    </header>
 
-        Offline PWA
+    <!-- CONTROLES -->
+
+    <section class="card">
+
+      <div class="controls">
+
+        <button id="btn-generate">
+
+          Criar rota
+
+        </button>
+
+        <button
+          id="btn-reset"
+          class="ghost"
+        >
+
+          Limpar
+
+        </button>
 
       </div>
 
-    </header>
+    </section>
 
-    <!-- ========================= -->
-    <!-- TELA SELEÇÃO -->
-    <!-- ========================= -->
+    <!-- HOTÉIS -->
 
-    <section id="screen-select">
+    <section class="card">
 
-      <!-- CONTROLES -->
-
-      <section class="card sticky-top">
-
-        <div class="controls">
-
-          <button id="btn-generate">
-
-            <i data-lucide="route"></i>
-
-            Criar rota
-
-          </button>
-
-          <button
-            id="btn-reset"
-            class="ghost"
-          >
-
-            <i data-lucide="trash-2"></i>
-
-            Limpar
-
-          </button>
-
-        </div>
-
-      </section>
-
-      <!-- HOTÉIS -->
-
-      <section class="card hotels-card">
-
-        <!-- AÇÕES -->
-
-        <div class="hotel-actions">
-
-          <button id="btn-add-hotel">
-
-            <i data-lucide="plus"></i>
-
-            Add
-
-          </button>
-
-          <button
-            id="btn-edit-hotel"
-            class="ghost"
-          >
-
-            <i data-lucide="pencil"></i>
-
-            Edit
-
-          </button>
-
-          <button
-            id="btn-remove-hotel"
-            class="danger"
-          >
-
-            <i data-lucide="trash"></i>
-
-            Remover
-
-          </button>
-
-        </div>
-
-        <!-- BUSCA -->
-
-        <div class="search-area">
-
-          <input
-            type="text"
-            id="searchHotel"
-            placeholder="Pesquisar hotel..."
-          />
-
-        </div>
-
-        <!-- LISTA -->
-
-        <div class="hotel-scroll">
-
-          <div
-            class="list"
-            id="hotelList"
-          ></div>
-
-        </div>
-
-      </section>
+      <div
+        id="hotelList"
+        class="hotel-list"
+      ></div>
 
     </section>
 
-    <!-- ========================= -->
     <!-- MAPA -->
-    <!-- ========================= -->
 
     <section class="card">
 
@@ -194,210 +101,27 @@
 
     </section>
 
-    <!-- ========================= -->
-    <!-- TELA ROTA -->
-    <!-- ========================= -->
+    <!-- FOTOS -->
 
-    <section
-      id="screen-route"
-      class="card hidden"
-    >
+    <section class="card">
 
-      <div class="header-text">
-
-        <strong>
-
-          Organize a rota
-
-        </strong>
-
-        <div class="muted">
-
-          Segure e arraste
-          para mudar a ordem.
-
-        </div>
-
-      </div>
-
-      <div class="controls">
-
-        <button id="btn-start-route">
-
-          <i data-lucide="play"></i>
-
-          Iniciar viagem
-
-        </button>
-
-        <button
-          id="btn-google"
-          class="ghost"
-        >
-
-          <i data-lucide="map-pin"></i>
-
-          Ver no Maps
-
-        </button>
-
-      </div>
+      <input
+        type="file"
+        id="photoInput"
+        accept="image/*"
+        multiple
+      />
 
       <div
-        id="routeList"
-        class="route-list"
+        id="photoPreview"
+        class="photo-preview"
       ></div>
-
-      <div class="bottom-actions">
-
-        <button
-          id="btn-back"
-          class="ghost"
-        >
-
-          <i data-lucide="arrow-left"></i>
-
-          Voltar
-
-        </button>
-
-        <span
-          class="status-badge"
-          id="activeCount"
-        >
-
-          0 ativos
-
-        </span>
-
-      </div>
 
     </section>
 
-    <!-- ========================= -->
-    <!-- TELA VIAGEM -->
-    <!-- ========================= -->
+    <!-- RELATÓRIO -->
 
-    <section
-      id="screen-mode"
-      class="card hidden"
-    >
-
-      <!-- TOPO -->
-
-      <div class="mode-header">
-
-        <div>
-
-          <strong>
-
-            Modo viagem
-
-          </strong>
-
-          <div class="muted">
-
-            Registro em tempo real
-
-          </div>
-
-        </div>
-
-        <button
-          id="btn-finish"
-          class="ghost small-btn"
-        >
-
-          Encerrar
-
-        </button>
-
-      </div>
-
-      <!-- HOTEL -->
-
-      <div id="currentHotel"></div>
-
-      <!-- SERVIÇOS -->
-
-      <div class="service-card">
-
-        <label class="custom-checkbox">
-
-          <input
-            type="checkbox"
-            id="chk-entrega"
-          />
-
-          <span>
-
-            Foi feita entrega
-
-          </span>
-
-        </label>
-
-        <label class="custom-checkbox">
-
-          <input
-            type="checkbox"
-            id="chk-coleta"
-          />
-
-          <span>
-
-            Foi feita coleta
-
-          </span>
-
-        </label>
-
-      </div>
-
-      <!-- FOTOS -->
-
-      <div class="photo-card">
-
-        <div class="photo-header">
-
-          <strong>
-
-            Fotos dos rols
-
-          </strong>
-
-        </div>
-
-        <input
-          type="file"
-          id="photoInput"
-          accept="image/*"
-          capture="environment"
-          multiple
-        />
-
-        <div
-          id="photoPreview"
-          class="photo-preview"
-        ></div>
-
-      </div>
-
-      <!-- AÇÕES -->
-
-      <div class="controls">
-
-        <button id="btn-next">
-
-          <i data-lucide="check-circle"></i>
-
-          Confirmar e próximo
-
-        </button>
-
-      </div>
-
-      <!-- RELATÓRIO -->
+    <section class="card">
 
       <div class="report-header">
 
@@ -412,8 +136,6 @@
           class="ghost"
         >
 
-          <i data-lucide="file-text"></i>
-
           PDF
 
         </button>
@@ -426,14 +148,6 @@
       ></div>
 
     </section>
-
-    <!-- FOOTER -->
-
-    <footer>
-
-      Feito para PWA • Offline
-
-    </footer>
 
   </div>
 
