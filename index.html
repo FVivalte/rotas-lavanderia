@@ -742,6 +742,135 @@ document.getElementById('btn-open-maps').addEventListener('click', ()=>{
   );
 });
 
+// ===== TELA RELATÓRIO =====
+
+const screenReport =
+  document.getElementById('screen-report');
+
+const reportRouteList =
+  document.getElementById('reportRouteList');
+
+const reportTitle =
+  document.getElementById('reportTitle');
+
+
+// ===== DATA FORMATADA =====
+
+function getFormattedDateTitle(){
+
+  const now = new Date();
+
+  const weekdays = [
+    'Domingo',
+    'Segunda-feira',
+    'Terça-feira',
+    'Quarta-feira',
+    'Quinta-feira',
+    'Sexta-feira',
+    'Sábado'
+  ];
+
+  const weekday =
+    weekdays[now.getDay()];
+
+  const day =
+    String(now.getDate()).padStart(2,'0');
+
+  const month =
+    String(now.getMonth() + 1)
+      .padStart(2,'0');
+
+  const year =
+    now.getFullYear();
+
+  return `ROTA do dia ${weekday}, ${day}/${month}/${year}`;
+}
+
+
+// ===== RENDER RELATÓRIO =====
+
+function renderFinalReport(routeData){
+
+  reportRouteList.innerHTML = '';
+
+  reportTitle.textContent =
+    getFormattedDateTitle();
+
+  routeData.forEach((hotel, index) => {
+
+    const card =
+      document.createElement('div');
+
+    card.className = 'report-item';
+
+    card.innerHTML = `
+
+      <div class="report-top-line">
+
+        <span class="report-order">
+          ${index + 1}°
+        </span>
+
+        <span class="report-hotel-name">
+          ${hotel.name}
+        </span>
+
+        <div class="report-time">
+          🚥 ${hotel.arrival || '09:00'}
+          -
+          🏁 ${hotel.departure || '09:30'}
+        </div>
+
+      </div>
+
+      <div class="report-photos">
+
+        <div class="report-photo-box">
+
+          <img
+            src="${hotel.deliveryPhoto || 'img/placeholder.jpg'}"
+          >
+
+          <div class="report-photo-label">
+            Entrega
+          </div>
+
+        </div>
+
+        <div class="report-photo-box">
+
+          <img
+            src="${hotel.pickupPhoto || 'img/placeholder.jpg'}"
+          >
+
+          <div class="report-photo-label">
+            Retirada
+          </div>
+
+        </div>
+
+      </div>
+
+    `;
+
+    reportRouteList.appendChild(card);
+
+  });
+
+}
+
+
+// ===== ABRIR TELA =====
+
+function openReportScreen(routeData){
+
+  hideAllScreens();
+
+  screenReport.classList.remove('hidden');
+
+  renderFinalReport(routeData);
+
+}
     
     // Init
     renderSelection();
