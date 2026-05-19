@@ -306,12 +306,100 @@ coords:"-22.7458674,-41.8783928"}
         const h = HOTELS.find(x=>x.id===id);
         const item = document.createElement('div');
         item.className='route-item';
-        item.draggable = true;
         item.dataset.id = id;
         item.innerHTML = `<div><strong>${idx+1}. ${h.name}</strong><div class="muted" style="font-size:0.85rem">${h.address}</div></div>
                           <div style="display:flex;gap:8px;align-items:center">
                             <span class="drag">⋮⋮</span>
-                            <button class="ghost" data-id="${id}">Rem</button>
+                            <button class="ghost" data-id="${id}">Remover</button>
+const dragHandle = item.querySelector('.drag');
+
+let touchStartY = 0;
+let draggingItem = null;
+
+dragHandle.addEventListener('touchstart', (e)=>{
+
+  draggingItem = item;
+
+  touchStartY = e.touches[0].clientY;
+
+  item.classList.add('dragging-mobile');
+
+}, {passive:true});
+
+dragHandle.addEventListener('touchmove', (e)=>{
+
+  if(!draggingItem) return;
+
+  const currentY = e.touches[0].clientY;
+
+  const items = [...routeListEl.querySelectorAll('.route-item')];
+
+  items.forEach(other=>{
+
+    other.classList.remove('over');
+
+    if(other === draggingItem) return;
+
+    const rect = other.getBoundingClientRect();
+
+    const middle = rect.top + rect.height / 2;
+
+    if(currentY < middle){
+
+      other.classList.add('over');
+
+    }
+  });
+
+}, {passive:true});
+
+dragHandle.addEventListener('touchend', (e)=>{
+
+  if(!draggingItem) return;
+
+  const currentY = e.changedTouches[0].clientY;
+
+  const items = [...routeListEl.querySelectorAll('.route-item')];
+
+  let targetIndex = null;
+
+  items.forEach((other,index)=>{
+
+    other.classList.remove('over');
+
+    if(other === draggingItem) return;
+
+    const rect = other.getBoundingClientRect();
+
+    const middle = rect.top + rect.height / 2;
+
+    if(currentY < middle && targetIndex === null){
+
+      targetIndex = index;
+
+    }
+
+  });
+
+  const fromIndex = routeOrder.indexOf(id);
+
+  if(targetIndex !== null){
+
+    routeOrder.splice(
+      targetIndex,
+      0,
+      routeOrder.splice(fromIndex,1)[0]
+    );
+
+  }
+
+  draggingItem.classList.remove('dragging-mobile');
+
+  draggingItem = null;
+
+  renderRoute();
+
+}, {passive:true});
                           </div>`;
         // remove
         item.querySelector('button').addEventListener('click', ()=>{
@@ -319,25 +407,7 @@ coords:"-22.7458674,-41.8783928"}
           routeOrder = routeOrder.filter(x=>x!==id);
           renderSelection(); renderRoute();
         });
-        // drag handlers
-        item.addEventListener('dragstart', e=>{
-          e.dataTransfer.setData('text/plain', id);
-          item.classList.add('dragging');
-        });
-        item.addEventListener('dragend', e=>{
-          item.classList.remove('dragging');
-        });
-        item.addEventListener('dragover', e=>{
-          e.preventDefault();
-          const dragging = document.querySelector('.dragging');
-          if(!dragging || dragging===item) return;
-          const fromId = Number(dragging.dataset.id);
-          const toId = Number(item.dataset.id);
-          const fromIndex = routeOrder.indexOf(fromId);
-          const toIndex = routeOrder.indexOf(toId);
-          routeOrder.splice(toIndex,0,routeOrder.splice(fromIndex,1)[0]);
-          renderRoute();
-        });
+        
         routeListEl.appendChild(item);
       });
       // report area reset
