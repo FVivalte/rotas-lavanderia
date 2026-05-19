@@ -77,7 +77,38 @@ function createRoute(){
 
   const coords = [];
 
-  HOTELS.forEach(h => {
+  // HOTÉIS ATIVOS
+
+  const ativos =
+    [
+      ...document.querySelectorAll(
+        '.hotel-check:checked'
+      )
+    ];
+
+  // LIMPA LINHA ANTIGA
+
+  if(routeLine){
+
+    map.removeLayer(routeLine);
+  }
+
+  ativos.forEach(check => {
+
+    const id =
+      Number(
+        check.dataset.id
+      );
+
+    const h =
+      HOTELS.find(
+        x => x.id === id
+      );
+
+    if(!h){
+
+      return;
+    }
 
     const partes =
       h.coords.split(',');
@@ -88,7 +119,7 @@ function createRoute(){
     const lng =
       parseFloat(partes[1]);
 
-    coords.push([lat,lng]);
+    coords.push([lat, lng]);
 
     routeReport.push({
 
@@ -106,24 +137,38 @@ function createRoute(){
     });
   });
 
-  if(routeLine){
+  // DESENHA LINHA
 
-    map.removeLayer(routeLine);
+  if(coords.length > 0){
+
+    routeLine =
+      L.polyline(
+
+        coords,
+
+        {
+
+          color:'blue',
+
+          weight:5
+        }
+
+      ).addTo(map);
+
+    map.fitBounds(coords);
   }
 
-  routeLine =
-    L.polyline(
+  // RELATÓRIO
 
-      coords,
+  if(
 
-      {
+    typeof renderReportMode
+    === 'function'
 
-        color:'blue'
-      }
+  ){
 
-    ).addTo(map);
-
-  renderReportMode();
+    renderReportMode();
+  }
 }
 
 // =========================
