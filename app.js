@@ -65,6 +65,31 @@ let currentPhotos = [];
 let gpsWatchId = null;
 
 // =========================
+// FILE -> BASE64
+// =========================
+
+function fileToBase64(file){
+
+  return new Promise((resolve, reject) => {
+
+    const reader =
+      new FileReader();
+
+    reader.readAsDataURL(file);
+
+    reader.onload = () => {
+
+      resolve(reader.result);
+    };
+
+    reader.onerror = error => {
+
+      reject(error);
+    };
+  });
+}
+
+// =========================
 // SAVE
 // =========================
 
@@ -90,6 +115,87 @@ function saveState(){
     currentIndex.toString()
   );
 }
+
+// =========================
+// ELEMENTOS FOTO
+// =========================
+
+const photoInput =
+  document.getElementById(
+    'photoInput'
+  );
+
+const photoPreview =
+  document.getElementById(
+    'photoPreview'
+  );
+
+// =========================
+// PREVIEW FOTOS
+// =========================
+
+async function handlePhotos(){
+
+  if(!photoInput){
+
+    return;
+  }
+
+  const files =
+    [...photoInput.files];
+
+  photoPreview.innerHTML = '';
+
+  const imagens = [];
+
+  for(const file of files){
+
+    // BASE64
+
+    const base64 =
+      await fileToBase64(file);
+
+    imagens.push(base64);
+
+    // PREVIEW
+
+    const img =
+      document.createElement('img');
+
+    img.src = base64;
+
+    img.className =
+      'preview-image';
+
+    photoPreview.appendChild(img);
+  }
+
+  // =========================
+  // SALVAR NA ROTA
+  // =========================
+
+  if(
+
+    routeReport.length > 0
+
+  ){
+
+    const ultimoIndex =
+      routeReport.length - 1;
+
+    routeReport[
+      ultimoIndex
+    ].fotos = imagens;
+  }
+}
+
+photoInput?.addEventListener(
+
+  'change',
+
+  handlePhotos
+);
+
 
 // =========================
 // TROCA TELA
