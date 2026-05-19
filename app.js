@@ -70,7 +70,7 @@ function renderHotelList(){
       document.createElement('div');
 
     item.className =
-      'hotel-item';
+      'item';
 
     item.innerHTML = `
 
