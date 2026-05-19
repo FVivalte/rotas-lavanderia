@@ -1,4 +1,10 @@
 // =========================
+// HOTEL ATUAL
+// =========================
+
+let currentRouteIndex = 0;
+
+// =========================
 // INIT
 // =========================
 
@@ -131,12 +137,20 @@ const photoPreview =
   );
 
 // =========================
-// PREVIEW FOTOS
+// FOTOS
 // =========================
 
 async function handlePhotos(){
 
-  if(!photoInput){
+  if(
+
+    !photoInput ||
+
+    !routeReport[
+      currentRouteIndex
+    ]
+
+  ){
 
     return;
   }
@@ -149,8 +163,6 @@ async function handlePhotos(){
   const imagens = [];
 
   for(const file of files){
-
-    // BASE64
 
     const base64 =
       await fileToBase64(file);
@@ -171,30 +183,22 @@ async function handlePhotos(){
   }
 
   // =========================
-  // SALVAR NA ROTA
+  // SALVA NO HOTEL ATUAL
   // =========================
 
-  if(
+  routeReport[
+    currentRouteIndex
+  ].fotos = imagens;
 
-    routeReport.length > 0
+  // DEBUG
 
-  ){
-
-    const ultimoIndex =
-      routeReport.length - 1;
+  console.log(
 
     routeReport[
-      ultimoIndex
-    ].fotos = imagens;
-  }
+      currentRouteIndex
+    ]
+  );
 }
-
-photoInput?.addEventListener(
-
-  'change',
-
-  handlePhotos
-);
 
 
 // =========================
