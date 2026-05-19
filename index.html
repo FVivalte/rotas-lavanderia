@@ -149,58 +149,7 @@
 </section>
 
     <footer>Instale como PWA para usar no celular • Servir via HTTPS para instalar</footer>
-//Add hotel
-const modal = document.getElementById('hotelModal');
 
-document.getElementById('btn-add-hotel')
-.addEventListener('click', ()=>{
-
-  modal.classList.add('active');
-
-});
-
-document.getElementById('closeModal')
-.addEventListener('click', ()=>{
-
-  modal.classList.remove('active');
-
-});
-
-document.getElementById('saveHotel')
-.addEventListener('click', ()=>{
-
-  const name =
-    document.getElementById('newName').value;
-
-  const region =
-    document.getElementById('newRegion').value;
-
-  const address =
-    document.getElementById('newAddress').value;
-
-  const coords =
-    document.getElementById('newCoords').value;
-
-  if(!name || !address){
-
-    alert('Preencha nome e endereço.');
-
-    return;
-  }
-
-  HOTELS.push({
-    id: Date.now(),
-    name,
-    region,
-    address,
-    coords
-  });
-
-  renderSelection();
-
-  modal.classList.remove('active');
-
-});
   </div>
 
 <script src="dados.js"></script>
@@ -253,6 +202,59 @@ document.getElementById('saveHotel')
       });
       activeCountEl.textContent = `${activeSet.size} hotéis ativos`;
     }
+
+    //Add hotel
+const modal = document.getElementById('hotelModal');
+
+document.getElementById('btn-add-hotel')
+.addEventListener('click', ()=>{
+
+  modal.classList.add('active');
+
+});
+
+document.getElementById('closeModal')
+.addEventListener('click', ()=>{
+
+  modal.classList.remove('active');
+
+});
+
+document.getElementById('saveHotel')
+.addEventListener('click', ()=>{
+
+  const name =
+    document.getElementById('newName').value;
+
+  const region =
+    document.getElementById('newRegion').value;
+
+  const address =
+    document.getElementById('newAddress').value;
+
+  const coords =
+    document.getElementById('newCoords').value;
+
+  if(!name || !address){
+
+    alert('Preencha nome e endereço.');
+
+    return;
+  }
+
+  HOTELS.push({
+    id: Date.now(),
+    name,
+    region,
+    address,
+    coords
+  });
+
+  renderSelection();
+
+  modal.classList.remove('active');
+
+});
 
     // Gera rota (Tela 2) a partir dos ativos
     function generateRoute(){
