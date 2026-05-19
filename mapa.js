@@ -9,110 +9,62 @@ let markers = [];
 let routeLine;
 
 // =========================
-// INICIAR MAPA
+// INIT
 // =========================
 
 function initMap(){
 
-  map = L.map('map').setView(
+  map =
+    L.map('map').setView(
 
-    [-22.757, -41.889],
+      [-22.757, -41.889],
 
-    13
-  );
+      12
+    );
 
   L.tileLayer(
 
     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
 
     {
-      attribution:
-        '© OpenStreetMap'
+
+      attribution:'OSM'
     }
 
   ).addTo(map);
 
-  renderHotels();
+  renderHotelsMap();
 }
 
 // =========================
-// RENDERIZAR HOTÉIS
+// HOTÉIS MAPA
 // =========================
 
-function renderHotels(){
-
-  clearMarkers();
+function renderHotelsMap(){
 
   HOTELS.forEach(h => {
 
-    let lat;
-    let lng;
+    const partes =
+      h.coords.split(',');
 
-    // =========================
-    // CONVERTE COORDS
-    // =========================
+    const lat =
+      parseFloat(partes[0]);
 
-    if(h.coords){
+    const lng =
+      parseFloat(partes[1]);
 
-      const partes =
-        h.coords.split(',');
+    const marker =
+      L.marker([lat, lng])
 
-      lat =
-        parseFloat(partes[0]);
+      .addTo(map)
 
-      lng =
-        parseFloat(partes[1]);
+      .bindPopup(
 
-    }else{
-
-      lat = h.lat;
-      lng = h.lng;
-    }
-
-    // =========================
-    // CRIA MARKER
-    // =========================
-
-    const marker = L.marker([
-
-      lat,
-      lng
-
-    ])
-
-    .addTo(map)
-
-    .bindPopup(`
-
-      <strong>
-        ${h.name}
-      </strong>
-
-      <br>
-
-      ${h.region}
-
-      <br>
-
-      ${h.address}
-    `);
+        `<strong>${h.name}</strong>`
+      );
 
     markers.push(marker);
   });
-}
-
-// =========================
-// LIMPAR MARCADORES
-// =========================
-
-function clearMarkers(){
-
-  markers.forEach(marker => {
-
-    map.removeLayer(marker);
-  });
-
-  markers = [];
 }
 
 // =========================
@@ -121,159 +73,67 @@ function clearMarkers(){
 
 function createRoute(){
 
-  clearRoute();
-
   routeReport = [];
 
   const coords = [];
 
   HOTELS.forEach(h => {
 
-    let lat;
-    let lng;
+    const partes =
+      h.coords.split(',');
 
-    // =========================
-    // CONVERTE COORDS
-    // =========================
+    const lat =
+      parseFloat(partes[0]);
 
-    if(h.coords){
+    const lng =
+      parseFloat(partes[1]);
 
-      const partes =
-        h.coords.split(',');
-
-      lat =
-        parseFloat(partes[0]);
-
-      lng =
-        parseFloat(partes[1]);
-
-    }else{
-
-      lat = h.lat;
-      lng = h.lng;
-    }
-
-    // =========================
-    // ARRAY DA ROTA
-    // =========================
-
-    coords.push([
-
-      lat,
-      lng
-    ]);
-
-    // =========================
-    // RELATÓRIO
-    // =========================
+    coords.push([lat,lng]);
 
     routeReport.push({
 
-      id: h.id,
+      id:h.id,
 
-      chegada:
-        new Date(),
+      chegada:new Date(),
 
-      saida:
-        null,
+      saida:null,
 
-      entrega:
-        false,
+      entrega:false,
 
-      coleta:
-        false,
+      coleta:false,
 
-      fotos: []
+      fotos:[]
     });
   });
 
-  // =========================
-  // DESENHAR LINHA
-  // =========================
+  if(routeLine){
 
-  drawRoute(coords);
-
-  // =========================
-  // RELATÓRIO VISUAL
-  // =========================
-
-  if(
-
-    typeof renderReportMode
-    === 'function'
-
-  ){
-
-    renderReportMode();
+    map.removeLayer(routeLine);
   }
+
+  routeLine =
+    L.polyline(
+
+      coords,
+
+      {
+
+        color:'blue'
+      }
+
+    ).addTo(map);
+
+  renderReportMode();
 }
 
 // =========================
-// DESENHAR ROTA
-// =========================
-
-function drawRoute(coords){
-
-  routeLine = L.polyline(
-
-    coords,
-
-    {
-      weight: 5
-    }
-
-  ).addTo(map);
-
-  map.fitBounds(
-
-    routeLine.getBounds()
-  );
-}
-
-// =========================
-// LIMPAR ROTA
+// LIMPAR
 // =========================
 
 function clearRoute(){
 
   if(routeLine){
 
-    map.removeLayer(
-      routeLine
-    );
+    map.removeLayer(routeLine);
   }
 }
-
-// =========================
-// CENTRALIZAR MAPA
-// =========================
-
-function focusMap(){
-
-  if(routeLine){
-
-    map.fitBounds(
-
-      routeLine.getBounds()
-    );
-  }
-}
-
-// =========================
-// EXPORT GLOBAL
-// =========================
-
-window.initMap =
-  initMap;
-
-window.renderHotels =
-  renderHotels;
-
-window.createRoute =
-  createRoute;
-
-window.clearRoute =
-  clearRoute;
-
-window.focusMap =
-  focusMap;
