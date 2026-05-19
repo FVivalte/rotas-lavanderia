@@ -25,19 +25,21 @@
 
   <div class="top-actions">
 
-    <button id="btn-generate" class="big-button">
-      Continuar para ordem da rota
-    </button>
+  <button id="btn-generate" class="big-button">
+    Continuar para ordem da rota
+  </button>
 
-    <button id="btn-reset" class="ghost">
-      Limpar seleção
-    </button>
+  <button id="btn-reset" class="ghost">
+    Limpar seleção
+  </button>
 
-  <div class="hotel-counter" id="activeCount">
-    0 hotéis ativos
-  </div>
+</div>
 
-  <div class="list" id="hotelList"></div>
+<div class="hotel-counter" id="activeCount">
+  0 hotéis ativos
+</div>
+
+<div class="list" id="hotelList"></div>
 
 </section>
 
@@ -457,11 +459,6 @@ coords:"-22.7458674,-41.8783928"}
       screenMode.style.display='none';
     });
     document.getElementById('btn-start-route').addEventListener('click', startModeRoute);
-    document.getElementById('btn-google').addEventListener('click', ()=>{
-      if(routeOrder.length===0){ alert('Gere a rota primeiro.'); return; }
-      const url = buildGoogleMapsUrl(routeOrder);
-      window.open(url,'_blank');
-    });
     document.getElementById('btn-reset').addEventListener('click', ()=>{
       if(confirm('Limpar seleção?')){
         activeSet.clear(); routeOrder=[]; routeReport=[]; currentIndex=0;
@@ -478,6 +475,20 @@ coords:"-22.7458674,-41.8783928"}
       alert('Rota finalizada. Relatório disponível na tela anterior.');
       screenSelect.style.display='none'; screenRoute.style.display='block'; screenMode.style.display='none';
     });
+document.getElementById('btn-open-maps').addEventListener('click', ()=>{
+
+  if(currentIndex >= routeOrder.length) return;
+
+  const id = routeOrder[currentIndex];
+
+  const hotel = HOTELS.find(h => h.id === id);
+
+  window.open(
+    `https://www.google.com/maps?q=${hotel.coords}`,
+    '_blank'
+  );
+});
+
 
     // Init
     renderSelection();
