@@ -17,25 +17,31 @@
 
     <!-- TELA 1: SELEÇÃO -->
     <section id="screen-select" class="card screen active">
-      <div class="screen-title">
-  <h2>Selecionar hotéis</h2>
-  <p>Ative os hotéis que farão parte da rota.</p>
-</div>
 
-<div class="top-actions">
-  <button id="btn-generate" class="big-button">
-    Continuar para ordem da rota
-  </button>
+  <div class="screen-title">
+    <h2>Selecionar hotéis</h2>
+    <p>Ative os hotéis que farão parte da rota.</p>
+  </div>
 
-  <button id="btn-reset" class="ghost">
-    Limpar seleção
-  </button>
-</div>
+  <div class="top-actions">
 
-<div class="hotel-counter" id="activeCount">
-  0 hotéis ativos
-</div>
-    </section>
+    <button id="btn-generate" class="big-button">
+      Continuar para ordem da rota
+    </button>
+
+    <button id="btn-reset" class="ghost">
+      Limpar seleção
+    </button>
+
+  </div>
+
+  <div class="hotel-counter" id="activeCount">
+    0 hotéis ativos
+  </div>
+
+  <div class="list" id="hotelList"></div>
+
+</section>
 
     <!-- TELA 2: ROTA GERADA -->
     <section id="screen-route" class="card screen">
@@ -54,8 +60,6 @@
   </button>
 </div>
         </div>
-      </div>
-
       <div class="route-list" id="routeList"></div>
 
       <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
@@ -128,11 +132,6 @@
   </div>
 
 </div>
-
-        <div>
-          <div class="muted">Relatório parcial</div>
-          <div class="report" id="reportMode"></div>
-        </div>
       </div>
     </section>
 
