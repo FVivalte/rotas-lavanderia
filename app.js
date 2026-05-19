@@ -56,38 +56,57 @@ function fileToBase64(file){
 }
 
 // =========================
-// HOTÉIS LISTA
+// RENDER HOTÉIS
 // =========================
 
 function renderHotelList(){
 
-  console.log(HOTELS);
+  console.log(
+    'HOTELS:',
+    HOTELS
+  );
+
+  console.log(
+    'hotelList:',
+    hotelList
+  );
+
+  if(!hotelList){
+
+    return;
+  }
+
   hotelList.innerHTML = '';
 
   HOTELS.forEach(h => {
 
-    const item =
+    const div =
       document.createElement('div');
 
-    item.className =
-      'item';
+    // USA CSS ANTIGO
 
-    item.innerHTML = `
+    div.className = 'item';
 
-      <strong>
+    div.innerHTML = `
 
-        ${h.name}
+      <div class="info">
 
-      </strong>
+        <div class="name">
 
-      <div>
+          ${h.name}
 
-        ${h.region}
+        </div>
+
+        <div class="addr">
+
+          ${h.region}
+
+        </div>
 
       </div>
     `;
 
-    hotelList.appendChild(item);
+    hotelList.appendChild(div);
   });
 }
 
