@@ -189,6 +189,9 @@
     let routeOrder = [];
     let routeReport = [];
     let currentIndex = 0;
+    let userPosition = null;
+    let watchId = null;
+    let arrivalConfirmed = false;
 
     // Elementos
     const screenSelect = document.getElementById('screen-select');
@@ -479,6 +482,104 @@ document.getElementById('saveHotel')
       return base + '&' + params.toString();
     }
 
+    // ATIVAR GPS 
+    function getDistanceMeters(lat1, lon1, lat2, lon2){
+
+  const R = 6371e3;
+
+  const φ1 = lat1 * Math.PI/180;
+  const φ2 = lat2 * Math.PI/180;
+
+  const Δφ = (lat2-lat1) * Math.PI/180;
+  const Δλ = (lon2-lon1) * Math.PI/180;
+
+  const a =
+    Math.sin(Δφ/2) * Math.sin(Δφ/2) +
+    Math.cos(φ1) *
+    Math.cos(φ2) *
+    Math.sin(Δλ/2) *
+    Math.sin(Δλ/2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+  return R * c;
+}
+
+function startGpsTracking(){
+
+  if(!navigator.geolocation){
+
+    alert('GPS não suportado');
+
+    return;
+  }
+
+  watchId = navigator.geolocation.watchPosition(pos=>{
+
+    userPosition = {
+      lat: pos.coords.latitude,
+      lng: pos.coords.longitude
+    };
+
+    checkArrival();
+
+  },
+  err=>{
+
+    console.log(err);
+
+  },
+  {
+    enableHighAccuracy:true,
+    maximumAge:0,
+    timeout:5000
+  });
+
+}
+
+function checkArrival(){
+
+  if(currentIndex >= routeOrder.length) return;
+
+  if(arrivalConfirmed) return;
+
+  const id = routeOrder[currentIndex];
+
+  const hotel = HOTELS.find(h=>h.id===id);
+
+  const coords = hotel.coords.split(',');
+
+  const hotelLat = Number(coords[0]);
+  const hotelLng = Number(coords[1]);
+
+  const distance = getDistanceMeters(
+    userPosition.lat,
+    userPosition.lng,
+    hotelLat,
+    hotelLng
+  );
+
+  if(distance <= 90){
+
+    arrivalConfirmed = true;
+
+    const ok = confirm(
+      `Você chegou em ${hotel.name}?`
+    );
+
+    if(ok){
+
+      routeReport[currentIndex].arrival =
+        new Date().toISOString();
+
+      renderReportMode();
+
+    }
+
+  }
+
+}
+
     // Start mode route (Tela 3)
     function startModeRoute(){
       if(routeOrder.length===0){ alert('Gere a rota primeiro.'); return; }
@@ -487,6 +588,7 @@ document.getElementById('saveHotel')
       screenSelect.style.display='none';
       screenRoute.style.display='none';
       screenMode.style.display='block';
+      startGpsTracking();
       updateModeUI();
       renderReportMode();
     }
@@ -528,7 +630,8 @@ document.getElementById('saveHotel')
       if(!entry.arrival) entry.arrival = now.toISOString();
       entry.entrega = entrega;
       entry.coleta = coleta;
-      entry.departure = new Date(now.getTime() + 2*60000).toISOString();
+      entry.departure = new Date().toISOString();
+      arrivalConfirmed = false;
       currentIndex++;
       updateModeUI();
       renderReportMode();
