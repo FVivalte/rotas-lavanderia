@@ -16,32 +16,43 @@
     </header>
 
     <!-- TELA 1: SELEÇÃO -->
-    <section id="screen-select" class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <strong>Selecione os hotéis</strong>
-          <div class="muted">Marque os hotéis que quer incluir e toque em Gerar rota</div>
-        </div>
-        <div class="controls">
-          <button id="btn-generate">Gerar rota (ativos)</button>
-          <button id="btn-reset" class="ghost">Limpar</button>
-        </div>
-      </div>
+    <section id="screen-select" class="card screen active">
+      <div class="screen-title">
+  <h2>Selecionar hotéis</h2>
+  <p>Ative os hotéis que farão parte da rota.</p>
+</div>
 
-      <div class="list" id="hotelList"></div>
+<div class="top-actions">
+  <button id="btn-generate" class="big-button">
+    Continuar para ordem da rota
+  </button>
+
+  <button id="btn-reset" class="ghost">
+    Limpar seleção
+  </button>
+</div>
+
+<div class="hotel-counter" id="activeCount">
+  0 hotéis ativos
+</div>
     </section>
 
     <!-- TELA 2: ROTA GERADA -->
-    <section id="screen-route" class="card" style="display:none;margin-top:12px">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <strong>Rota gerada</strong>
-          <div class="muted">Reordene arrastando; quando pronto, inicie o modo rota</div>
-        </div>
-        <div class="controls">
-          <button id="btn-google" class="ghost">Tudo no Google Maps</button>
-          <button id="btn-start-route">Iniciar modo rota</button>
-          <button id="btn-back" class="ghost">Voltar</button>
+    <section id="screen-route" class="card screen">
+      <div class="screen-title">
+  <h2>Ordem da rota</h2>
+  <p>Arraste os hotéis para definir a sequência.</p>
+</div>
+
+<div class="top-actions">
+  <button id="btn-start-route" class="big-button">
+    Iniciar modo navegação
+  </button>
+
+  <button id="btn-back" class="ghost">
+    Voltar
+  </button>
+</div>
         </div>
       </div>
 
@@ -56,31 +67,67 @@
     </section>
 
     <!-- TELA 3: MODO ROTA -->
-    <section id="screen-mode" class="card" style="display:none;margin-top:12px">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div>
-          <strong>Modo Rota</strong>
-          <div class="muted">Registre entrega/coleta e avance para o próximo</div>
-        </div>
+    <section id="screen-mode" class="card screen">
+      <div class="screen-title">
+  <h2>Modo navegação</h2>
+  <p>Controle entregas e abra navegação individual.</p>
+</div>
         <div class="controls">
           <button id="btn-finish" class="ghost">Finalizar</button>
         </div>
       </div>
 
       <div class="mode">
-        <div id="currentHotel" style="padding:12px;border-radius:10px;background:linear-gradient(180deg,#fff,#f7fbff);border:1px solid rgba(11,99,183,0.04)"></div>
 
-        <div style="display:flex;gap:12px;align-items:center">
-          <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="chk-entrega"> <span class="muted">Entrega</span></label>
-          <label style="display:flex;align-items:center;gap:8px"><input type="checkbox" id="chk-coleta"> <span class="muted">Coleta</span></label>
-          <div style="flex:1"></div>
-          <button id="btn-next">Próximo hotel</button>
-        </div>
+  <div id="currentHotel"></div>
 
-        <div>
-          <div class="muted">Próximos</div>
-          <div class="next-two" id="nextTwo"></div>
-        </div>
+  <div class="check-group">
+
+    <label class="check-card">
+      <input type="checkbox" id="chk-entrega">
+      <span>Entrega</span>
+    </label>
+
+    <label class="check-card">
+      <input type="checkbox" id="chk-coleta">
+      <span>Coleta</span>
+    </label>
+
+  </div>
+
+  <div class="mode-actions">
+
+    <button id="btn-open-maps" class="maps-button">
+      Navegar no Google Maps
+    </button>
+
+    <button id="btn-next">
+      Próximo hotel
+    </button>
+
+  </div>
+
+  <div>
+
+    <div class="muted">
+      Próximos hotéis
+    </div>
+
+    <div class="next-two" id="nextTwo"></div>
+
+  </div>
+
+  <div>
+
+    <div class="muted">
+      Relatório parcial
+    </div>
+
+    <div class="report" id="reportMode"></div>
+
+  </div>
+
+</div>
 
         <div>
           <div class="muted">Relatório parcial</div>
