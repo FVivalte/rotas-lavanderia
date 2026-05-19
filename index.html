@@ -198,7 +198,7 @@
     const hotelListEl = document.getElementById('hotelList');
     const routeListEl = document.getElementById('routeList');
     const reportEl = document.getElementById('report');
-    const reportModeEl = document.getElementById('reportMode');
+    const reportEl = document.getElementById('report') || document.createElement('div');
     const currentHotelEl = document.getElementById('currentHotel');
     const nextTwoEl = document.getElementById('nextTwo');
     const activeCountEl = document.getElementById('activeCount');
@@ -458,8 +458,6 @@ document.getElementById('saveHotel')
     coleta:false
   }));
 
-  renderReport();
-
   activeCountEl.textContent =
     `${activeSet.size} hotéis ativos`;
 }
@@ -666,7 +664,6 @@ function checkArrival(){
                          </div>`;
         reportModeEl.appendChild(div);
       });
-      renderReport();
     }
 
     // Buttons
