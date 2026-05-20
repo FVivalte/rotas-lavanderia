@@ -231,6 +231,9 @@
     let userPosition = null;
     let watchId = null;
     let arrivalConfirmed = false;
+    let map = null;
+    let userMarker = null;
+    let hotelMarker = null;
 
 // Elementos
 
@@ -661,6 +664,7 @@ function startGpsTracking(){
     };
 
     checkArrival();
+    updateMap();
 
   },
   err=>{
@@ -722,6 +726,65 @@ function checkArrival(){
 
 // Start mode route (Tela 3)
 
+    function initMap(){
+
+  if(map) return;
+
+  map = L.map('map').setView(
+    [-22.75, -41.88],
+    13
+  );
+
+  L.tileLayer(
+    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {
+      attribution:'© OpenStreetMap'
+    }
+  ).addTo(map);
+
+}
+    function updateMap(){
+
+  if(currentIndex >= routeOrder.length) return;
+
+  const id = routeOrder[currentIndex];
+
+  const hotel = HOTELS.find(h=>h.id===id);
+
+  const coords = hotel.coords.split(',');
+
+  const lat = Number(coords[0]);
+
+  const lng = Number(coords[1]);
+
+  if(hotelMarker){
+
+    map.removeLayer(hotelMarker);
+
+  }
+
+  hotelMarker = L.marker([lat,lng])
+    .addTo(map);
+
+  map.setView([lat,lng],15);
+
+  // usuário
+  if(userPosition){
+
+    if(userMarker){
+
+      map.removeLayer(userMarker);
+
+    }
+
+    userMarker = L.marker([
+      userPosition.lat,
+      userPosition.lng
+    ]).addTo(map);
+
+  }
+
+}
     function startModeRoute(){
       if(routeOrder.length===0){ alert('Gere a rota primeiro.'); return; }
       currentIndex = 0;
@@ -729,6 +792,8 @@ function checkArrival(){
       screenSelect.style.display='none';
       screenRoute.style.display='none';
       screenMode.style.display='block';
+      initMap();
+      updateMap();
       startGpsTracking();
       updateModeUI();
       renderReportMode();
@@ -767,7 +832,7 @@ function checkArrival(){
       document.getElementById('chk-coleta').checked = entry.coleta;
     }
 
-// Next hotel in mode
+// Next hotel in mode - SCRIPT BOTAO PROXIMO HOTEL 
     document.getElementById('btn-next').addEventListener('click', ()=>{
       if(currentIndex >= routeOrder.length) return;
       const entrega = document.getElementById('chk-entrega').checked;
@@ -781,6 +846,7 @@ function checkArrival(){
       arrivalConfirmed = false;
       currentIndex++;
       updateModeUI();
+      updateMap();
       renderReportMode();
       saveAppState();
     });
