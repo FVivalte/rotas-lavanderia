@@ -776,6 +776,7 @@ function checkArrival(){
       currentIndex++;
       updateModeUI();
       renderReportMode();
+      saveAppState();
     });
 
 // Render report (Tela 2)
@@ -982,7 +983,7 @@ function openReportScreen(routeData){
 }
     
     // Init
-    renderSelection();
+    restoreAppState();
 
     // Register service worker
     if('serviceWorker' in navigator){
