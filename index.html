@@ -6,13 +6,18 @@
   <title>Rota Búzios — PWA</title>
   <meta name="theme-color" content="#0b63b7"/>
   <link rel="manifest" href="manifest.json" />
-<link rel="stylesheet" href="style.css">
-<link
+  <link rel="stylesheet" href="style.css">
+  <link
   rel="stylesheet"
   href="https://unpkg.com/leaflet/dist/leaflet.css"
 />
-
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+   <link
+ rel="stylesheet"
+ href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css"
+/>
+<script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+
 </head>
 <body>
   <div class="app">
@@ -111,6 +116,13 @@
     <div id="currentHotel"></div>
     <div id="map"></div>
     <div class="check-group">
+<label class="check-card">
+
+  <input type="checkbox" id="voiceEnabled" checked>
+
+  <span>Voz navegação</span>
+
+</label>
 
       <label class="check-card">
         <input type="checkbox" id="chk-entrega">
@@ -224,6 +236,9 @@
 
 // Estado
 
+    let routingControl = null;
+    let speechEnabled = true;
+    let lastInstruction = '';
     let activeSet = new Set();
     let routeOrder = [];
     let routeReport = [];
@@ -662,6 +677,17 @@ function startGpsTracking(){
       lat: pos.coords.latitude,
       lng: pos.coords.longitude
     };
+    if(map){
+
+  map.setView(
+    [
+      userPosition.lat,
+      userPosition.lng
+    ],
+    16
+  );
+
+}
 
     checkArrival();
     updateMap();
@@ -726,6 +752,24 @@ function checkArrival(){
 
 // Start mode route (Tela 3)
 
+  function speak(text){
+
+  if(!speechEnabled) return;
+
+  if(text === lastInstruction) return;
+
+  lastInstruction = text;
+
+  const utter =
+    new SpeechSynthesisUtterance(text);
+
+  utter.lang = 'pt-BR';
+
+  utter.rate = 1;
+
+  speechSynthesis.speak(utter);
+
+}
     function initMap(){
 
   if(map) return;
@@ -745,44 +789,117 @@ function checkArrival(){
 }
     function updateMap(){
 
-  if(currentIndex >= routeOrder.length) return;
+  if(!map) return;
 
-  const id = routeOrder[currentIndex];
+  if(currentIndex >= routeOrder.length)
+    return;
 
-  const hotel = HOTELS.find(h=>h.id===id);
+  const currentHotel =
+    HOTELS.find(
+      h=>h.id===routeOrder[currentIndex]
+    );
 
-  const coords = hotel.coords.split(',');
+  const coords =
+    currentHotel.coords.split(',');
 
-  const lat = Number(coords[0]);
+  const hotelLat = Number(coords[0]);
+  const hotelLng = Number(coords[1]);
 
-  const lng = Number(coords[1]);
+  // limpa rota antiga
+  if(routingControl){
 
-  if(hotelMarker){
-
-    map.removeLayer(hotelMarker);
+    map.removeControl(routingControl);
 
   }
 
-  hotelMarker = L.marker([lat,lng])
-    .addTo(map);
-
-  map.setView([lat,lng],15);
+  const waypoints = [];
 
   // usuário
   if(userPosition){
 
-    if(userMarker){
+    waypoints.push(
+      L.latLng(
+        userPosition.lat,
+        userPosition.lng
+      )
+    );
 
-      map.removeLayer(userMarker);
+  }
+
+  // hotel atual
+  waypoints.push(
+    L.latLng(hotelLat,hotelLng)
+  );
+
+  // próximos hotéis
+  for(let i=1;i<=2;i++){
+
+    const idx = currentIndex + i;
+
+    if(idx < routeOrder.length){
+
+      const nextHotel =
+        HOTELS.find(
+          h=>h.id===routeOrder[idx]
+        );
+
+      const nextCoords =
+        nextHotel.coords.split(',');
+
+      waypoints.push(
+        L.latLng(
+          Number(nextCoords[0]),
+          Number(nextCoords[1])
+        )
+      );
 
     }
 
-    userMarker = L.marker([
-      userPosition.lat,
-      userPosition.lng
-    ]).addTo(map);
-
   }
+
+  routingControl = L.Routing.control({
+
+    waypoints,
+
+    routeWhileDragging:false,
+
+    addWaypoints:false,
+
+    draggableWaypoints:false,
+
+    fitSelectedRoutes:true,
+
+    show:false,
+
+    createMarker:(i,wp)=>{
+
+      return L.marker(wp.latLng);
+
+    }
+
+  }).addTo(map);
+
+  // instruções voz
+  routingControl.on(
+    'routesfound',
+    function(e){
+
+      const route = e.routes[0];
+
+      if(
+        route.instructions &&
+        route.instructions.length
+      ){
+
+        const instruction =
+          route.instructions[0].text;
+
+        speak(instruction);
+
+      }
+
+    }
+  );
 
 }
     function startModeRoute(){
@@ -887,7 +1004,14 @@ function checkArrival(){
     }
 
 // Buttons
-    document.getElementById('btn-generate').addEventListener('click', generateRoute);
+
+document
+.getElementById('voiceEnabled')
+.addEventListener('change',(e)=>{
+
+  speechEnabled = e.target.checked;
+
+}); document.getElementById('btn-generate').addEventListener('click', generateRoute);
     document.getElementById('btn-back').addEventListener('click', ()=>{
       screenSelect.style.display='block';
       screenRoute.style.display='none';
