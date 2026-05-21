@@ -718,6 +718,18 @@ function startGpsTracking(){
 
 }
 
+function stopGpsTracking(){
+
+  if(watchId !== null){
+
+    navigator.geolocation.clearWatch(watchId);
+
+    watchId = null;
+
+  }
+
+}
+
 function checkArrival(){
 
   if(currentIndex >= routeOrder.length) return;
@@ -1024,18 +1036,45 @@ document
   speechEnabled = e.target.checked;
 
 }); document.getElementById('btn-generate').addEventListener('click', generateRoute);
-    document.getElementById('btn-back').addEventListener('click', ()=>{
-      screenSelect.style.display='block';
-      screenRoute.style.display='none';
-      screenMode.style.display='none';
-    });
+    document.getElementById('btn-back')
+.addEventListener('click', ()=>{
+
+  stopGpsTracking();
+
+  screenSelect.style.display='block';
+
+  screenRoute.style.display='none';
+
+  screenMode.style.display='none';
+
+});
     document.getElementById('btn-start-route').addEventListener('click', startModeRoute);
-    document.getElementById('btn-reset').addEventListener('click', ()=>{
-      if(confirm('Limpar seleção?')){
-        activeSet.clear(); routeOrder=[]; routeReport=[]; currentIndex=0;
-        renderSelection(); renderRoute(); reportEl.innerHTML=''; reportModeEl.innerHTML='';
-      }
-    });
+    document.getElementById('btn-reset')
+.addEventListener('click', ()=>{
+
+  if(confirm('Limpar seleção?')){
+
+    stopGpsTracking();
+
+    activeSet.clear();
+
+    routeOrder=[];
+
+    routeReport=[];
+
+    currentIndex=0;
+
+    renderSelection();
+
+    renderRoute();
+
+    reportEl.innerHTML='';
+
+    reportModeEl.innerHTML='';
+
+  }
+
+});
     document.getElementById('btn-export').addEventListener('click', ()=>{
       const data = {generatedAt: new Date().toISOString(), route: routeOrder, report: routeReport};
       const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
