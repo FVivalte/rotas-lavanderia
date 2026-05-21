@@ -51,7 +51,7 @@
 
 </div>
 
-<div class="hotel-counter" id="activeCount">
+<div class="hotel-counter" id="activeCountSelect">
   0 hotéis ativos
 </div>
 
@@ -89,7 +89,7 @@
       Exportar relatório
     </button>
 
-    <div class="muted" id="activeCount" style="align-self:center"></div>
+    <div class="muted" id="activeCountRoute" style="align-self:center"></div>
   </div>
 
 </section>
@@ -265,7 +265,10 @@ const reportEl =
 const reportModeEl = document.getElementById('reportMode');
 const currentHotelEl = document.getElementById('currentHotel');
 const nextTwoEl = document.getElementById('nextTwo');
-const activeCountEl = document.getElementById('activeCount');
+const activeCountSelectEl =
+  document.getElementById('activeCountSelect');
+const activeCountRouteEl =
+  document.getElementById('activeCountRoute');
 
 // Salvar o App em segundo plano
 
@@ -373,10 +376,15 @@ function restoreAppState(){
         cb.addEventListener('change', e=>{
           const id = Number(e.target.dataset.id);
           if(e.target.checked) activeSet.add(id); else activeSet.delete(id);
-          activeCountEl.textContent = `${activeSet.size} hotéis ativos`;
+          activeCountSelectEl.textContent = `${activeSet.size} hotéis ativos`;
         });
       });
-      activeCountEl.textContent = `${activeSet.size} hotéis ativos`;
+      const text =
+  `${activeSet.size} hotéis ativos`;
+
+activeCountSelectEl.textContent = text;
+
+activeCountRouteEl.textContent = text;
 saveAppState();
     }
 
@@ -614,8 +622,12 @@ saveAppState();
     coleta:false
   }));
 
-  activeCountEl.textContent =
-    `${activeSet.size} hotéis ativos`;
+  const text =
+  `${activeSet.size} hotéis ativos`;
+
+activeCountSelectEl.textContent = text;
+
+activeCountRouteEl.textContent = text;
 saveAppState();
 }
 
