@@ -421,9 +421,17 @@ document.getElementById('saveHotel')
   const coords =
     document.getElementById('newCoords').value;
 
-  if(!name || !address){
+  const parsedCoords =
+    parseCoords(coords);
 
-    alert('Preencha nome e endereço.');
+  if(
+    !name ||
+    !address ||
+    !parsedCoords
+  ){
+    alert(
+      'Preencha nome, endereço e coordenadas válidas.'
+    );
 
     return;
   }
@@ -435,6 +443,12 @@ document.getElementById('saveHotel')
     address,
     coords
   });
+
+  renderSelection();
+
+  modal.classList.remove('active');
+
+});
 
   renderSelection();
 
@@ -636,7 +650,23 @@ saveAppState();
 
     function buildGoogleMapsUrl(order){
       if(order.length===0) return '';
-      const coords = order.map(id=>HOTELS.find(h=>h.id===id).coords.replace(/\s/g,''));
+      const coords = order
+  .map(id=>{
+
+    const hotel =
+      HOTELS.find(h=>h.id===id);
+
+    if(!hotel) return null;
+
+    const parsed =
+      parseCoords(hotel.coords);
+
+    if(!parsed) return null;
+
+    return `${parsed.lat},${parsed.lng}`;
+
+  })
+  .filter(Boolean);
       const origin = coords[0];
       const destination = coords[coords.length-1];
       const waypoints = coords.slice(1,coords.length-1).join('|');
@@ -652,7 +682,30 @@ saveAppState();
 
 // ATIVAR GPS
 
-    function getDistanceMeters(lat1, lon1, lat2, lon2){
+function parseCoords(coords){
+
+  if(!coords) return null;
+
+  const parts = coords.split(',');
+
+  if(parts.length !== 2) return null;
+
+  const lat = Number(parts[0].trim());
+
+  const lng = Number(parts[1].trim());
+
+  if(
+    isNaN(lat) ||
+    isNaN(lng)
+  ){
+    return null;
+  }
+
+  return { lat, lng };
+
+}
+
+function getDistanceMeters(lat1, lon1, lat2, lon2){
 
   const R = 6371e3;
 
@@ -740,10 +793,14 @@ function checkArrival(){
 
   const hotel = HOTELS.find(h=>h.id===id);
 
-  const coords = hotel.coords.split(',');
+  const parsed =
+  parseCoords(hotel.coords);
 
-  const hotelLat = Number(coords[0]);
-  const hotelLng = Number(coords[1]);
+if(!parsed) return;
+
+const hotelLat = parsed.lat;
+
+const hotelLng = parsed.lng;
 
   const distance = getDistanceMeters(
     userPosition.lat,
@@ -823,11 +880,21 @@ function checkArrival(){
       h=>h.id===routeOrder[currentIndex]
     );
 
-  const coords =
-    currentHotel.coords.split(',');
+  const parsed =
+  parseCoords(currentHotel.coords);
 
-  const hotelLat = Number(coords[0]);
-  const hotelLng = Number(coords[1]);
+if(!parsed){
+
+  alert(
+    `Coordenadas inválidas em ${currentHotel.name}`
+  );
+
+  return;
+}
+
+const hotelLat = parsed.lat;
+
+const hotelLng = parsed.lng;
 
   // limpa rota antiga
   if(routingControl){
@@ -867,17 +934,19 @@ function checkArrival(){
           h=>h.id===routeOrder[idx]
         );
 
-      const nextCoords =
-        nextHotel.coords.split(',');
+      const nextParsed =
+  parseCoords(nextHotel.coords);
 
-      waypoints.push(
-        L.latLng(
-          Number(nextCoords[0]),
-          Number(nextCoords[1])
-        )
-      );
+if(nextParsed){
 
-    }
+  waypoints.push(
+    L.latLng(
+      nextParsed.lat,
+      nextParsed.lng
+    )
+  );
+
+}
 
   }
 
