@@ -1203,6 +1203,7 @@ if(nextParsed){
       startGpsTracking();
       updateModeUI();
       renderReportMode();
+      renderPhotoPreviews();
       saveAppState();
     }
 
@@ -1252,6 +1253,7 @@ if(nextParsed){
       arrivalConfirmed = false;
       currentIndex++;
       updateModeUI();
+      renderPhotoPreviews();
       updateMap();
       renderReportMode();
       saveAppState();
