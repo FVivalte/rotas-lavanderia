@@ -114,16 +114,20 @@
   <div class="mode">
 
     <div id="currentHotel"></div>
+
+<div class="voice-toggle-bar">
+
+  <button
+    id="voiceToggle"
+    class="voice-toggle off"
+  >
+    🔇 Voz desligada
+  </button>
+
+</div>
+
     <div id="map"></div>
     <div class="check-group">
-<label class="check-card">
-
-  <input type="checkbox" id="voiceEnabled" checked>
-
-  <span>Voz navegação</span>
-
-</label>
-
       <label class="check-card">
         <input type="checkbox" id="chk-entrega">
         <span>Entrega</span>
@@ -283,7 +287,7 @@
 // Estado
 
     let routingControl = null;
-    let speechEnabled = true;
+    let speechEnabled = false;
     let lastInstruction = '';
     let activeSet = new Set();
     let routeOrder = [];
@@ -1412,13 +1416,37 @@ function renderPhotoPreviews(){
 
 // Buttons
 
-document
-.getElementById('voiceEnabled')
-.addEventListener('change',(e)=>{
+const voiceToggle =
+  document.getElementById('voiceToggle');
 
-  speechEnabled = e.target.checked;
+voiceToggle.addEventListener('click', ()=>{
 
-}); document.getElementById('btn-generate').addEventListener('click', generateRoute);
+  speechEnabled = !speechEnabled;
+
+  if(speechEnabled){
+
+    voiceToggle.classList.remove('off');
+
+    voiceToggle.classList.add('on');
+
+    voiceToggle.textContent =
+      '🔊 Voz ligada';
+
+  }else{
+
+    voiceToggle.classList.remove('on');
+
+    voiceToggle.classList.add('off');
+
+    voiceToggle.textContent =
+      '🔇 Voz desligada';
+
+    speechSynthesis.cancel();
+
+  }
+
+});
+ document.getElementById('btn-generate').addEventListener('click', generateRoute);
     document.getElementById('btn-back')
 .addEventListener('click', ()=>{
 
