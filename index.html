@@ -136,6 +136,52 @@
 
     </div>
 
+<div class="photo-section">
+
+  <div class="photo-upload-group">
+
+    <label>
+      Fotos Entrega
+    </label>
+
+    <input
+      type="file"
+      id="deliveryPhotosInput"
+      accept="image/*"
+      capture="environment"
+      multiple
+    >
+
+    <div
+      class="photo-preview"
+      id="deliveryPreview"
+    ></div>
+
+  </div>
+
+  <div class="photo-upload-group">
+
+    <label>
+      Fotos Coleta
+    </label>
+
+    <input
+      type="file"
+      id="pickupPhotosInput"
+      accept="image/*"
+      capture="environment"
+      multiple
+    >
+
+    <div
+      class="photo-preview"
+      id="pickupPreview"
+    ></div>
+
+  </div>
+
+</div>
+
     <div class="mode-actions">
 
       <button id="btn-open-maps" class="maps-button">
@@ -1245,6 +1291,122 @@ if(nextParsed){
         reportModeEl.appendChild(div);
       });
     }
+
+function readFilesAsBase64(files){
+
+  return Promise.all(
+
+    [...files].map(file => {
+
+      return new Promise(resolve => {
+
+        const reader = new FileReader();
+
+        reader.onload = () => {
+
+          resolve(reader.result);
+
+        };
+
+        reader.readAsDataURL(file);
+
+      });
+
+    })
+
+  );
+
+}
+
+document
+.getElementById('deliveryPhotosInput')
+.addEventListener('change', async (e)=>{
+
+  if(currentIndex >= routeReport.length)
+    return;
+
+  const images =
+    await readFilesAsBase64(e.target.files);
+
+  routeReport[currentIndex]
+    .deliveryPhotos
+    .push(...images);
+
+  renderPhotoPreviews();
+
+  saveAppState();
+
+});
+
+document
+.getElementById('pickupPhotosInput')
+.addEventListener('change', async (e)=>{
+
+  if(currentIndex >= routeReport.length)
+    return;
+
+  const images =
+    await readFilesAsBase64(e.target.files);
+
+  routeReport[currentIndex]
+    .pickupPhotos
+    .push(...images);
+
+  renderPhotoPreviews();
+
+  saveAppState();
+
+});
+
+function renderPhotoPreviews(){
+
+  if(currentIndex >= routeReport.length)
+    return;
+
+  const entry =
+    routeReport[currentIndex];
+
+  const deliveryPreview =
+    document.getElementById(
+      'deliveryPreview'
+    );
+
+  const pickupPreview =
+    document.getElementById(
+      'pickupPreview'
+    );
+
+  deliveryPreview.innerHTML = '';
+
+  pickupPreview.innerHTML = '';
+
+  entry.deliveryPhotos.forEach(src=>{
+
+    const img =
+      document.createElement('img');
+
+    img.src = src;
+
+    img.className = 'preview-thumb';
+
+    deliveryPreview.appendChild(img);
+
+  });
+
+  entry.pickupPhotos.forEach(src=>{
+
+    const img =
+      document.createElement('img');
+
+    img.src = src;
+
+    img.className = 'preview-thumb';
+
+    pickupPreview.appendChild(img);
+
+  });
+
+}
 
 // Buttons
 
