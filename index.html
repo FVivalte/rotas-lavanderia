@@ -1042,10 +1042,48 @@ document
       const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download='relatorio_rota.json'; a.click();
       URL.revokeObjectURL(a.href);
     });
-    document.getElementById('btn-finish').addEventListener('click', ()=>{
-      alert('Rota finalizada. Relatório disponível na tela anterior.');
-      screenSelect.style.display='none'; screenRoute.style.display='block'; screenMode.style.display='none';
-    });
+    document
+.getElementById('btn-finish')
+.addEventListener('click', ()=>{
+
+  stopGpsTracking();
+
+  const finalData = routeReport.map(r=>{
+
+    const hotel =
+      HOTELS.find(h => h.id === r.id);
+
+    return {
+
+      name: hotel.name,
+
+      arrival: r.arrival
+        ? new Date(r.arrival)
+            .toLocaleTimeString('pt-BR',{
+              hour:'2-digit',
+              minute:'2-digit'
+            })
+        : '--:--',
+
+      departure: r.departure
+        ? new Date(r.departure)
+            .toLocaleTimeString('pt-BR',{
+              hour:'2-digit',
+              minute:'2-digit'
+            })
+        : '--:--',
+
+      deliveryPhoto:null,
+
+      pickupPhoto:null
+
+    };
+
+  });
+
+  openReportScreen(finalData);
+
+});
 document.getElementById('btn-open-maps').addEventListener('click', ()=>{
 
   if(currentIndex >= routeOrder.length) return;
@@ -1178,6 +1216,18 @@ function renderFinalReport(routeData){
 }
 
 
+function hideAllScreens(){
+
+  screenSelect.style.display = 'none';
+
+  screenRoute.style.display = 'none';
+
+  screenMode.style.display = 'none';
+
+  screenReport.classList.add('hidden');
+
+}
+
 // ===== ABRIR TELA =====
 
 function openReportScreen(routeData){
@@ -1185,6 +1235,8 @@ function openReportScreen(routeData){
   hideAllScreens();
 
   screenReport.classList.remove('hidden');
+
+  screenReport.style.display = 'block';
 
   renderFinalReport(routeData);
 
