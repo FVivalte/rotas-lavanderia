@@ -144,9 +144,13 @@
 
   <div class="photo-upload-group">
 
-    <label>
-      Fotos Entrega
-    </label>
+  <label>
+    Fotos Entrega
+  </label>
+
+  <label class="camera-button">
+
+    📷
 
     <input
       type="file"
@@ -154,20 +158,20 @@
       accept="image/*"
       capture="environment"
       multiple
+      hidden
     >
 
-    <div
-      class="photo-preview"
-      id="deliveryPreview"
-    ></div>
-
-  </div>
+  </label>
 
   <div class="photo-upload-group">
 
-    <label>
-      Fotos Coleta
-    </label>
+  <label>
+    Fotos Coleta
+  </label>
+
+  <label class="camera-button">
+
+    📷
 
     <input
       type="file"
@@ -175,14 +179,17 @@
       accept="image/*"
       capture="environment"
       multiple
+      hidden
     >
 
-    <div
-      class="photo-preview"
-      id="pickupPreview"
-    ></div>
+  </label>
 
-  </div>
+  <div
+    class="photo-preview"
+    id="pickupPreview"
+  ></div>
+
+</div>
 
 </div>
 
