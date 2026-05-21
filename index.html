@@ -250,6 +250,9 @@
     let userMarker = null;
     let hotelMarker = null;
 
+    const CUSTOM_HOTELS_KEY =
+  'rotaBuziosCustomHotels';
+
 // Elementos
 
 const screenSelect = document.getElementById('screen-select');
@@ -269,6 +272,91 @@ const activeCountSelectEl =
   document.getElementById('activeCountSelect');
 const activeCountRouteEl =
   document.getElementById('activeCountRoute');
+
+function saveCustomHotels(){
+
+  const customHotels =
+    HOTELS.filter(h => h.custom);
+
+  localStorage.setItem(
+    CUSTOM_HOTELS_KEY,
+    JSON.stringify(customHotels)
+  );
+
+}
+
+function loadCustomHotels(){
+
+  const saved =
+    localStorage.getItem(
+      CUSTOM_HOTELS_KEY
+    );
+
+  if(!saved) return;
+
+  try{
+
+    const customHotels =
+      JSON.parse(saved);
+
+    customHotels.forEach(h=>{
+
+      const alreadyExists =
+        HOTELS.some(x=>x.id===h.id);
+
+      if(!alreadyExists){
+
+        HOTELS.push(h);
+
+      }
+
+    });
+
+  }catch(err){
+
+    console.log(
+      'Erro carregando hotéis',
+      err
+    );
+
+  }
+
+}
+
+function deleteCustomHotel(id){
+
+  const index =
+    HOTELS.findIndex(h => h.id === id);
+
+  if(index === -1) return;
+
+  const hotel = HOTELS[index];
+
+  if(!hotel.custom) return;
+
+  const ok = confirm(
+    `Excluir ${hotel.name}?`
+  );
+
+  if(!ok) return;
+
+  HOTELS.splice(index,1);
+
+  activeSet.delete(id);
+
+  routeOrder =
+    routeOrder.filter(x => x !== id);
+
+  routeReport =
+    routeReport.filter(r => r.id !== id);
+
+  saveCustomHotels();
+
+  renderSelection();
+
+  renderRoute();
+
+}
 
 // Salvar o App em segundo plano
 
@@ -363,11 +451,33 @@ function restoreAppState(){
             <div class="addr">${h.region} • ${h.address}</div>
           </div>
           <div class="right">
-            <label class="switch">
-              <input type="checkbox" data-id="${h.id}" ${activeSet.has(h.id)?'checked':''}>
-              <span class="slider"></span>
-            </label>
-          </div>`;
+
+  ${
+    h.custom
+    ? `
+      <button
+        class="delete-hotel"
+        data-delete="${h.id}"
+      >
+        🗑️
+      </button>
+    `
+    : ''
+  }
+
+  <label class="switch">
+
+    <input
+      type="checkbox"
+      data-id="${h.id}"
+      ${activeSet.has(h.id)?'checked':''}
+    >
+
+    <span class="slider"></span>
+
+  </label>
+
+</div>
         hotelListEl.appendChild(div);
       });
 
@@ -379,6 +489,20 @@ function restoreAppState(){
           activeCountSelectEl.textContent = `${activeSet.size} hotéis ativos`;
         });
       });
+hotelListEl
+.querySelectorAll('[data-delete]')
+.forEach(btn=>{
+
+  btn.addEventListener('click', ()=>{
+
+    const id =
+      Number(btn.dataset.delete);
+
+    deleteCustomHotel(id);
+
+  });
+
+});
       const text =
   `${activeSet.size} hotéis ativos`;
 
@@ -437,18 +561,21 @@ document.getElementById('saveHotel')
   }
 
   HOTELS.push({
-    id: Date.now(),
-    name,
-    region,
-    address,
-    coords
-  });
 
-  renderSelection();
+  id: Date.now(),
 
-  modal.classList.remove('active');
+  name,
+
+  region,
+
+  address,
+
+  coords,
+
+  custom:true
 
 });
+  saveCustomHotels();
 
   renderSelection();
 
@@ -1373,7 +1500,12 @@ function openReportScreen(routeData){
 }
     
     // Init
-    restoreAppState();
+
+loadCustomHotels();
+
+restoreAppState();
+
+renderSelection();
 
     // Register service worker
     if('serviceWorker' in navigator){
