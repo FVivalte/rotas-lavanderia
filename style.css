@@ -605,3 +605,27 @@ footer{
   overflow:hidden;
 
 }
+
+.delete-hotel{
+
+  border:none;
+
+  background:#ffebeb;
+
+  color:#c62828;
+
+  border-radius:8px;
+
+  padding:6px 10px;
+
+  cursor:pointer;
+
+  font-size:16px;
+
+}
+
+.delete-hotel:active{
+
+  transform:scale(0.95);
+
+}
