@@ -759,12 +759,22 @@ saveAppState();
   });
 
   routeReport = routeOrder.map(id=>({
-    id,
-    arrival:null,
-    departure:null,
-    entrega:false,
-    coleta:false
-  }));
+
+  id,
+
+  arrival:null,
+
+  departure:null,
+
+  entrega:false,
+
+  coleta:false,
+
+  deliveryPhotos:[],
+
+  pickupPhotos:[]
+
+}));
 
   const text =
   `${activeSet.size} hotéis ativos`;
@@ -1129,7 +1139,16 @@ if(nextParsed){
     function startModeRoute(){
       if(routeOrder.length===0){ alert('Gere a rota primeiro.'); return; }
       currentIndex = 0;
-      routeReport = routeOrder.map(id=>({id, arrival:null, departure:null, entrega:false, coleta:false}));
+      routeReport = routeOrder.map(id=>({
+      id,
+      arrival:null,
+      departure:null,
+      entrega:false,
+      coleta:false,
+      deliveryPhotos:[],
+      pickupPhotos:[]
+
+}));
       screenSelect.style.display='none';
       screenRoute.style.display='none';
       screenMode.style.display='block';
