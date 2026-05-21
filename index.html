@@ -446,39 +446,42 @@ function restoreAppState(){
         const div = document.createElement('div');
         div.className='item';
         div.innerHTML = `
-          <div class="info">
-            <div class="name">${h.name}</div>
-            <div class="addr">${h.region} • ${h.address}</div>
-          </div>
-          <div class="right">
+  <div class="info">
+    <div class="name">${h.name}</div>
+    <div class="addr">${h.region} • ${h.address}</div>
+  </div>
 
-  ${
-    h.custom
-    ? `
-      <button
-        class="delete-hotel"
-        data-delete="${h.id}"
+  <div class="right">
+
+    ${
+      h.custom
+      ? `
+        <button
+          class="delete-hotel"
+          data-delete="${h.id}"
+        >
+          🗑️
+        </button>
+      `
+      : ''
+    }
+
+    <label class="switch">
+
+      <input
+        type="checkbox"
+        data-id="${h.id}"
+        ${activeSet.has(h.id)?'checked':''}
       >
-        🗑️
-      </button>
-    `
-    : ''
-  }
 
-  <label class="switch">
+      <span class="slider"></span>
 
-    <input
-      type="checkbox"
-      data-id="${h.id}"
-      ${activeSet.has(h.id)?'checked':''}
-    >
+    </label>
 
-    <span class="slider"></span>
+  </div>
+`;
 
-  </label>
-
-</div>
-        hotelListEl.appendChild(div);
+hotelListEl.appendChild(div);
       });
 
 // attach listeners to toggles
@@ -1075,7 +1078,7 @@ if(nextParsed){
 
 }
 
-  }
+}
 
   routingControl = L.Routing.control({
 
