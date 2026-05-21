@@ -317,11 +317,9 @@ const screenRoute = document.getElementById('screen-route');
 const screenMode = document.getElementById('screen-mode');
 const hotelListEl = document.getElementById('hotelList');
 const routeListEl = document.getElementById('routeList');
-
 const reportEl =
   document.getElementById('report')
   || document.createElement('div');
-
 const reportModeEl = document.getElementById('reportMode');
 const currentHotelEl = document.getElementById('currentHotel');
 const nextTwoEl = document.getElementById('nextTwo');
@@ -1246,6 +1244,18 @@ if(nextParsed){
 
 
       const entry = routeReport[currentIndex];
+      const nextBtn =
+  document.getElementById('btn-next');
+
+if(currentIndex === routeOrder.length - 1){
+
+  nextBtn.textContent = 'Finalizar';
+
+}else{
+
+  nextBtn.textContent = 'Próximo hotel';
+
+}
       document.getElementById('chk-entrega').checked = entry.entrega;
       document.getElementById('chk-coleta').checked = entry.coleta;
     }
@@ -1263,6 +1273,16 @@ if(nextParsed){
       entry.departure = new Date().toISOString();
       arrivalConfirmed = false;
       currentIndex++;
+
+if(currentIndex >= routeOrder.length){
+
+  document
+    .getElementById('btn-finish')
+    .click();
+
+  return;
+
+}
       updateModeUI();
       renderPhotoPreviews();
       updateMap();
