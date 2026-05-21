@@ -1137,6 +1137,28 @@ document.getElementById('btn-open-maps').addEventListener('click', ()=>{
   );
 });
 
+document
+.getElementById('btnNewRoute')
+.addEventListener('click', ()=>{
+
+  stopGpsTracking();
+
+  activeSet.clear();
+
+  routeOrder = [];
+
+  routeReport = [];
+
+  currentIndex = 0;
+
+  hideAllScreens();
+
+  screenSelect.style.display = 'block';
+
+  renderSelection();
+
+});
+
 // ===== TELA RELATÓRIO =====
 
 const screenReport =
