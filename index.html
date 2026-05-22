@@ -18,6 +18,10 @@
 />
 <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
 </head>
 <body>
   <div class="app">
@@ -1597,6 +1601,58 @@ async function renderPhotoPreviews(){
 
 // Buttons
 
+document
+.getElementById('btnExportPdf')
+.addEventListener('click', async ()=>{
+
+  const reportElement =
+    document.getElementById(
+      'screen-report'
+    );
+
+  const canvas =
+    await html2canvas(reportElement,{
+
+      scale:2,
+
+      useCORS:true
+
+    });
+
+  const imgData =
+    canvas.toDataURL('image/jpeg',1);
+
+  const { jsPDF } = window.jspdf;
+
+  const pdf =
+    new jsPDF(
+      'p',
+      'mm',
+      'a4'
+    );
+
+  const pdfWidth =
+    pdf.internal.pageSize.getWidth();
+
+  const pdfHeight =
+    (canvas.height * pdfWidth)
+    / canvas.width;
+
+  pdf.addImage(
+    imgData,
+    'JPEG',
+    0,
+    0,
+    pdfWidth,
+    pdfHeight
+  );
+
+  pdf.save(
+    `rota-${Date.now()}.pdf`
+  );
+
+});
+
 const voiceToggle =
   document.getElementById('voiceToggle');
 
@@ -1686,29 +1742,31 @@ voiceToggle.addEventListener('click', ()=>{
 
     return {
 
-      name: hotel.name,
+  name: hotel.name,
 
-      arrival: r.arrival
-        ? new Date(r.arrival)
-            .toLocaleTimeString('pt-BR',{
-              hour:'2-digit',
-              minute:'2-digit'
-            })
-        : '--:--',
+  arrival: r.arrival
+    ? new Date(r.arrival)
+        .toLocaleTimeString('pt-BR',{
+          hour:'2-digit',
+          minute:'2-digit'
+        })
+    : '--:--',
 
-      departure: r.departure
-        ? new Date(r.departure)
-            .toLocaleTimeString('pt-BR',{
-              hour:'2-digit',
-              minute:'2-digit'
-            })
-        : '--:--',
+  departure: r.departure
+    ? new Date(r.departure)
+        .toLocaleTimeString('pt-BR',{
+          hour:'2-digit',
+          minute:'2-digit'
+        })
+    : '--:--',
 
-      deliveryPhoto:null,
+  deliveryPhotos:
+    r.deliveryPhotos || [],
 
-      pickupPhoto:null
+  pickupPhotos:
+    r.pickupPhotos || []
 
-    };
+};
 
   });
 
@@ -1834,17 +1892,47 @@ function renderFinalReport(routeData){
 
       <div class="report-photos">
 
-        <div class="report-photo-box">
+  <div class="report-photo-group">
 
-          <img
-            src="${hotel.deliveryPhoto || 'img/placeholder.jpg'}"
-          >
+    <div class="report-photo-label">
+      Entrega
+    </div>
 
-          <div class="report-photo-label">
-            Entrega
-          </div>
+    <div class="report-photo-list">
 
-        </div>
+      ${
+        hotel.deliveryPhotos?.length
+        ? hotel.deliveryPhotos.map(src=>`
+          <img src="${src}">
+        `).join('')
+        : '<div class="empty-photo">Sem fotos</div>'
+      }
+
+    </div>
+
+  </div>
+
+  <div class="report-photo-group">
+
+    <div class="report-photo-label">
+      Coleta
+    </div>
+
+    <div class="report-photo-list">
+
+      ${
+        hotel.pickupPhotos?.length
+        ? hotel.pickupPhotos.map(src=>`
+          <img src="${src}">
+        `).join('')
+        : '<div class="empty-photo">Sem fotos</div>'
+      }
+
+    </div>
+
+  </div>
+
+</div>
 
         <div class="report-photo-box">
 
