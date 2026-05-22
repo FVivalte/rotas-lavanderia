@@ -311,6 +311,8 @@
     let userMarker = null;
     let hotelMarker = null;
     let db = null;
+    let mapInitialized = false;
+    let lastHeading = 0;
 
     const CUSTOM_HOTELS_KEY =
   'rotaBuziosCustomHotels';
@@ -1033,38 +1035,80 @@ function startGpsTracking(){
     return;
   }
 
-  watchId = navigator.geolocation.watchPosition(pos=>{
+  watchId = navigator.geolocation.watchPosition(
 
-    userPosition = {
-      lat: pos.coords.latitude,
-      lng: pos.coords.longitude
-    };
-    if(map){
+    pos=>{
 
-  map.setView(
-    [
-      userPosition.lat,
-      userPosition.lng
-    ],
-    16
+      const newPosition = {
+        lat: pos.coords.latitude,
+        lng: pos.coords.longitude
+      };
+
+      const heading =
+        pos.coords.heading;
+
+      userPosition = newPosition;
+
+      // CENTRALIZA APENAS NA PRIMEIRA VEZ
+      if(map && !mapInitialized){
+
+        map.setView(
+          [
+            userPosition.lat,
+            userPosition.lng
+          ],
+          17
+        );
+
+        mapInitialized = true;
+
+      }
+
+      // AUTO PAN SUAVE
+      if(map){
+
+        map.panTo(
+          [
+            userPosition.lat,
+            userPosition.lng
+          ],
+          {
+            animate:true,
+            duration:1
+          }
+        );
+
+      }
+
+      // ROTAÇÃO DO MAPA
+      if(
+        heading !== null &&
+        !isNaN(heading)
+      ){
+
+        rotateMap(heading);
+
+      }
+
+      checkArrival();
+
+      updateMap();
+
+    },
+
+    err=>{
+
+      console.log(err);
+
+    },
+
+    {
+      enableHighAccuracy:true,
+      maximumAge:1000,
+      timeout:5000
+    }
+
   );
-
-}
-
-    checkArrival();
-    updateMap();
-
-  },
-  err=>{
-
-    console.log(err);
-
-  },
-  {
-    enableHighAccuracy:true,
-    maximumAge:0,
-    timeout:5000
-  });
 
 }
 
@@ -1152,10 +1196,22 @@ const hotelLng = parsed.lng;
 
   if(map) return;
 
-  map = L.map('map').setView(
-    [-22.75, -41.88],
-    13
-  );
+  map = L.map('map',{
+
+  zoomControl:true,
+
+  dragging:true,
+
+  touchZoom:true,
+
+  doubleClickZoom:true,
+
+  scrollWheelZoom:true
+
+}).setView(
+  [-22.75, -41.88],
+  13
+);
 
   L.tileLayer(
     'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
@@ -1165,7 +1221,25 @@ const hotelLng = parsed.lng;
   ).addTo(map);
 
 }
-    function updateMap(){
+
+function rotateMap(angle){
+
+  const mapPane =
+    map.getPane('mapPane');
+
+  mapPane.style.transformOrigin =
+    '50% 50%';
+
+  mapPane.style.transition =
+    'transform 0.5s linear';
+
+  mapPane.style.transform =
+    `rotate(${-angle}deg)`;
+
+}
+
+
+function updateMap(){
 
   if(!map) return;
 
@@ -1194,11 +1268,35 @@ const hotelLat = parsed.lat;
 const hotelLng = parsed.lng;
 
   // limpa rota antiga
-  if(routingControl){
+  if(!routingControl){
 
-    map.removeControl(routingControl);
+  routingControl = L.Routing.control({
 
-  }
+    waypoints,
+
+    routeWhileDragging:false,
+
+    addWaypoints:false,
+
+    draggableWaypoints:false,
+
+    fitSelectedRoutes:false,
+
+    show:false,
+
+    createMarker:(i,wp)=>{
+
+      return L.marker(wp.latLng);
+
+    }
+
+  }).addTo(map);
+
+}else{
+
+  routingControl.setWaypoints(waypoints);
+
+}
 
   const waypoints = [];
 
@@ -1258,7 +1356,7 @@ if(nextParsed){
 
     draggableWaypoints:false,
 
-    fitSelectedRoutes:true,
+    fitSelectedRoutes:false,
 
     show:false,
 
