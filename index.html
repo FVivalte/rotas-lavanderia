@@ -1610,7 +1610,10 @@ document
       'screen-report'
     );
 
-  const canvas =
+  await new Promise(resolve=>
+  setTimeout(resolve,500)
+);
+   const canvas =
     await html2canvas(reportElement,{
 
       scale:2,
@@ -1856,14 +1859,44 @@ function getFormattedDateTitle(){
 
 // ===== RENDER RELATÓRIO =====
 
-function renderFinalReport(routeData){
+async function renderFinalReport(routeData){
 
   reportRouteList.innerHTML = '';
 
   reportTitle.textContent =
     getFormattedDateTitle();
 
-  routeData.forEach((hotel, index) => {
+  for(const [index, hotel] of routeData.entries()){
+
+    const deliveryImages = [];
+
+    for(const photoId of hotel.deliveryPhotos || []){
+
+      const photo =
+        await getPhoto(photoId);
+
+      if(photo?.image){
+
+        deliveryImages.push(photo.image);
+
+      }
+
+    }
+
+    const pickupImages = [];
+
+    for(const photoId of hotel.pickupPhotos || []){
+
+      const photo =
+        await getPhoto(photoId);
+
+      if(photo?.image){
+
+        pickupImages.push(photo.image);
+
+      }
+
+    }
 
     const card =
       document.createElement('div');
@@ -1883,65 +1916,51 @@ function renderFinalReport(routeData){
         </span>
 
         <div class="report-time">
-          🚥 ${hotel.arrival || '09:00'}
+          🚥 ${hotel.arrival || '--:--'}
           -
-          🏁 ${hotel.departure || '09:30'}
+          🏁 ${hotel.departure || '--:--'}
         </div>
 
       </div>
 
       <div class="report-photos">
 
-  <div class="report-photo-group">
-
-    <div class="report-photo-label">
-      Entrega
-    </div>
-
-    <div class="report-photo-list">
-
-      ${
-        hotel.deliveryPhotos?.length
-        ? hotel.deliveryPhotos.map(src=>`
-          <img src="${src}">
-        `).join('')
-        : '<div class="empty-photo">Sem fotos</div>'
-      }
-
-    </div>
-
-  </div>
-
-  <div class="report-photo-group">
-
-    <div class="report-photo-label">
-      Coleta
-    </div>
-
-    <div class="report-photo-list">
-
-      ${
-        hotel.pickupPhotos?.length
-        ? hotel.pickupPhotos.map(src=>`
-          <img src="${src}">
-        `).join('')
-        : '<div class="empty-photo">Sem fotos</div>'
-      }
-
-    </div>
-
-  </div>
-
-</div>
-
-        <div class="report-photo-box">
-
-          <img
-            src="${hotel.pickupPhoto || 'img/placeholder.jpg'}"
-          >
+        <div class="report-photo-group">
 
           <div class="report-photo-label">
-            Retirada
+            Entrega
+          </div>
+
+          <div class="report-photo-list">
+
+            ${
+              deliveryImages.length
+              ? deliveryImages.map(src=>`
+                <img src="${src}">
+              `).join('')
+              : '<div class="empty-photo">Sem fotos</div>'
+            }
+
+          </div>
+
+        </div>
+
+        <div class="report-photo-group">
+
+          <div class="report-photo-label">
+            Coleta
+          </div>
+
+          <div class="report-photo-list">
+
+            ${
+              pickupImages.length
+              ? pickupImages.map(src=>`
+                <img src="${src}">
+              `).join('')
+              : '<div class="empty-photo">Sem fotos</div>'
+            }
+
           </div>
 
         </div>
@@ -1952,7 +1971,7 @@ function renderFinalReport(routeData){
 
     reportRouteList.appendChild(card);
 
-  });
+  }
 
 }
 
@@ -1971,7 +1990,7 @@ function hideAllScreens(){
 
 // ===== ABRIR TELA =====
 
-function openReportScreen(routeData){
+async function openReportScreen(routeData){
 
   hideAllScreens();
 
@@ -1979,7 +1998,7 @@ function openReportScreen(routeData){
 
   screenReport.style.display = 'block';
 
-  renderFinalReport(routeData);
+  await renderFinalReport(routeData);
 
 }
     
