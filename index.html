@@ -306,6 +306,7 @@
     let map = null;
     let userMarker = null;
     let hotelMarker = null;
+    let db = null;
 
     const CUSTOM_HOTELS_KEY =
   'rotaBuziosCustomHotels';
@@ -414,6 +415,103 @@ function deleteCustomHotel(id){
 }
 
 // Salvar o App em segundo plano
+
+function initDatabase(){
+
+  return new Promise((resolve,reject)=>{
+
+    const request =
+      indexedDB.open(
+        'RotaBuziosDB',
+        1
+      );
+
+    request.onupgradeneeded = (e)=>{
+
+      db = e.target.result;
+
+      if(
+        !db.objectStoreNames.contains(
+          'photos'
+        )
+      ){
+
+        db.createObjectStore(
+          'photos',
+          { keyPath:'id' }
+        );
+
+      }
+
+    };
+
+    request.onsuccess = (e)=>{
+
+      db = e.target.result;
+
+      resolve();
+
+    };
+
+    request.onerror = (e)=>{
+
+      reject(e);
+
+    };
+
+  });
+
+}
+
+function savePhoto(photo){
+
+  return new Promise((resolve,reject)=>{
+
+    const tx =
+      db.transaction(
+        ['photos'],
+        'readwrite'
+      );
+
+    const store =
+      tx.objectStore('photos');
+
+    const request =
+      store.put(photo);
+
+    request.onsuccess = ()=>resolve();
+
+    request.onerror = err=>reject(err);
+
+  });
+
+}
+
+function getPhoto(id){
+
+  return new Promise((resolve,reject)=>{
+
+    const tx =
+      db.transaction(
+        ['photos'],
+        'readonly'
+      );
+
+    const store =
+      tx.objectStore('photos');
+
+    const request =
+      store.get(id);
+
+    request.onsuccess =
+      ()=>resolve(request.result);
+
+    request.onerror =
+      err=>reject(err);
+
+  });
+
+}
 
 function saveAppState(){
 
@@ -1361,9 +1459,28 @@ document
   const images =
     await readFilesAsBase64(e.target.files);
 
-  routeReport[currentIndex]
-    .deliveryPhotos
-    .push(...images);
+  const imageIds = [];
+
+for(const image of images){
+
+  const id =
+    `delivery_${Date.now()}_${Math.random()}`;
+
+  await savePhoto({
+
+    id,
+
+    image
+
+  });
+
+  imageIds.push(id);
+
+}
+
+routeReport[currentIndex]
+  .deliveryPhotos
+  .push(...imageIds);
 
   renderPhotoPreviews();
 
@@ -1381,9 +1498,28 @@ document
   const images =
     await readFilesAsBase64(e.target.files);
 
-  routeReport[currentIndex]
-    .pickupPhotos
-    .push(...images);
+  const imageIds = [];
+
+for(const image of images){
+
+  const id =
+    `pickup_${Date.now()}_${Math.random()}`;
+
+  await savePhoto({
+
+    id,
+
+    image
+
+  });
+
+  imageIds.push(id);
+
+}
+
+routeReport[currentIndex]
+  .pickupPhotos
+  .push(...imageIds);
 
   renderPhotoPreviews();
 
@@ -1391,7 +1527,7 @@ document
 
 });
 
-function renderPhotoPreviews(){
+async function renderPhotoPreviews(){
 
   if(currentIndex >= routeReport.length)
     return;
@@ -1413,10 +1549,23 @@ function renderPhotoPreviews(){
 
   pickupPreview.innerHTML = '';
 
-  entry.deliveryPhotos.forEach(src=>{
+  for(const photoId of entry.deliveryPhotos){
 
-    const img =
-      document.createElement('img');
+  const photo =
+    await getPhoto(photoId);
+
+  if(!photo) continue;
+
+  const img =
+    document.createElement('img');
+
+  img.src = photo.image;
+
+  img.className = 'preview-thumb';
+
+  deliveryPreview.appendChild(img);
+
+}
 
     img.src = src;
 
@@ -1426,18 +1575,23 @@ function renderPhotoPreviews(){
 
   });
 
-  entry.pickupPhotos.forEach(src=>{
+  for(const photoId of entry.pickupPhotos){
 
-    const img =
-      document.createElement('img');
+  const photo =
+    await getPhoto(photoId);
 
-    img.src = src;
+  if(!photo) continue;
 
-    img.className = 'preview-thumb';
+  const img =
+    document.createElement('img');
 
-    pickupPreview.appendChild(img);
+  img.src = photo.image;
 
-  });
+  img.className = 'preview-thumb';
+
+  pickupPreview.appendChild(img);
+
+});
 
 }
 
@@ -1743,11 +1897,16 @@ function openReportScreen(routeData){
     
     // Init
 
-loadCustomHotels();
+initDatabase()
+.then(()=>{
 
-restoreAppState();
+  loadCustomHotels();
 
-renderSelection();
+  restoreAppState();
+
+  renderSelection();
+
+});
 
     // Register service worker
     if('serviceWorker' in navigator){
