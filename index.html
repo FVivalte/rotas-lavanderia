@@ -1067,16 +1067,17 @@ function startGpsTracking(){
       // AUTO PAN SUAVE
       if(map){
 
-        map.panTo(
-          [
-            userPosition.lat,
-            userPosition.lng
-          ],
-          {
-            animate:true,
-            duration:1
-          }
-        );
+        map.flyTo(
+  [
+    userPosition.lat,
+    userPosition.lng
+  ],
+  map.getZoom(),
+  {
+    animate:true,
+    duration:1
+  }
+);
 
       }
 
@@ -1248,147 +1249,167 @@ function updateMap(){
 
   const currentHotel =
     HOTELS.find(
-      h=>h.id===routeOrder[currentIndex]
+      h => h.id === routeOrder[currentIndex]
     );
 
+  if(!currentHotel) return;
+
   const parsed =
-  parseCoords(currentHotel.coords);
+    parseCoords(currentHotel.coords);
 
-if(!parsed){
+  if(!parsed){
 
-  alert(
-    `Coordenadas inválidas em ${currentHotel.name}`
-  );
+    console.log(
+      'Coordenadas inválidas'
+    );
 
-  return;
-}
+    return;
 
-const hotelLat = parsed.lat;
+  }
 
-const hotelLng = parsed.lng;
+  const hotelLat = parsed.lat;
+  const hotelLng = parsed.lng;
 
-  // limpa rota antiga
-  if(!routingControl){
-
-  routingControl = L.Routing.control({
-
-    waypoints,
-
-    routeWhileDragging:false,
-
-    addWaypoints:false,
-
-    draggableWaypoints:false,
-
-    fitSelectedRoutes:false,
-
-    show:false,
-
-    createMarker:(i,wp)=>{
-
-      return L.marker(wp.latLng);
-
-    }
-
-  }).addTo(map);
-
-}else{
-
-  routingControl.setWaypoints(waypoints);
-
-}
+  // =========================
+  // WAYPOINTS
+  // =========================
 
   const waypoints = [];
 
-  // usuário
+  // posição usuário
+
   if(userPosition){
 
     waypoints.push(
+
       L.latLng(
         userPosition.lat,
         userPosition.lng
       )
+
     );
 
   }
 
   // hotel atual
+
   waypoints.push(
-    L.latLng(hotelLat,hotelLng)
+
+    L.latLng(
+      hotelLat,
+      hotelLng
+    )
+
   );
 
   // próximos hotéis
-  for(let i=1;i<=2;i++){
 
-    const idx = currentIndex + i;
+  for(let i = 1; i <= 2; i++){
+
+    const idx =
+      currentIndex + i;
 
     if(idx < routeOrder.length){
 
       const nextHotel =
         HOTELS.find(
-          h=>h.id===routeOrder[idx]
+          h => h.id === routeOrder[idx]
         );
 
-      const nextParsed =
-  parseCoords(nextHotel.coords);
+      if(nextHotel){
 
-if(nextParsed){
+        const nextParsed =
+          parseCoords(
+            nextHotel.coords
+          );
 
-  waypoints.push(
-    L.latLng(
-      nextParsed.lat,
-      nextParsed.lng
-    )
-  );
+        if(nextParsed){
 
-}
+          waypoints.push(
 
-}
-}
+            L.latLng(
+              nextParsed.lat,
+              nextParsed.lng
+            )
 
-  routingControl = L.Routing.control({
+          );
 
-    waypoints,
-
-    routeWhileDragging:false,
-
-    addWaypoints:false,
-
-    draggableWaypoints:false,
-
-    fitSelectedRoutes:false,
-
-    show:false,
-
-    createMarker:(i,wp)=>{
-
-      return L.marker(wp.latLng);
-
-    }
-
-  }).addTo(map);
-
-  // instruções voz
-  routingControl.on(
-    'routesfound',
-    function(e){
-
-      const route = e.routes[0];
-
-      if(
-        route.instructions &&
-        route.instructions.length
-      ){
-
-        const instruction =
-          route.instructions[0].text;
-
-        speak(instruction);
+        }
 
       }
 
     }
-  );
+
+  }
+
+  // =========================
+  // CRIA ROTA UMA VEZ
+  // =========================
+
+  if(!routingControl){
+
+    routingControl =
+      L.Routing.control({
+
+        waypoints,
+
+        routeWhileDragging:false,
+
+        addWaypoints:false,
+
+        draggableWaypoints:false,
+
+        fitSelectedRoutes:false,
+
+        show:false,
+
+        lineOptions:{
+          addWaypoints:false
+        },
+
+        createMarker:(i,wp)=>{
+
+          return L.marker(
+            wp.latLng
+          );
+
+        }
+
+      }).addTo(map);
+
+    // voz
+
+    routingControl.on(
+      'routesfound',
+      function(e){
+
+        const route =
+          e.routes[0];
+
+        if(
+          route.instructions &&
+          route.instructions.length
+        ){
+
+          const instruction =
+            route.instructions[0].text;
+
+          speak(instruction);
+
+        }
+
+      }
+    );
+
+  }else{
+
+    // apenas atualiza
+
+    routingControl.setWaypoints(
+      waypoints
+    );
+
+  }
 
 }
     function startModeRoute(){
@@ -1408,6 +1429,7 @@ if(nextParsed){
       screenRoute.style.display='none';
       screenMode.style.display='block';
       initMap();
+      mapInitialized = false;
       updateMap();
       startGpsTracking();
       updateModeUI();
