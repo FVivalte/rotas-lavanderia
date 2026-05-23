@@ -1,4 +1,4 @@
-    const HOTELS = [
+window.HOTELS = [
       {id:1,
 name:"Hotel Aretê",
 region:"Baía Formosa / Rasa",
