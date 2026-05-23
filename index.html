@@ -1,1090 +1,338 @@
-<!doctype html>  
-<html lang="pt-BR">  
-<head>  
-  <meta charset="utf-8" />  
-  <meta name="viewport" content="width=device-width,initial-scale=1" />  
-  <title>Rota Búzios — PWA</title>  
-  <meta name="theme-color" content="#0b63b7"/>  
-  <link rel="manifest" href="manifest.json" />  
-  <link rel="stylesheet" href="style.css">  
-  <link  
-  rel="stylesheet"  
-  href="https://unpkg.com/leaflet/dist/leaflet.css"  
-/>  
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>  
-   <link  
- rel="stylesheet"  
- href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css"  
-/>  
-<script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>  
-  
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>  
-  
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>  
-  
-</head>  
-<body>  
-  <div class="app">  
-    <header>  
-      <h1>Rota Búzios</h1>  
-      <div class="muted">Offline • Azul</div>  
-    </header>  
-  
-  
-    <!-- TELA 1: SELEÇÃO -->  
-  
-  
-    <section id="screen-select" class="card screen active">  
-  
-  <div class="screen-title">  
-    <h2>Selecionar hotéis</h2>  
-    <p>Ative os hotéis que farão parte da rota.</p>  
-  </div>  
-  
-  <div class="top-actions">  
-  <button id="btn-add-hotel" class="ghost">  
-  + Adicionar hotel  
-</button>  
-  <button id="btn-generate" class="big-button">  
-    Continuar para ordem da rota  
-  </button>  
-  
-  <button id="btn-reset" class="ghost">  
-    Limpar seleção  
-  </button>  
-  
-</div>  
-  
-<div class="hotel-counter" id="activeCountSelect">  
-  0 hotéis ativos  
-</div>  
-  
-<div class="list" id="hotelList"></div>  
-  
-</section>  
-  
-  
-    <!-- TELA 2: ROTA GERADA -->  
-  
-  
-    <section id="screen-route" class="card screen">  
-  
-  <div class="screen-title">  
-    <h2>Ordem da rota</h2>  
-    <p>Arraste os hotéis para definir a sequência.</p>  
-  </div>  
-  
-  <div class="top-actions">  
-  
-    <button id="btn-start-route" class="big-button">  
-      Iniciar modo navegação  
-    </button>  
-  
-    <button id="btn-back" class="ghost">  
-      Voltar  
-    </button>  
-  
-  </div>  
-  
-  <div class="route-list" id="routeList"></div>  
-  
-  <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">  
-    <button id="btn-export" class="ghost">  
-      Exportar relatório  
-    </button>  
-  
-    <div class="muted" id="activeCountRoute" style="align-self:center"></div>  
-  </div>  
-  
-</section>  
-  
-  
-    <!-- TELA 3: MODO ROTA -->  
-  
-  
-    <section id="screen-mode" class="card screen">  
-  
-  <div class="screen-title">  
-    <h2>Modo navegação</h2>  
-    <p>Controle entregas e abra navegação individual.</p>  
-  </div>  
-  
-  <div class="controls">  
-    <button id="btn-finish" class="ghost">  
-      Finalizar  
-    </button>  
-  </div>  
-  
-  <div class="mode">  
-  
-    <div id="currentHotel"></div>  
-  
-<div class="voice-toggle-bar">  
-  
-  <button  
-    id="voiceToggle"  
-    class="voice-toggle off"  
-  >  
-    🔇 Voz desligada  
-  </button>  
-  
-</div>  
-  
-    <div id="map"></div>  
-    <div class="check-group">  
-      <label class="check-card">  
-        <input type="checkbox" id="chk-entrega">  
-        <span>Entrega</span>  
-      </label>  
-  
-      <label class="check-card">  
-        <input type="checkbox" id="chk-coleta">  
-        <span>Coleta</span>  
-      </label>  
-  
-    </div>  
-  
-<div class="photo-section">  
-  
-  <div class="photo-upload-group">  
-  
-  <label>  
-    Fotos Entrega  
-  </label>  
-  
-  <label class="camera-button">  
-  
-    📷  
-  
-    <input  
-      type="file"  
-      id="deliveryPhotosInput"  
-      accept="image/*"  
-      capture="environment"  
-      multiple  
-      hidden  
-    >  
-  
-  </label>  
-  
-  <div class="photo-upload-group">  
-  
-  <label>  
-    Fotos Coleta  
-  </label>  
-  
-  <label class="camera-button">  
-  
-    📷  
-  
-    <input  
-      type="file"  
-      id="pickupPhotosInput"  
-      accept="image/*"  
-      capture="environment"  
-      multiple  
-      hidden  
-    >  
-  
-  </label>  
-  
-  <div  
-    class="photo-preview"  
-    id="pickupPreview"  
-  ></div>  
-  
-</div>  
-  
-</div>  
-  
-    <div class="mode-actions">  
-  
-      <button id="btn-open-maps" class="maps-button">  
-        Navegar no Google Maps  
-      </button>  
-  
-      <button id="btn-next">  
-        Próximo hotel  
-      </button>  
-  
-    </div>  
-  
-    <div>  
-  
-      <div class="muted">  
-        Próximos hotéis  
-      </div>  
-  
-      <div class="next-two" id="nextTwo"></div>  
-  
-    </div>  
-  
-    <div>  
-  
-      <div class="muted">  
-        Relatório parcial  
-      </div>  
-  
-      <div class="report" id="reportMode"></div>  
-  
-    </div>  
-  
-  </div>  
-  
-</section>  
-  
-  
-<!-- TELA 4 - RELATÓRIO FINAL -->  
-  
-  
-<section id="screen-report" class="screen hidden">  
-  
-  <div class="report-header">  
-    <h1 id="reportTitle">  
-      ROTA do dia Segunda-feira, 19/05/2026  
-    </h1>  
-  </div>  
-  
-  <div id="reportRouteList" class="report-route-list"></div>  
-  
-  <div class="report-bottom-actions">  
-    <button id="btnExportPdf">  
-      Exportar PDF  
-    </button>  
-  
-    <button id="btnNewRoute">  
-      Nova Rota  
-    </button>  
-  </div>  
-  
-</section>  
-  
-    <footer>Instale como PWA para usar no celular • Servir via HTTPS para instalar</footer>  
-  
-<div id="hotelModal" class="modal">  
-  
-  <div class="modal-content">  
-  
-    <h3>Novo hotel</h3>  
-  
-    <input type="text" id="newName" placeholder="Nome">  
-  
-    <input type="text" id="newRegion" placeholder="Região">  
-  
-    <input type="text" id="newAddress" placeholder="Endereço">  
-  
-    <input type="text" id="newCoords" placeholder="Latitude,Longitude">  
-  
-    <div class="modal-actions">  
-  
-      <button id="saveHotel">  
-        Salvar  
-      </button>  
-  
-      <button id="closeModal" class="ghost">  
-        Cancelar  
-      </button>  
-  
-    </div>  
-  
-  </div>  
-  
-</div>  
+<!doctype html>
+<html lang="pt-BR">
+
+<head>
+
+  <meta charset="utf-8" />
+
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  />
+
+  <title>Rota Búzios</title>
+
+  <meta
+    name="theme-color"
+    content="#0b63b7"
+  />
+
+  <link
+    rel="manifest"
+    href="manifest.json"
+  />
+
+  <link
+    rel="stylesheet"
+    href="style.css"
+  />
+
+  <!-- LEAFLET -->
+
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet/dist/leaflet.css"
+  />
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <!-- LEAFLET ROUTING -->
+
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css"
+  />
+
+  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+
+  <!-- HTML2CANVAS -->
+
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <!-- JSPDF -->
+
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+</head>
+
+<body>
+
+  <!-- ===================== -->
+  <!-- TELA SELEÇÃO -->
+  <!-- ===================== -->
+
+  <section id="screen-select">
+
+    <header class="topbar">
+
+      <h1>
+        Rota Búzios
+      </h1>
+
+      <div id="activeCountSelect">
+        0 hotéis ativos
+      </div>
+
+    </header>
+
+    <div id="hotelList"></div>
+
+    <div class="bottom-actions">
+
+      <button id="btn-add-hotel">
+        + Hotel
+      </button>
+
+      <button id="btn-generate">
+        Criar rota
+      </button>
+
+      <button id="btn-reset">
+        Limpar
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- ===================== -->
+  <!-- TELA ROTA -->
+  <!-- ===================== -->
+
+  <section
+    id="screen-route"
+    style="display:none"
+  >
+
+    <header class="topbar">
+
+      <button id="btn-back">
+        ←
+      </button>
+
+      <div id="activeCountRoute">
+        0 hotéis ativos
+      </div>
+
+    </header>
+
+    <div id="routeList"></div>
+
+    <div id="report"></div>
+
+    <div class="bottom-actions">
+
+      <button id="btn-start-route">
+        Iniciar rota
+      </button>
+
+      <button id="btn-export">
+        Exportar
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- ===================== -->
+  <!-- TELA NAVEGAÇÃO -->
+  <!-- ===================== -->
+
+  <section
+    id="screen-mode"
+    style="display:none"
+  >
+
+    <div id="voiceToggle" class="off">
+      🔇 Voz desligada
+    </div>
+
+    <div id="map"></div>
+
+    <div id="currentHotel"></div>
+
+    <div id="nextTwo"></div>
+
+    <div class="mode-actions">
+
+      <label>
+
+        <input
+          type="checkbox"
+          id="chk-entrega"
+        />
+
+        Entrega
+
+      </label>
+
+      <label>
+
+        <input
+          type="checkbox"
+          id="chk-coleta"
+        />
+
+        Coleta
+
+      </label>
+
+    </div>
+
+    <div class="photo-area">
+
+      <label class="camera-btn">
+
+        📷
+
+        <input
+          type="file"
+          id="deliveryPhotosInput"
+          accept="image/*"
+          multiple
+          hidden
+        />
+
+      </label>
+
+      <div id="deliveryPreview"></div>
+
+      <label class="camera-btn">
+
+        📷
+
+        <input
+          type="file"
+          id="pickupPhotosInput"
+          accept="image/*"
+          multiple
+          hidden
+        />
+
+      </label>
+
+      <div id="pickupPreview"></div>
+
+    </div>
+
+    <div id="reportMode"></div>
+
+    <div class="bottom-actions">
+
+      <button id="btn-open-maps">
+        Google Maps
+      </button>
+
+      <button id="btn-next">
+        Próximo hotel
+      </button>
+
+      <button id="btn-finish">
+        Finalizar
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- ===================== -->
+  <!-- TELA RELATÓRIO -->
+  <!-- ===================== -->
+
+  <section
+    id="screen-report"
+    class="hidden"
+  >
+
+    <header class="topbar">
+
+      <h2 id="reportTitle">
+        Relatório
+      </h2>
+
+    </header>
+
+    <div id="reportRouteList"></div>
+
+    <div class="bottom-actions">
+
+      <button id="btnExportPdf">
+        Exportar PDF
+      </button>
+
+      <button id="btnNewRoute">
+        Nova rota
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <!-- ===================== -->
+  <!-- MODAL HOTEL -->
+  <!-- ===================== -->
+
+  <div
+    id="hotelModal"
+    class="modal"
+  >
+
+    <div class="modal-content">
+
+      <h3>
+        Novo hotel
+      </h3>
+
+      <input
+        id="newName"
+        placeholder="Nome"
+      />
+
+      <input
+        id="newRegion"
+        placeholder="Região"
+      />
+
+      <input
+        id="newAddress"
+        placeholder="Endereço"
+      />
+
+      <input
+        id="newCoords"
+        placeholder="Lat,Lng"
+      />
+
+      <div class="modal-actions">
+
+        <button id="closeModal">
+          Cancelar
+        </button>
+
+        <button id="saveHotel">
+          Salvar
+        </button>
+
+      </div>
+
+    </div>
+
   </div>
- <script type="module">
 
-// ======================
-// DADOS
-// ======================
 
-import { HOTELS }
-from './data/dados.js';
+  <!-- ===================== -->
+  <!-- MAIN -->
+  <!-- ===================== -->
 
+  <script
+    type="module"
+    src="./main.js"
+  ></script>
 
-// ======================
-// CORE
-// ======================
+</body>
 
-import { state }
-from './core/state.js';
-
-
-// ======================
-// UI
-// ======================
-
-import {
-
-  screenSelect,
-  screenRoute,
-  screenMode,
-
-  hotelListEl,
-  routeListEl,
-
-  activeCountSelectEl,
-  activeCountRouteEl,
-
-  modal,
-
-  btnGenerate,
-  btnBack,
-  btnStartRoute,
-  btnReset,
-  btnExport,
-  btnFinish,
-  btnNewRoute,
-  btnOpenMaps,
-
-  btnAddHotel,
-  btnSaveHotel,
-  btnCloseModal,
-
-  btnNext,
-
-  voiceToggle,
-
-  chkEntrega,
-  chkColeta,
-
-  newName,
-  newRegion,
-  newAddress,
-  newCoords,
-
-  deliveryPhotosInput,
-  pickupPhotosInput
-
-} from './ui/elements.js';
-
-
-// ======================
-// UTILS
-// ======================
-
-import {
-
-  parseCoords,
-  buildGoogleMapsUrl,
-  readFilesAsBase64
-
-} from './utils/utils.js';
-
-
-// ======================
-// STORAGE
-// ======================
-
-import {
-
-  saveAppState,
-  restoreAppState,
-  saveCustomHotels,
-  loadCustomHotels
-
-} from './storage/storage.js';
-
-
-// ======================
-// DATABASE
-// ======================
-
-import {
-
-  initDatabase,
-  savePhoto
-
-} from './storage/database.js';
-
-
-// ======================
-// GPS
-// ======================
-
-import {
-
-  startGpsTracking,
-  stopGpsTracking,
-  checkArrival
-
-} from './services/gps.js';
-
-
-// ======================
-// MAP
-// ======================
-
-import {
-
-  initMap,
-  updateMap,
-  rotateMap
-
-} from './services/map.js';
-
-
-// ======================
-// REPORT
-// ======================
-
-import {
-
-  renderReport,
-  renderReportMode,
-  renderFinalReport,
-  openReportScreen,
-  hideAllScreens
-
-} from './ui/report.js';
-
-
-// ======================
-// RENDER SELEÇÃO
-// ======================
-
-function renderSelection(){
-
-  hotelListEl.innerHTML = '';
-
-  HOTELS.forEach(h=>{
-
-    const div =
-      document.createElement('div');
-
-    div.className = 'item';
-
-    div.innerHTML = `
-      <div class="info">
-
-        <div class="name">
-          ${h.name}
-        </div>
-
-        <div class="addr">
-          ${h.region} • ${h.address}
-        </div>
-
-      </div>
-
-      <div class="right">
-
-        <label class="switch">
-
-          <input
-            type="checkbox"
-            data-id="${h.id}"
-            ${
-              state.activeSet.has(h.id)
-              ? 'checked'
-              : ''
-            }
-          >
-
-          <span class="slider"></span>
-
-        </label>
-
-      </div>
-    `;
-
-    hotelListEl.appendChild(div);
-
-  });
-
-  hotelListEl
-  .querySelectorAll(
-    'input[type=checkbox]'
-  )
-  .forEach(cb=>{
-
-    cb.addEventListener(
-      'change',
-      e=>{
-
-        const id =
-          Number(
-            e.target.dataset.id
-          );
-
-        if(e.target.checked){
-
-          state.activeSet.add(id);
-
-        }else{
-
-          state.activeSet.delete(id);
-
-        }
-
-        updateCounters();
-
-        saveAppState();
-
-      }
-    );
-
-  });
-
-  updateCounters();
-
-}
-
-
-// ======================
-// CONTADORES
-// ======================
-
-function updateCounters(){
-
-  const text =
-    `${state.activeSet.size} hotéis ativos`;
-
-  activeCountSelectEl.textContent =
-    text;
-
-  activeCountRouteEl.textContent =
-    text;
-
-}
-
-
-// ======================
-// GERAR ROTA
-// ======================
-
-function generateRoute(){
-
-  const active =
-    HOTELS.filter(
-      h => state.activeSet.has(h.id)
-    );
-
-  if(active.length === 0){
-
-    alert(
-      'Selecione ao menos um hotel.'
-    );
-
-    return;
-
-  }
-
-  state.routeOrder =
-    active.map(h => h.id);
-
-  renderRoute();
-
-  screenSelect.style.display =
-    'none';
-
-  screenRoute.style.display =
-    'block';
-
-  screenMode.style.display =
-    'none';
-
-  saveAppState();
-
-}
-
-
-// ======================
-// RENDER ROTA
-// ======================
-
-function renderRoute(){
-
-  routeListEl.innerHTML = '';
-
-  state.routeOrder.forEach(
-    (id, idx)=>{
-
-      const h =
-        HOTELS.find(
-          x => x.id === id
-        );
-
-      const item =
-        document.createElement('div');
-
-      item.className =
-        'route-item';
-
-      item.innerHTML = `
-        <div>
-
-          <strong>
-            ${idx + 1}. ${h.name}
-          </strong>
-
-          <div class="muted">
-            ${h.address}
-          </div>
-
-        </div>
-
-      `;
-
-      routeListEl.appendChild(item);
-
-    }
-  );
-
-  renderReport();
-
-}
-
-
-// ======================
-// INICIAR ROTA
-// ======================
-
-function startModeRoute(){
-
-  if(
-    state.routeOrder.length === 0
-  ){
-
-    alert(
-      'Gere a rota primeiro.'
-    );
-
-    return;
-
-  }
-
-  state.currentIndex = 0;
-
-  state.routeReport =
-    state.routeOrder.map(id=>({
-
-      id,
-
-      arrival:null,
-      departure:null,
-
-      entrega:false,
-      coleta:false,
-
-      deliveryPhotos:[],
-      pickupPhotos:[]
-
-    }));
-
-  hideAllScreens();
-
-  screenMode.style.display =
-    'block';
-
-  initMap();
-
-  updateMap();
-
-  startGpsTracking();
-
-  updateModeUI();
-
-  renderReportMode();
-
-  saveAppState();
-
-}
-
-
-// ======================
-// UPDATE UI GPS
-// ======================
-
-function updateModeUI(){
-
-  if(
-    state.currentIndex >=
-    state.routeOrder.length
-  ){
-
-    return;
-
-  }
-
-  const id =
-    state.routeOrder[
-      state.currentIndex
-    ];
-
-  const hotel =
-    HOTELS.find(h=>h.id===id);
-
-  if(!hotel) return;
-
-}
-
-
-// ======================
-// PRÓXIMO HOTEL
-// ======================
-
-btnNext.addEventListener(
-  'click',
-  ()=>{
-
-    if(
-      state.currentIndex >=
-      state.routeOrder.length
-    ){
-      return;
-    }
-
-    const entry =
-      state.routeReport[
-        state.currentIndex
-      ];
-
-    entry.entrega =
-      chkEntrega.checked;
-
-    entry.coleta =
-      chkColeta.checked;
-
-    entry.departure =
-      new Date().toISOString();
-
-    state.currentIndex++;
-
-    if(
-      state.currentIndex >=
-      state.routeOrder.length
-    ){
-
-      btnFinish.click();
-
-      return;
-
-    }
-
-    updateModeUI();
-
-    renderReportMode();
-
-    updateMap();
-
-    saveAppState();
-
-  }
-);
-
-
-// ======================
-// EXPORT JSON
-// ======================
-
-btnExport.addEventListener(
-  'click',
-  ()=>{
-
-    const data = {
-
-      generatedAt:
-        new Date().toISOString(),
-
-      route:
-        state.routeOrder,
-
-      report:
-        state.routeReport
-
-    };
-
-    const blob =
-      new Blob(
-        [JSON.stringify(data,null,2)],
-        {
-          type:'application/json'
-        }
-      );
-
-    const a =
-      document.createElement('a');
-
-    const url =
-      URL.createObjectURL(blob);
-
-    a.href = url;
-
-    a.download =
-      'relatorio_rota.json';
-
-    a.click();
-
-    setTimeout(()=>{
-
-      URL.revokeObjectURL(url);
-
-    },1000);
-
-  }
-);
-
-
-// ======================
-// FINALIZAR
-// ======================
-
-btnFinish.addEventListener(
-  'click',
-  ()=>{
-
-    stopGpsTracking();
-
-    const finalData =
-      state.routeReport.map(r=>{
-
-        const hotel =
-          HOTELS.find(
-            h => h.id === r.id
-          );
-
-        return {
-
-          name:
-            hotel.name,
-
-          arrival:
-            r.arrival,
-
-          departure:
-            r.departure,
-
-          deliveryPhotos:
-            r.deliveryPhotos,
-
-          pickupPhotos:
-            r.pickupPhotos
-
-        };
-
-      });
-
-    openReportScreen(
-      finalData
-    );
-
-  }
-);
-
-
-// ======================
-// BOTÕES
-// ======================
-
-btnGenerate.addEventListener(
-  'click',
-  generateRoute
-);
-
-btnBack.addEventListener(
-  'click',
-  ()=>{
-
-    stopGpsTracking();
-
-    screenSelect.style.display =
-      'block';
-
-    screenRoute.style.display =
-      'none';
-
-    screenMode.style.display =
-      'none';
-
-  }
-);
-
-btnStartRoute.addEventListener(
-  'click',
-  startModeRoute
-);
-
-btnNewRoute.addEventListener(
-  'click',
-  ()=>{
-
-    stopGpsTracking();
-
-    state.activeSet.clear();
-
-    state.routeOrder = [];
-
-    state.routeReport = [];
-
-    state.currentIndex = 0;
-
-    hideAllScreens();
-
-    screenSelect.style.display =
-      'block';
-
-    renderSelection();
-
-    saveAppState();
-
-  }
-);
-
-
-// ======================
-// MODAL HOTEL
-// ======================
-
-btnAddHotel.addEventListener(
-  'click',
-  ()=>{
-
-    modal.classList.add('active');
-
-  }
-);
-
-btnCloseModal.addEventListener(
-  'click',
-  ()=>{
-
-    modal.classList.remove('active');
-
-  }
-);
-
-btnSaveHotel.addEventListener(
-  'click',
-  ()=>{
-
-    const coords =
-      parseCoords(
-        newCoords.value
-      );
-
-    if(
-      !newName.value ||
-      !newAddress.value ||
-      !coords
-    ){
-
-      alert(
-        'Dados inválidos'
-      );
-
-      return;
-
-    }
-
-    HOTELS.push({
-
-      id: Date.now(),
-
-      name:
-        newName.value,
-
-      region:
-        newRegion.value,
-
-      address:
-        newAddress.value,
-
-      coords:
-        newCoords.value,
-
-      custom:true
-
-    });
-
-    saveCustomHotels();
-
-    renderSelection();
-
-    modal.classList.remove(
-      'active'
-    );
-
-  }
-);
-
-
-// ======================
-// VOZ
-// ======================
-
-voiceToggle.addEventListener(
-  'click',
-  ()=>{
-
-    state.speechEnabled =
-      !state.speechEnabled;
-
-    saveAppState();
-
-  }
-);
-
-
-// ======================
-// FOTOS
-// ======================
-
-deliveryPhotosInput
-.addEventListener(
-  'change',
-  async e=>{
-
-    const images =
-      await readFilesAsBase64(
-        e.target.files
-      );
-
-    for(const image of images){
-
-      await savePhoto({
-
-        id: crypto.randomUUID(),
-
-        image
-
-      });
-
-    }
-
-  }
-);
-
-
-// ======================
-// INIT
-// ======================
-
-initDatabase()
-.then(()=>{
-
-  loadCustomHotels();
-
-  restoreAppState();
-
-  renderSelection();
-
-});
-
-
-// ======================
-// SERVICE WORKER
-// ======================
-
-if('serviceWorker' in navigator){
-
-  navigator
-  .serviceWorker
-  .register('sw.js')
-  .catch(()=>{});
-
-}
-
-</script> 
-  
-</body>  
 </html>
