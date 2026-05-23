@@ -1,26 +1,55 @@
-// ===============================
-// REPORT.JS
-// ===============================
+// ui/report.js
 
-// ===== RELATÓRIO TELA 2 =====
+import { HOTELS } from '../data/dados.js';
 
-function renderReport(){
+import { state } from '../core/state.js';
+
+import {
+  reportEl,
+  reportModeEl,
+  screenReport,
+  screenSelect,
+  screenRoute,
+  screenMode,
+  reportRouteList,
+  reportTitle
+} from './elements.js';
+
+import {
+  getPhoto
+} from '../storage/database.js';
+
+
+// ======================
+// RELATÓRIO TELA ROTA
+// ======================
+
+export function renderReport(){
 
   reportEl.innerHTML = '';
 
-  routeReport.forEach((r, idx)=>{
+  state.routeReport.forEach((r, idx)=>{
 
-    const h = HOTELS.find(x=>x.id===r.id);
+    const h =
+      HOTELS.find(x => x.id === r.id);
 
-    const div = document.createElement('div');
+    if(!h) return;
+
+    const div =
+      document.createElement('div');
 
     div.className = 'report-row';
 
     div.innerHTML = `
       <div>
-        <strong>${idx+1}. ${h.name}</strong>
+        <strong>
+          ${idx + 1}. ${h.name}
+        </strong>
 
-        <div class="muted" style="font-size:0.85rem">
+        <div
+          class="muted"
+          style="font-size:0.85rem"
+        >
           ${h.address}
         </div>
       </div>
@@ -32,7 +61,7 @@ function renderReport(){
             r.arrival
             ? 'Cheg: ' +
               new Date(r.arrival)
-              .toLocaleTimeString()
+                .toLocaleTimeString()
             : 'Cheg: -'
           }
         </div>
@@ -42,7 +71,7 @@ function renderReport(){
             r.departure
             ? 'Sai: ' +
               new Date(r.departure)
-              .toLocaleTimeString()
+                .toLocaleTimeString()
             : 'Sai: -'
           }
         </div>
@@ -62,23 +91,31 @@ function renderReport(){
 }
 
 
-// ===== RELATÓRIO TELA 3 =====
+// ======================
+// RELATÓRIO TELA GPS
+// ======================
 
-function renderReportMode(){
+export function renderReportMode(){
 
   reportModeEl.innerHTML = '';
 
-  routeReport.forEach((r, idx)=>{
+  state.routeReport.forEach((r, idx)=>{
 
-    const h = HOTELS.find(x=>x.id===r.id);
+    const h =
+      HOTELS.find(x => x.id === r.id);
 
-    const div = document.createElement('div');
+    if(!h) return;
+
+    const div =
+      document.createElement('div');
 
     div.className = 'report-row';
 
     div.innerHTML = `
       <div>
-        <strong>${idx+1}. ${h.name}</strong>
+        <strong>
+          ${idx + 1}. ${h.name}
+        </strong>
       </div>
 
       <div style="text-align:right">
@@ -87,7 +124,7 @@ function renderReportMode(){
           ${
             r.arrival
             ? new Date(r.arrival)
-              .toLocaleTimeString()
+                .toLocaleTimeString()
             : '-'
           }
         </div>
@@ -96,7 +133,7 @@ function renderReportMode(){
           ${
             r.departure
             ? new Date(r.departure)
-              .toLocaleTimeString()
+                .toLocaleTimeString()
             : '-'
           }
         </div>
@@ -111,9 +148,11 @@ function renderReportMode(){
 }
 
 
-// ===== DATA FORMATADA =====
+// ======================
+// DATA FORMATADA
+// ======================
 
-function getFormattedDateTitle(){
+export function getFormattedDateTitle(){
 
   const now = new Date();
 
@@ -132,11 +171,11 @@ function getFormattedDateTitle(){
 
   const day =
     String(now.getDate())
-    .padStart(2,'0');
+      .padStart(2,'0');
 
   const month =
     String(now.getMonth() + 1)
-    .padStart(2,'0');
+      .padStart(2,'0');
 
   const year =
     now.getFullYear();
@@ -150,21 +189,38 @@ function getFormattedDateTitle(){
 }
 
 
-// ===== RENDER FINAL =====
+// ======================
+// ESCONDER TELAS
+// ======================
 
-async function renderFinalReport(routeData){
+export function hideAllScreens(){
+
+  screenSelect.style.display = 'none';
+
+  screenRoute.style.display = 'none';
+
+  screenMode.style.display = 'none';
+
+  screenReport.classList.add('hidden');
+
+}
+
+
+// ======================
+// RELATÓRIO FINAL
+// ======================
+
+export async function renderFinalReport(routeData){
 
   reportRouteList.innerHTML = '';
 
   reportTitle.textContent =
     getFormattedDateTitle();
 
-  for(const [index, hotel]
-    of routeData.entries()){
-
-    // =====================
-    // ENTREGA
-    // =====================
+  for(
+    const [index, hotel]
+    of routeData.entries()
+  ){
 
     const deliveryImages = [];
 
@@ -186,10 +242,6 @@ async function renderFinalReport(routeData){
 
     }
 
-    // =====================
-    // COLETA
-    // =====================
-
     const pickupImages = [];
 
     for(
@@ -210,10 +262,6 @@ async function renderFinalReport(routeData){
 
     }
 
-    // =====================
-    // CARD
-    // =====================
-
     const card =
       document.createElement('div');
 
@@ -233,22 +281,14 @@ async function renderFinalReport(routeData){
         </span>
 
         <div class="report-time">
-
-          🚥
-          ${hotel.arrival || '--:--'}
-
+          🚥 ${hotel.arrival || '--:--'}
           -
-
-          🏁
-          ${hotel.departure || '--:--'}
-
+          🏁 ${hotel.departure || '--:--'}
         </div>
 
       </div>
 
       <div class="report-photos">
-
-        <!-- ENTREGA -->
 
         <div class="report-photo-group">
 
@@ -260,11 +300,11 @@ async function renderFinalReport(routeData){
 
             ${
               deliveryImages.length
-
-              ? deliveryImages.map(src=>`
-                  <img src="${src}">
-                `).join('')
-
+              ? deliveryImages
+                  .map(src => `
+                    <img src="${src}">
+                  `)
+                  .join('')
               : `
                 <div class="empty-photo">
                   Sem fotos
@@ -276,8 +316,6 @@ async function renderFinalReport(routeData){
 
         </div>
 
-        <!-- COLETA -->
-
         <div class="report-photo-group">
 
           <div class="report-photo-label">
@@ -288,11 +326,11 @@ async function renderFinalReport(routeData){
 
             ${
               pickupImages.length
-
-              ? pickupImages.map(src=>`
-                  <img src="${src}">
-                `).join('')
-
+              ? pickupImages
+                  .map(src => `
+                    <img src="${src}">
+                  `)
+                  .join('')
               : `
                 <div class="empty-photo">
                   Sem fotos
@@ -315,26 +353,11 @@ async function renderFinalReport(routeData){
 }
 
 
-// ===== ESCONDER TELAS =====
+// ======================
+// ABRIR RELATÓRIO
+// ======================
 
-function hideAllScreens(){
-
-  screenSelect.style.display = 'none';
-
-  screenRoute.style.display = 'none';
-
-  screenMode.style.display = 'none';
-
-  screenReport.classList.add(
-    'hidden'
-  );
-
-}
-
-
-// ===== ABRIR RELATÓRIO =====
-
-async function openReportScreen(routeData){
+export async function openReportScreen(routeData){
 
   hideAllScreens();
 
