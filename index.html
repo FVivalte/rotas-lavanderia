@@ -291,1440 +291,624 @@
   
 </div>  
   </div>
-  <script type="module">
-    import { HOTELS } from './data/dados.js';
-    import { state } from './core/state.js';
-// Estado  
-    let userMarker = null;  
-    let hotelMarker = null;
-  
-    const CUSTOM_HOTELS_KEY =  
-  'rotaBuziosCustomHotels';  
-  
-// Elementos  
-  
-const screenSelect = document.getElementById('screen-select');  
-const screenRoute = document.getElementById('screen-route');  
-const screenMode = document.getElementById('screen-mode');  
-const hotelListEl = document.getElementById('hotelList');  
-const routeListEl = document.getElementById('routeList');  
-const reportEl =  
-  document.getElementById('report')  
-  || document.createElement('div');  
-const reportModeEl = document.getElementById('reportMode');  
-const currentHotelEl = document.getElementById('currentHotel');  
-const nextTwoEl = document.getElementById('nextTwo');  
-const activeCountSelectEl =  
-  document.getElementById('activeCountSelect');  
-const activeCountRouteEl =  
-  document.getElementById('activeCountRoute');  
-  
-function saveCustomHotels(){  
-  
-  const customHotels =  
-    HOTELS.filter(h => h.custom);  
-  
-  localStorage.setItem(  
-    CUSTOM_HOTELS_KEY,  
-    JSON.stringify(customHotels)  
-  );  
-  
-}  
-  
-function loadCustomHotels(){  
-  
-  const saved =  
-    localStorage.getItem(  
-      CUSTOM_HOTELS_KEY  
-    );  
-  
-  if(!saved) return;  
-  
-  try{  
-  
-    const customHotels =  
-      JSON.parse(saved);  
-  
-    customHotels.forEach(h=>{  
-  
-      const alreadyExists =  
-        HOTELS.some(x=>x.id===h.id);  
-  
-      if(!alreadyExists){  
-  
-        HOTELS.push(h);  
-  
-      }  
-  
-    });  
-  
-  }catch(err){  
-  
-    console.log(  
-      'Erro carregando hotéis',  
-      err  
-    );  
-  
-  }  
-  
-}  
-  
-function deleteCustomHotel(id){  
-  
-  const index =  
-    HOTELS.findIndex(h => h.id === id);  
-  
-  if(index === -1) return;  
-  
-  const hotel = HOTELS[index];  
-  
-  if(!hotel.custom) return;  
-  
-  const ok = confirm(  
-    `Excluir ${hotel.name}?`  
-  );  
-  
-  if(!ok) return;  
-  
-  HOTELS.splice(index,1);  
-  
-  state.activeSet.delete(id);  
-  
-  state.routeOrder =  
-    state.routeOrder.filter(x => x !== id);  
-  
-  state.routeReport =  
-    state.routeReport.filter(r => r.id !== id);  
-  
-  saveCustomHotels();  
-  
-  renderSelection();  
-  
-  renderRoute();  
-  
-}  
-  
-// Salvar o App em segundo plano  
-  
-function initDatabase(){  
-  
-  return new Promise((resolve,reject)=>{  
-  
-    const request =  
-      indexedDB.open(  
-        'RotaBuziosDB',  
-        1  
-      );  
-  
-    request.onupgradeneeded = (e)=>{  
-  
-      state.db = e.target.result; 
-  
-      if(
-  !state.db.objectStoreNames.contains(
-    'photos'
-  )
-){
+ <script type="module">
 
-  state.db.createObjectStore(
-    'photos',
-    { keyPath:'id' }
+// ======================
+// DADOS
+// ======================
+
+import { HOTELS }
+from './data/dados.js';
+
+
+// ======================
+// CORE
+// ======================
+
+import { state }
+from './core/state.js';
+
+
+// ======================
+// UI
+// ======================
+
+import {
+
+  screenSelect,
+  screenRoute,
+  screenMode,
+
+  hotelListEl,
+  routeListEl,
+
+  activeCountSelectEl,
+  activeCountRouteEl,
+
+  modal,
+
+  btnGenerate,
+  btnBack,
+  btnStartRoute,
+  btnReset,
+  btnExport,
+  btnFinish,
+  btnNewRoute,
+  btnOpenMaps,
+
+  btnAddHotel,
+  btnSaveHotel,
+  btnCloseModal,
+
+  btnNext,
+
+  voiceToggle,
+
+  chkEntrega,
+  chkColeta,
+
+  newName,
+  newRegion,
+  newAddress,
+  newCoords,
+
+  deliveryPhotosInput,
+  pickupPhotosInput
+
+} from './ui/elements.js';
+
+
+// ======================
+// UTILS
+// ======================
+
+import {
+
+  parseCoords,
+  buildGoogleMapsUrl,
+  readFilesAsBase64
+
+} from './utils/utils.js';
+
+
+// ======================
+// STORAGE
+// ======================
+
+import {
+
+  saveAppState,
+  restoreAppState,
+  saveCustomHotels,
+  loadCustomHotels
+
+} from './storage/storage.js';
+
+
+// ======================
+// DATABASE
+// ======================
+
+import {
+
+  initDatabase,
+  savePhoto
+
+} from './storage/database.js';
+
+
+// ======================
+// GPS
+// ======================
+
+import {
+
+  startGpsTracking,
+  stopGpsTracking,
+  checkArrival
+
+} from './services/gps.js';
+
+
+// ======================
+// MAP
+// ======================
+
+import {
+
+  initMap,
+  updateMap,
+  rotateMap
+
+} from './services/map.js';
+
+
+// ======================
+// REPORT
+// ======================
+
+import {
+
+  renderReport,
+  renderReportMode,
+  renderFinalReport,
+  openReportScreen,
+  hideAllScreens
+
+} from './ui/report.js';
+
+
+// ======================
+// RENDER SELEÇÃO
+// ======================
+
+function renderSelection(){
+
+  hotelListEl.innerHTML = '';
+
+  HOTELS.forEach(h=>{
+
+    const div =
+      document.createElement('div');
+
+    div.className = 'item';
+
+    div.innerHTML = `
+      <div class="info">
+
+        <div class="name">
+          ${h.name}
+        </div>
+
+        <div class="addr">
+          ${h.region} • ${h.address}
+        </div>
+
+      </div>
+
+      <div class="right">
+
+        <label class="switch">
+
+          <input
+            type="checkbox"
+            data-id="${h.id}"
+            ${
+              state.activeSet.has(h.id)
+              ? 'checked'
+              : ''
+            }
+          >
+
+          <span class="slider"></span>
+
+        </label>
+
+      </div>
+    `;
+
+    hotelListEl.appendChild(div);
+
+  });
+
+  hotelListEl
+  .querySelectorAll(
+    'input[type=checkbox]'
+  )
+  .forEach(cb=>{
+
+    cb.addEventListener(
+      'change',
+      e=>{
+
+        const id =
+          Number(
+            e.target.dataset.id
+          );
+
+        if(e.target.checked){
+
+          state.activeSet.add(id);
+
+        }else{
+
+          state.activeSet.delete(id);
+
+        }
+
+        updateCounters();
+
+        saveAppState();
+
+      }
+    );
+
+  });
+
+  updateCounters();
+
+}
+
+
+// ======================
+// CONTADORES
+// ======================
+
+function updateCounters(){
+
+  const text =
+    `${state.activeSet.size} hotéis ativos`;
+
+  activeCountSelectEl.textContent =
+    text;
+
+  activeCountRouteEl.textContent =
+    text;
+
+}
+
+
+// ======================
+// GERAR ROTA
+// ======================
+
+function generateRoute(){
+
+  const active =
+    HOTELS.filter(
+      h => state.activeSet.has(h.id)
+    );
+
+  if(active.length === 0){
+
+    alert(
+      'Selecione ao menos um hotel.'
+    );
+
+    return;
+
+  }
+
+  state.routeOrder =
+    active.map(h => h.id);
+
+  renderRoute();
+
+  screenSelect.style.display =
+    'none';
+
+  screenRoute.style.display =
+    'block';
+
+  screenMode.style.display =
+    'none';
+
+  saveAppState();
+
+}
+
+
+// ======================
+// RENDER ROTA
+// ======================
+
+function renderRoute(){
+
+  routeListEl.innerHTML = '';
+
+  state.routeOrder.forEach(
+    (id, idx)=>{
+
+      const h =
+        HOTELS.find(
+          x => x.id === id
+        );
+
+      const item =
+        document.createElement('div');
+
+      item.className =
+        'route-item';
+
+      item.innerHTML = `
+        <div>
+
+          <strong>
+            ${idx + 1}. ${h.name}
+          </strong>
+
+          <div class="muted">
+            ${h.address}
+          </div>
+
+        </div>
+
+      `;
+
+      routeListEl.appendChild(item);
+
+    }
   );
 
-}  
-  
-    };  
-  
-    request.onsuccess = (e)=>{  
-  
-      state.db = e.target.result;  
-  
-      resolve();  
-  
-    };  
-  
-    request.onerror = (e)=>{  
-  
-      reject(e);  
-  
-    };  
-  
-  });  
-  
-}  
-  
-function savePhoto(photo){  
-  
-  return new Promise((resolve,reject)=>{  
-  
-    const tx =  
-      state.db.transaction(  
-        ['photos'],  
-        'readwrite'  
-      );  
-  
-    const store =  
-      tx.objectStore('photos');  
-  
-    const request =  
-      store.put(photo);  
-  
-    request.onsuccess = ()=>resolve();  
-  
-    request.onerror = err=>reject(err);  
-  
-  });  
-  
-}  
-  
-function getPhoto(id){  
-  
-  return new Promise((resolve,reject)=>{  
-  
-    const tx =  
-      state.db.transaction(  
-        ['photos'],  
-        'readonly'  
-      );  
-  
-    const store =  
-      tx.objectStore('photos');  
-  
-    const request =  
-      store.get(id);  
-  
-    request.onsuccess =  
-      ()=>resolve(request.result);  
-  
-    request.onerror =  
-      err=>reject(err);  
-  
-  });  
-  
-}  
-  
-function saveAppState(){  
-  
-  const data = {
+  renderReport();
 
-  activeSet: [...state.activeSet],
-  speechEnabled: state.speechEnabled,
-  arrivalConfirmed: state.arrivalConfirmed,
-  routeOrder: state.routeOrder,
-  routeReport: state.routeReport,
-  currentIndex: state.currentIndex,  
-  currentScreen:  
-      screenMode.style.display === 'block'  
-        ? 'mode'  
-        : screenRoute.style.display === 'block'  
-        ? 'route'  
-        : 'select'  
-  
-  };  
-  localStorage.setItem(  
-    'rotaBuziosState',  
-    JSON.stringify(data)  
-  );  
-  
-}  
-  
-function restoreAppState(){
-  const saved =
-    localStorage.getItem('rotaBuziosState');
-  if(!saved) return;
-  let data;
-  try{
-    data = JSON.parse(saved);
-  }catch{
+}
+
+
+// ======================
+// INICIAR ROTA
+// ======================
+
+function startModeRoute(){
+
+  if(
+    state.routeOrder.length === 0
+  ){
+
+    alert(
+      'Gere a rota primeiro.'
+    );
+
     return;
-  }
-  state.speechEnabled =
-    data.speechEnabled || false;
-  state.arrivalConfirmed =
-    data.arrivalConfirmed || false;
-  state.activeSet =
-    new Set(data.activeSet || []);
-  state.routeOrder =
-    data.routeOrder || [];
-  state.routeReport =
-    data.routeReport || [];
-  state.currentIndex =
-    data.currentIndex || 0;
-  if(state.routeOrder.length){
-    renderRoute();
-  }
-  if(data.currentScreen === 'route'){
-    screenSelect.style.display='none';
-    screenRoute.style.display='block';
-    screenMode.style.display='none';
-  }
-  if(data.currentScreen === 'mode'){
-    screenSelect.style.display='none';
-    screenRoute.style.display='none';
-    screenMode.style.display='block';
-    updateModeUI();
-    renderReportMode();
-    startGpsTracking();
-    initMap();
-    updateMap();
-    renderPhotoPreviews();
-  }
-}
-// Render seleção (Tela 1)  
-  
-    function renderSelection(){  
-      hotelListEl.innerHTML = '';  
-      HOTELS.forEach(h=>{  
-        const div = document.createElement('div');  
-        div.className='item';  
-        div.innerHTML = `  
-  <div class="info">  
-    <div class="name">${h.name}</div>  
-    <div class="addr">${h.region} • ${h.address}</div>  
-  </div>  
-  
-  <div class="right">  
-  
-    ${  
-      h.custom  
-      ? `  
-        <button  
-          class="delete-hotel"  
-          data-delete="${h.id}"  
-        >  
-          🗑️  
-        </button>  
-      `  
-      : ''  
-    }  
-  
-    <label class="switch">  
-  
-      <input  
-        type="checkbox"  
-        data-id="${h.id}"  
-        ${state.activeSet.has(h.id)?'checked':''}  
-      >  
-  
-      <span class="slider"></span>  
-  
-    </label>  
-  
-  </div>  
-`;  
-  
-hotelListEl.appendChild(div);  
-      });  
-  
-// attach listeners to toggles  
-      hotelListEl.querySelectorAll('input[type=checkbox]').forEach(cb=>{  
-        cb.addEventListener('change', e=>{  
-          const id = Number(e.target.dataset.id);  
-          if(e.target.checked) { state.activeSet.add(id);
-}
-          else {
-  state.activeSet.delete(id);
-}  
-          activeCountSelectEl.textContent =
-`${state.activeSet.size} hotéis ativos`;  
-        });  
-      });  
-hotelListEl  
-.querySelectorAll('[data-delete]')  
-.forEach(btn=>{  
-  
-  btn.addEventListener('click', ()=>{  
-  
-    const id =  
-      Number(btn.dataset.delete);  
-  
-    deleteCustomHotel(id);  
-  
-  });  
-  
-});  
-      const text =
-`${state.activeSet.size} hotéis ativos`;  
-  
-activeCountSelectEl.textContent = text;  
-  
-activeCountRouteEl.textContent = text;  
-saveAppState();  
-    }  
-  
-//Add hotel  
-  
-const modal = document.getElementById('hotelModal');  
-  
-document.getElementById('btn-add-hotel')  
-.addEventListener('click', ()=>{  
-  
-  modal.classList.add('active');  
-  
-});  
-  
-document.getElementById('closeModal')  
-.addEventListener('click', ()=>{  
-  
-  modal.classList.remove('active');  
-  
-});  
-  
-document.getElementById('saveHotel')  
-.addEventListener('click', ()=>{  
-  
-  const name =  
-    document.getElementById('newName').value;  
-  
-  const region =  
-    document.getElementById('newRegion').value;  
-  
-  const address =  
-    document.getElementById('newAddress').value;  
-  
-  const coords =  
-    document.getElementById('newCoords').value;  
-  
-  const parsedCoords =  
-    parseCoords(coords);  
-  
-  if(  
-    !name ||  
-    !address ||  
-    !parsedCoords  
-  ){  
-    alert(  
-      'Preencha nome, endereço e coordenadas válidas.'  
-    );  
-  
-    return;  
-  }  
-  
-  HOTELS.push({  
-  
-  id: Date.now(),  
-  
-  name,  
-  
-  region,  
-  
-  address,  
-  
-  coords,  
-  
-  custom:true  
-  
-});  
-  saveCustomHotels();  
-  
-  renderSelection();  
-  
-  modal.classList.remove('active');  
-  
-});  
-  
-// Gera rota (Tela 2) a partir dos ativos  
-  
-    function generateRoute(){  
-      const active = HOTELS.filter(h=>state.activeSet.has(h.id)); 
-      if(active.length === 0){
-  alert('Selecione ao menos um hotel.');
-  return;
-}
 
-saveAppState();
-  
-// inicializa ordem pela ordem de ativação (inserção em activeSet não tem ordem; usar HOTELS order)  
-  
-      state.routeOrder = HOTELS
-.filter(h=>state.activeSet.has(h.id))
-.map(h=>h.id);
-      renderRoute();  
-  
-// trocar telas  
-  
-      screenSelect.style.display='none';  
-      screenRoute.style.display='block';  
-      screenMode.style.display='none';  
-    }  
-  
-// Render route list (Tela 2)  
-  
-    function renderRoute(){
-  routeListEl.innerHTML = '';
-  state.routeOrder.forEach((id, idx)=>{
-    const h = HOTELS.find(x=>x.id===id);
-    const item = document.createElement('div');
-    item.className = 'route-item';
-    item.dataset.id = id;
-    item.innerHTML = `  
-      <div>  
-        <strong>${idx+1}. ${h.name}</strong>
-        <div class="muted" style="font-size:0.85rem">  
-          ${h.address}  
-        </div>  
-      </div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <span class="drag">⋮⋮</span>
-        <button class="ghost" data-id="${id}">  
-          Remover  
-        </button>
-      </div>  
-    `;
-    // ======================  
-    // REMOVER HOTEL  
-    // ======================  
-  item.querySelector('button').addEventListener('click', ()=>{  
-   state.activeSet.delete(id);
-   state.routeOrder = state.routeOrder.filter(x => x !== id); 
-    renderSelection();
-    saveAppState();
-    renderRoute();
-    });  
-  
-    // ======================  
-    // MOBILE DRAG  
-    // ======================  
-  
-    const dragHandle = item.querySelector('.drag');  
-  
-    let draggingItem = null;  
-  
-    dragHandle.addEventListener('touchstart', ()=>{  
-  
-      draggingItem = item;  
-  
-      item.classList.add('dragging-mobile');  
-  
-    }, {passive:true});  
-  
-    dragHandle.addEventListener('touchmove', (e)=>{  
-  
-      if(!draggingItem) return;  
-  
-      const currentY = e.touches[0].clientY;  
-  
-      const items = [  
-        ...routeListEl.querySelectorAll('.route-item')  
-      ];  
-  
-      items.forEach(other=>{  
-  
-        other.classList.remove('over');  
-  
-        if(other === draggingItem) return;  
-  
-        const rect = other.getBoundingClientRect();  
-  
-        const middle = rect.top + rect.height / 2;  
-  
-        if(currentY < middle){  
-  
-          other.classList.add('over');  
-  
-        }  
-  
-      });  
-  
-    }, {passive:true});  
-  
-    dragHandle.addEventListener('touchend', (e)=>{  
-  
-      if(!draggingItem) return;  
-  
-      const currentY = e.changedTouches[0].clientY;  
-  
-      const items = [  
-        ...routeListEl.querySelectorAll('.route-item')  
-      ];  
-  
-      let targetIndex = null;  
-  
-      items.forEach((other,index)=>{  
-  
-        other.classList.remove('over');  
-  
-        if(other === draggingItem) return;  
-  
-        const rect = other.getBoundingClientRect();  
-  
-        const middle = rect.top + rect.height / 2;  
-  
-        if(currentY < middle && targetIndex === null){  
-  
-          targetIndex = index;
-          saveAppState();
-  
-        }  
-  
-      });  
-  
-      const fromIndex = state.routeOrder.indexOf(id);  
-  
-      if(targetIndex !== null){  
-  
-        state.routeOrder.splice(  
-          targetIndex,  
-          0,  
-          state.routeOrder.splice(fromIndex,1)[0]  
-        );  
-  
-      }  
-  
-      draggingItem.classList.remove('dragging-mobile');  
-  
-      draggingItem = null;  
-  
-      renderRoute();  
-  
-    }, {passive:true});  
-  
-    routeListEl.appendChild(item);  
-  
-  });  
-  
-  if(state.routeReport.length === 0){
+  }
+
+  state.currentIndex = 0;
 
   state.routeReport =
     state.routeOrder.map(id=>({
+
       id,
+
       arrival:null,
       departure:null,
+
       entrega:false,
       coleta:false,
+
       deliveryPhotos:[],
       pickupPhotos:[]
 
     }));
 
-}  
-  
-  const text =  
-  `${state.activeSet.size} hotéis ativos`;  
-  
-activeCountSelectEl.textContent = text;  
-  
-activeCountRouteEl.textContent = text;  
-saveAppState();  
-}  
-  
-  
-// Build Google Maps URL  
-  
-    function buildGoogleMapsUrl(order){  
-      if(order.length===0) return '';  
-      const coords = order  
-  .map(id=>{  
-  
-    const hotel =  
-      HOTELS.find(h=>h.id===id);  
-  
-    if(!hotel) return null;  
-  
-    const parsed =  
-      parseCoords(hotel.coords);  
-  
-    if(!parsed) return null;  
-  
-    return `${parsed.lat},${parsed.lng}`;  
-  
-  })  
-  .filter(Boolean);  
-      const origin = coords[0];  
-      const destination = coords[coords.length-1];  
-      const waypoints = coords.slice(1,coords.length-1).join('|');  
-      const base = 'https://www.google.com/maps/dir/?api=1';  
-      const params = new URLSearchParams();  
-      params.set('origin', origin);  
-      params.set('destination', destination);  
-      if(waypoints) params.set('waypoints', waypoints);  
-      params.set('travelmode','driving');  
-      return base + '&' + params.toString();  
-    }  
-  
-  
-// ATIVAR GPS  
-  
-function parseCoords(coords){  
-  
-  if(!coords) return null;  
-  
-  const parts = coords.split(',');  
-  
-  if(parts.length !== 2) return null;  
-  
-  const lat = Number(parts[0].trim());  
-  
-  const lng = Number(parts[1].trim());  
-  
-  if(  
-    isNaN(lat) ||  
-    isNaN(lng)  
-  ){  
-    return null;  
-  }  
-  
-  return { lat, lng };  
-  
-}  
-  
-function getDistanceMeters(lat1, lon1, lat2, lon2){  
-  
-  const R = 6371e3;  
-  
-  const φ1 = lat1 * Math.PI/180;  
-  const φ2 = lat2 * Math.PI/180;  
-  
-  const Δφ = (lat2-lat1) * Math.PI/180;  
-  const Δλ = (lon2-lon1) * Math.PI/180;  
-  
-  const a =  
-    Math.sin(Δφ/2) * Math.sin(Δφ/2) +  
-    Math.cos(φ1) *  
-    Math.cos(φ2) *  
-    Math.sin(Δλ/2) *  
-    Math.sin(Δλ/2);  
-  
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));  
-  
-  return R * c;  
-}  
-  
-function startGpsTracking(){  
-  
-  if(!navigator.geolocation){  
-  
-    alert('GPS não suportado');  
-  
-    return;  
-  }  
-  
-  state.watchId =
-navigator.geolocation.watchPosition(  
-  
-    pos=>{  
-  
-      const newPosition = {  
-        lat: pos.coords.latitude,  
-        lng: pos.coords.longitude  
-      };  
-  
-      const heading =  
-        pos.coords.heading;  
-  
-      state.userPosition = newPosition;  
-  
-      // CENTRALIZA APENAS NA PRIMEIRA VEZ  
-      if(state.map && !state.mapInitialized){  
-  
-        state.map.setView(  
-          [  
-            state.userPosition.lat,  
-            state.userPosition.lng  
-          ],  
-          17  
-        );  
-  
-        state.mapInitialized = true;  
-  
-      }  
-  
-      // AUTO PAN SUAVE  
-      if(state.map){  
-  
-        state.map.panTo(  
-          [  
-            state.userPosition.lat,  
-            state.userPosition.lng  
-          ],  
-          {  
-            animate:true,  
-            duration:1  
-          }  
-        );  
-  
-      }  
-  
-      // ROTAÇÃO DO MAPA  
-      if(  
-        heading !== null &&  
-        !isNaN(heading)  
-      ){  
-  
-        rotateMap(heading);  
-  
-      }  
-  
-      checkArrival();  
-  
-      updateMap();  
-  
-    },  
-  
-    err=>{  
-  
-      console.log(err);  
-  
-    },  
-  
-    {  
-      enableHighAccuracy:true,  
-      maximumAge:1000,  
-      timeout:5000  
-    }  
-  
-  );  
-  
-}  
-  
-function stopGpsTracking(){
+  hideAllScreens();
 
-  if(state.watchId !== null){
+  screenMode.style.display =
+    'block';
 
-    navigator.geolocation.clearWatch(
-      state.watchId
-    );
+  initMap();
 
-    state.watchId = null;
+  updateMap();
 
-  }
+  startGpsTracking();
 
-}
-  
-function checkArrival(){  
-  
-  if(state.currentIndex >= state.routeOrder.length) return;  
-  
-  if(state.arrivalConfirmed) return;  
-  
-  const id = state.routeOrder[state.currentIndex];  
-  
-  const hotel = HOTELS.find(h=>h.id===id);
-  if(!hotel) return;
-  const parsed =  
-  parseCoords(hotel.coords);  
-  
-if(!parsed) return;  
-  
-const hotelLat = parsed.lat;  
-  
-const hotelLng = parsed.lng;  
-  if(!state.userPosition) return;
-  const distance = getDistanceMeters(  
-    state.userPosition.lat,  
-    state.userPosition.lng,  
-    hotelLat,  
-    hotelLng  
-  );  
-  
-  if(distance <= 90){  
-  
-    state.arrivalConfirmed = true;  
-  
-    const ok = confirm(`Você chegou em ${hotel.name}?`);
-
-if(ok){
-
-  state.arrivalConfirmed = true;
-
-  state.routeReport[state.currentIndex].arrival =
-    new Date().toISOString();
+  updateModeUI();
 
   renderReportMode();
 
-}
-  
-  }  
-  
-}  
-  
-  
-// Start mode route (Tela 3)  
-  
-  function speak(text){  
-  
-  if(!state.speechEnabled) return;  
-  
-  if(text === state.lastInstruction) return;  
-  
-  state.lastInstruction = text;  
-  
-  const utter =  
-    new SpeechSynthesisUtterance(text);  
-  
-  utter.lang = 'pt-BR';  
-  
-  utter.rate = 1;  
-  
-  speechSynthesis.cancel();
-speechSynthesis.speak(utter);  
-  
-}  
-    function initMap(){  
-  
-  if(state.map) return;  
-  
-  state.map = L.map('map',{  
-  
-  zoomControl:true,  
-  
-  dragging:true,  
-  
-  touchZoom:true,  
-  
-  doubleClickZoom:true,  
-  
-  scrollWheelZoom:true  
-  
-}).setView(  
-  [-22.75, -41.88],  
-  13  
-);  
-  
-  L.tileLayer(  
-    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',  
-    {  
-      attribution:'© OpenStreetMap'  
-    }  
-  ).addTo(state.map); 
-  
-}  
-  
-function rotateMap(angle){  
-  
-  const mapPane =
-  state.map.getPane('mapPane'); 
-  
-  mapPane.style.transformOrigin =  
-    '50% 50%';  
-  
-  mapPane.style.transition =  
-    'transform 0.5s linear';  
-  
-  mapPane.style.transform =  
-    `rotate(${-angle}deg)`;  
-  
-}  
-  
-  
-function updateMap(){  
-  
-  if(!state.map) return;
-  
-  if(state.currentIndex >= state.routeOrder.length)  
-    return;  
-  
-  if(!currentHotel) return;
-
-const parsed = parseCoords(currentHotel.coords);
-
-if(!parsed) return;  
-  
-if(!parsed){  
-  
-  alert(  
-    `Coordenadas inválidas em ${currentHotel.name}`  
-  );  
-  
-  return;  
-}  
-  
-const hotelLat = parsed.lat;  
-  
-const hotelLng = parsed.lng;  
-  
-  // limpa rota antiga 
-  const waypoints = [];
-
-if(state.userPosition){
-
-  waypoints.push(
-    L.latLng(
-      state.userPosition.lat,
-      state.userPosition.lng
-    )
-  );
+  saveAppState();
 
 }
 
-waypoints.push(
-  L.latLng(hotelLat, hotelLng)
-);
 
-for(let i = 1; i <= 2; i++){
+// ======================
+// UPDATE UI GPS
+// ======================
 
-  const idx = state.currentIndex + i;
+function updateModeUI(){
 
-  if(idx < state.routeOrder.length){
+  if(
+    state.currentIndex >=
+    state.routeOrder.length
+  ){
 
-    const nextHotel =
-      HOTELS.find(
-        h => h.id === state.routeOrder[idx]
-      );
-
-    const nextParsed =
-      parseCoords(nextHotel.coords);
-
-    if(nextParsed){
-
-      waypoints.push(
-        L.latLng(
-          nextParsed.lat,
-          nextParsed.lng
-        )
-      );
-
-    }
-
-  }
-
-}
-
-if(!state.routingControl){
-
-  state.routingControl = L.Routing.control({
-
-    waypoints,
-
-    routeWhileDragging:false,
-    addWaypoints:false,
-    draggableWaypoints:false,
-    fitSelectedRoutes:false,
-    show:false,
-
-    createMarker:(i,wp)=>{
-      return L.marker(wp.latLng);
-    }
-
-  }).addTo(state.map);
-
-}else{
-
-  state.routingControl.setWaypoints(
-    waypoints
-  );
-
-} 
-    
-  // usuário
-function startModeRoute(){  
-      if(state.routeOrder.length===0){ alert('Gere a rota primeiro.'); return; }  
-      state.currentIndex = 0; 
-      state.routeReport =
-state.routeOrder.map(id=>({  
-      id,  
-      arrival:null,  
-      departure:null,  
-      entrega:false,  
-      coleta:false,  
-      deliveryPhotos:[],  
-      pickupPhotos:[]  
-  
-}));  
-      screenSelect.style.display='none';  
-      screenRoute.style.display='none';  
-      screenMode.style.display='block';
-      state.mapInitialized = false;
-      initMap();  
-      updateMap();  
-      startGpsTracking();  
-      updateModeUI();  
-      renderReportMode();  
-      renderPhotoPreviews();  
-      saveAppState();  
-    }  
-  
-    function updateModeUI(){  
-      if(state.currentIndex >= state.routeOrder.length){  
-        currentHotelEl.innerHTML = `<div><strong>Rota finalizada</strong></div>`;  
-        nextTwoEl.innerHTML = '';  
-        return;  
-      }  
-      const id =
-state.routeOrder[state.currentIndex];  
-      const h = HOTELS.find(x=>x.id===id);  
-      currentHotelEl.innerHTML = `<div style="font-weight:700">${h.name}</div><div class="muted">${h.address}</div>`;  
-  
-// next two  
-  
-      nextTwoEl.innerHTML = '';  
-      for(let i=1;i<=2;i++){  
-        const idx = state.currentIndex + i;  
-        if(idx < state.routeOrder.length){  
-          const nh = HOTELS.find(x=>x.id===state.routeOrder[idx]);  
-          const div = document.createElement('div');  
-          div.className='next-card';  
-          div.innerHTML = `<strong>${nh.name}</strong><div class="muted" style="font-size:0.85rem">${nh.address}</div>`;  
-          nextTwoEl.appendChild(div);  
-        }  
-      }  
-  
-// set checkboxes from report  
-  
-  
-      const entry = state.routeReport[state.currentIndex];  
-      const nextBtn =  
-  document.getElementById('btn-next');  
-  
-if(state.currentIndex === state.routeOrder.length - 1){  
-  
-  nextBtn.textContent = 'Finalizar';  
-  
-}else{  
-  
-  nextBtn.textContent = 'Próximo hotel';  
-  
-}  
-      document.getElementById('chk-entrega').checked = entry.entrega;  
-      document.getElementById('chk-coleta').checked = entry.coleta;  
-    }  
-  
-// Next hotel in mode - SCRIPT BOTAO PROXIMO HOTEL   
-    document.getElementById('btn-next').addEventListener('click', ()=>{  
-      if(state.currentIndex >= state.routeOrder.length) return;  
-      const entrega = document.getElementById('chk-entrega').checked;  
-      const coleta = document.getElementById('chk-coleta').checked;  
-      const now = new Date();  
-      const entry = state.routeReport[state.currentIndex];  
-      if(!entry.arrival) entry.arrival = now.toISOString();  
-      entry.entrega = entrega;  
-      entry.coleta = coleta;  
-      entry.departure = new Date().toISOString();  
-      state.arrivalConfirmed = false;  
-      state.currentIndex++;  
-  
-if(state.currentIndex >= state.routeOrder.length){  
-  
-  document  
-    .getElementById('btn-finish')  
-    .click();  
-  
-  return;  
-  
-}  
-      updateModeUI();  
-      renderPhotoPreviews();  
-      updateMap();  
-      renderReportMode();  
-      saveAppState();  
-    });  
-  
-// Render report (Tela 2)  
-  
-    function renderReport(){  
-      reportEl.innerHTML = '';  
-      state.routeReport.forEach((r, idx)=>{  
-        const h = HOTELS.find(x=>x.id===r.id);  
-        const div = document.createElement('div');  
-        div.className='report-row';  
-        div.innerHTML = `<div><strong>${idx+1}. ${h.name}</strong><div class="muted" style="font-size:0.85rem">${h.address}</div></div>  
-                         <div style="text-align:right">  
-                           <div class="muted">${r.arrival?('Cheg: '+new Date(r.arrival).toLocaleTimeString()):'Cheg: -'}</div>  
-                           <div class="muted">${r.departure?('Sai: '+new Date(r.departure).toLocaleTimeString()):'Sai: -'}</div>  
-                           <div class="muted">${r.entrega?'Entrega':''} ${r.coleta?'Coleta':''}</div>  
-                         </div>`;  
-        reportEl.appendChild(div);  
-      });  
-    }  
-  
-// Render report (Tela 3)  
-  
-    function renderReportMode(){  
-      reportModeEl.innerHTML = '';  
-      state.routeReport.forEach((r, idx)=>{  
-        const h = HOTELS.find(x=>x.id===r.id);  
-        const div = document.createElement('div');  
-        div.className='report-row';  
-        div.innerHTML = `<div><strong>${idx+1}. ${h.name}</strong></div>  
-                         <div style="text-align:right">  
-                           <div class="muted">${r.arrival?new Date(r.arrival).toLocaleTimeString():'-'}</div>  
-                           <div class="muted">${r.departure?new Date(r.departure).toLocaleTimeString():'-'}</div>  
-                         </div>`;  
-        reportModeEl.appendChild(div);  
-      });  
-    }  
-  
-function readFilesAsBase64(files){  
-  
-  return Promise.all(  
-  
-    [...files].map(file => {  
-  
-      return new Promise(resolve => {  
-  
-        const reader = new FileReader();  
-  
-        reader.onload = () => {  
-  
-          resolve(reader.result);  
-  
-        };  
-  
-        reader.readAsDataURL(file);  
-  
-      });  
-  
-    })  
-  
-  );  
-  
-}  
-  
-document  
-.getElementById('deliveryPhotosInput')  
-.addEventListener('change', async (e)=>{  
-  
-  if(state.currentIndex >= state.routeReport.length)  
-    return;  
-  
-  const images =  
-    await readFilesAsBase64(e.target.files);  
-  
-  const imageIds = [];  
-  
-for(const image of images){  
-  
-  const id =  
-    `delivery_${Date.now()}_${Math.random()}`;  
-  
-  await savePhoto({  
-  
-    id,  
-  
-    image  
-  
-  });  
-  
-  imageIds.push(id);  
-  
-}  
-  
-state.routeReport[state.currentIndex]  
-  .deliveryPhotos  
-  .push(...imageIds);  
-  
-  renderPhotoPreviews();  
-  saveAppState();  
-  
-});  
-  
-document  
-.getElementById('pickupPhotosInput')  
-.addEventListener('change', async (e)=>{  
-  
-  if(state.currentIndex >= state.routeReport.length)  
-    return;  
-  
-  const images =  
-    await readFilesAsBase64(e.target.files);  
-  
-  const imageIds = [];  
-  
-for(const image of images){  
-  
-  const id =  
-    `pickup_${Date.now()}_${Math.random()}`;  
-  
-  await savePhoto({  
-  
-    id,  
-  
-    image  
-  
-  });  
-  
-  imageIds.push(id);  
-  
-}  
-  
-state.routeReport[state.currentIndex]  
-  .pickupPhotos  
-  .push(...imageIds);  
-  
-  renderPhotoPreviews();  
-  saveAppState();  
-  
-});  
-  
-async function renderPhotoPreviews(){
-
-  if(state.currentIndex >= state.routeReport.length)
     return;
 
-  const entry =
-    state.routeReport[state.currentIndex];
-
-  const deliveryPreview =
-    document.getElementById(
-      'deliveryPreview'
-    );
-
-  const pickupPreview =
-    document.getElementById(
-      'pickupPreview'
-    );
-
-  deliveryPreview.innerHTML = '';
-
-  pickupPreview.innerHTML = '';
-
-  // ENTREGA
-
-  for(const photoId of entry.deliveryPhotos){
-
-    const photo =
-      await getPhoto(photoId);
-
-    if(!photo) continue;
-
-    const img =
-      document.createElement('img');
-
-    img.src = photo.image;
-
-    img.className =
-      'preview-thumb';
-
-    deliveryPreview.appendChild(img);
-
   }
 
-  // COLETA
+  const id =
+    state.routeOrder[
+      state.currentIndex
+    ];
 
-  for(const photoId of entry.pickupPhotos){
+  const hotel =
+    HOTELS.find(h=>h.id===id);
 
-    const photo =
-      await getPhoto(photoId);
+  if(!hotel) return;
 
-    if(!photo) continue;
+}
 
-    const img =
-      document.createElement('img');
 
-    img.src = photo.image;
+// ======================
+// PRÓXIMO HOTEL
+// ======================
 
-    img.className =
-      'preview-thumb';
+btnNext.addEventListener(
+  'click',
+  ()=>{
 
-    pickupPreview.appendChild(img);
+    if(
+      state.currentIndex >=
+      state.routeOrder.length
+    ){
+      return;
+    }
+
+    const entry =
+      state.routeReport[
+        state.currentIndex
+      ];
+
+    entry.entrega =
+      chkEntrega.checked;
+
+    entry.coleta =
+      chkColeta.checked;
+
+    entry.departure =
+      new Date().toISOString();
+
+    state.currentIndex++;
+
+    if(
+      state.currentIndex >=
+      state.routeOrder.length
+    ){
+
+      btnFinish.click();
+
+      return;
+
+    }
+
+    updateModeUI();
+
+    renderReportMode();
+
+    updateMap();
+
+    saveAppState();
 
   }
+);
 
-}  
-// Buttons  
-  
-document  
-.getElementById('btnExportPdf')  
-.addEventListener('click', async ()=>{  
-  
-  const reportElement =  
-    document.getElementById(  
-      'screen-report'  
-    );  
-  
-  await new Promise(resolve=>  
-  setTimeout(resolve,500)  
-);  
-   const canvas =  
-    await html2canvas(reportElement,{  
-  
-      scale:2,  
-  
-      useCORS:true  
-  
-    });  
-  
-  const imgData =  
-    canvas.toDataURL('image/jpeg',1);  
-  
-  const { jsPDF } = window.jspdf;  
-  
-  const pdf =  
-    new jsPDF(  
-      'p',  
-      'mm',  
-      'a4'  
-    );  
-  
-  const pdfWidth =  
-    pdf.internal.pageSize.getWidth();  
-  
-  const pdfHeight =  
-    (canvas.height * pdfWidth)  
-    / canvas.width;  
-  
-  pdf.addImage(  
-    imgData,  
-    'JPEG',  
-    0,  
-    0,  
-    pdfWidth,  
-    pdfHeight  
-  );  
-  
-  pdf.save(  
-    `rota-${Date.now()}.pdf`  
-  );  
-  
-});  
-  
-const voiceToggle =  
-  document.getElementById('voiceToggle');  
-  
-voiceToggle.addEventListener('click', ()=>{
-  state.speechEnabled =
-  !state.speechEnabled;  
-    if(state.speechEnabled){
 
-  voiceToggle.classList.remove('off');
+// ======================
+// EXPORT JSON
+// ======================
 
-  voiceToggle.classList.add('on');
+btnExport.addEventListener(
+  'click',
+  ()=>{
 
-  voiceToggle.textContent =
-    '🔊 Voz ligada';
+    const data = {
 
-}else{
+      generatedAt:
+        new Date().toISOString(),
 
-  voiceToggle.classList.remove('on');
+      route:
+        state.routeOrder,
 
-  voiceToggle.classList.add('off');
+      report:
+        state.routeReport
 
-  voiceToggle.textContent =
-    '🔇 Voz desligada';
+    };
 
-}  
-  saveAppState();
-});  
- document.getElementById('btn-generate').addEventListener('click', generateRoute);  
-    document.getElementById('btn-back')  
-.addEventListener('click', ()=>{  
-  
-  stopGpsTracking();  
-  
-  screenSelect.style.display='block';  
-  
-  screenRoute.style.display='none';  
-  
-  screenMode.style.display='none';  
-  
-});  
-    document.getElementById('btn-start-route').addEventListener('click', startModeRoute);  
-    document.getElementById('btn-reset')
-.addEventListener('click', ()=>{
+    const blob =
+      new Blob(
+        [JSON.stringify(data,null,2)],
+        {
+          type:'application/json'
+        }
+      );
 
-  if(confirm('Limpar seleção?')){
+    const a =
+      document.createElement('a');
+
+    const url =
+      URL.createObjectURL(blob);
+
+    a.href = url;
+
+    a.download =
+      'relatorio_rota.json';
+
+    a.click();
+
+    setTimeout(()=>{
+
+      URL.revokeObjectURL(url);
+
+    },1000);
+
+  }
+);
+
+
+// ======================
+// FINALIZAR
+// ======================
+
+btnFinish.addEventListener(
+  'click',
+  ()=>{
 
     stopGpsTracking();
 
-    if(state.routingControl){
+    const finalData =
+      state.routeReport.map(r=>{
 
-      state.map.removeControl(
-        state.routingControl
-      );
+        const hotel =
+          HOTELS.find(
+            h => h.id === r.id
+          );
 
-      state.routingControl = null;
+        return {
 
-    }
+          name:
+            hotel.name,
+
+          arrival:
+            r.arrival,
+
+          departure:
+            r.departure,
+
+          deliveryPhotos:
+            r.deliveryPhotos,
+
+          pickupPhotos:
+            r.pickupPhotos
+
+        };
+
+      });
+
+    openReportScreen(
+      finalData
+    );
+
+  }
+);
+
+
+// ======================
+// BOTÕES
+// ======================
+
+btnGenerate.addEventListener(
+  'click',
+  generateRoute
+);
+
+btnBack.addEventListener(
+  'click',
+  ()=>{
+
+    stopGpsTracking();
+
+    screenSelect.style.display =
+      'block';
+
+    screenRoute.style.display =
+      'none';
+
+    screenMode.style.display =
+      'none';
+
+  }
+);
+
+btnStartRoute.addEventListener(
+  'click',
+  startModeRoute
+);
+
+btnNewRoute.addEventListener(
+  'click',
+  ()=>{
+
+    stopGpsTracking();
 
     state.activeSet.clear();
 
@@ -1734,347 +918,173 @@ voiceToggle.addEventListener('click', ()=>{
 
     state.currentIndex = 0;
 
-    state.mapInitialized = false;
+    hideAllScreens();
 
-    state.lastInstruction = '';
+    screenSelect.style.display =
+      'block';
 
     renderSelection();
 
-    renderRoute();
+    saveAppState();
+
+  }
+);
+
+
+// ======================
+// MODAL HOTEL
+// ======================
+
+btnAddHotel.addEventListener(
+  'click',
+  ()=>{
+
+    modal.classList.add('active');
+
+  }
+);
+
+btnCloseModal.addEventListener(
+  'click',
+  ()=>{
+
+    modal.classList.remove('active');
+
+  }
+);
+
+btnSaveHotel.addEventListener(
+  'click',
+  ()=>{
+
+    const coords =
+      parseCoords(
+        newCoords.value
+      );
+
+    if(
+      !newName.value ||
+      !newAddress.value ||
+      !coords
+    ){
+
+      alert(
+        'Dados inválidos'
+      );
+
+      return;
+
+    }
+
+    HOTELS.push({
+
+      id: Date.now(),
+
+      name:
+        newName.value,
+
+      region:
+        newRegion.value,
+
+      address:
+        newAddress.value,
+
+      coords:
+        newCoords.value,
+
+      custom:true
+
+    });
+
+    saveCustomHotels();
+
+    renderSelection();
+
+    modal.classList.remove(
+      'active'
+    );
+
+  }
+);
+
+
+// ======================
+// VOZ
+// ======================
+
+voiceToggle.addEventListener(
+  'click',
+  ()=>{
+
+    state.speechEnabled =
+      !state.speechEnabled;
 
     saveAppState();
 
-    reportEl.innerHTML='';
+  }
+);
 
-    reportModeEl.innerHTML='';
+
+// ======================
+// FOTOS
+// ======================
+
+deliveryPhotosInput
+.addEventListener(
+  'change',
+  async e=>{
+
+    const images =
+      await readFilesAsBase64(
+        e.target.files
+      );
+
+    for(const image of images){
+
+      await savePhoto({
+
+        id: crypto.randomUUID(),
+
+        image
+
+      });
+
+    }
 
   }
+);
 
-});
-  document
-.getElementById('btn-export')
-.addEventListener('click', ()=>{
-  const data = {
-    generatedAt: new Date().toISOString(),
-    route: state.routeOrder,
-    report: state.routeReport
-  };
-  const blob = new Blob(
-    [JSON.stringify(data,null,2)],
-    {type:'application/json'}
-  );
-  const a = document.createElement('a');
-  const url = URL.createObjectURL(blob);
-  a.href = url;
-  a.download = 'relatorio_rota.json';
-  a.click();
-  setTimeout(()=>{
-    URL.revokeObjectURL(url);
-  },1000);
-});
-  
-  document  
-.getElementById('btn-finish')  
-.addEventListener('click', ()=>{  
-  
-  stopGpsTracking();  
-  
-  const finalData = state.routeReport.map(r=>{  
-  
-    const hotel =  
-      HOTELS.find(h => h.id === r.id);  
-  
-    return {  
-  
-  name: hotel.name,  
-  
-  arrival: r.arrival  
-    ? new Date(r.arrival)  
-        .toLocaleTimeString('pt-BR',{  
-          hour:'2-digit',  
-          minute:'2-digit'  
-        })  
-    : '--:--',  
-  
-  departure: r.departure  
-    ? new Date(r.departure)  
-        .toLocaleTimeString('pt-BR',{  
-          hour:'2-digit',  
-          minute:'2-digit'  
-        })  
-    : '--:--',  
-  
-  deliveryPhotos:  
-    r.deliveryPhotos || [],  
-  
-  pickupPhotos:  
-    r.pickupPhotos || []  
-  
-};  
-  
-  });  
-  
-  openReportScreen(finalData);  
-  
-});  
-document.getElementById('btn-open-maps').addEventListener('click', ()=>{  
-  
-  if(state.currentIndex >= state.routeOrder.length) return;  
-  
-  const id = state.routeOrder[state.currentIndex];  
-  
-  const hotel = HOTELS.find(h => h.id === id);  
-  if(!hotel) return;
-  window.open(  
-    `https://www.google.com/maps?q=${hotel.coords}`,  
-    '_blank'  
-  );  
-});  
-  
-document
-.getElementById('btnNewRoute')
-.addEventListener('click', ()=>{
 
-  stopGpsTracking();
+// ======================
+// INIT
+// ======================
 
-  if(state.routingControl){
+initDatabase()
+.then(()=>{
 
-    state.map.removeControl(
-      state.routingControl
-    );
+  loadCustomHotels();
 
-    state.routingControl = null;
-
-  }
-
-  state.activeSet.clear();
-
-  state.routeOrder = [];
-
-  state.routeReport = [];
-
-  state.currentIndex = 0;
-
-  state.mapInitialized = false;
-
-  state.lastInstruction = '';
-
-  hideAllScreens();
-
-  screenSelect.style.display = 'block';
+  restoreAppState();
 
   renderSelection();
 
-  saveAppState();
+});
 
-});  
-  
-// ===== TELA RELATÓRIO =====  
-  
-const screenReport =  
-  document.getElementById('screen-report');  
-  
-const reportRouteList =  
-  document.getElementById('reportRouteList');  
-  
-const reportTitle =  
-  document.getElementById('reportTitle');  
-  
-  
-// ===== DATA FORMATADA =====  
-  
-function getFormattedDateTitle(){  
-  
-  const now = new Date();  
-  
-  const weekdays = [  
-    'Domingo',  
-    'Segunda-feira',  
-    'Terça-feira',  
-    'Quarta-feira',  
-    'Quinta-feira',  
-    'Sexta-feira',  
-    'Sábado'  
-  ];  
-  
-  const weekday =  
-    weekdays[now.getDay()];  
-  
-  const day =  
-    String(now.getDate()).padStart(2,'0');  
-  
-  const month =  
-    String(now.getMonth() + 1)  
-      .padStart(2,'0');  
-  
-  const year =  
-    now.getFullYear();  
-  
-  return `ROTA do dia ${weekday}, ${day}/${month}/${year}`;  
-}  
-  
-  
-// ===== RENDER RELATÓRIO =====  
-  
-async function renderFinalReport(routeData){  
-  
-  reportRouteList.innerHTML = '';  
-  
-  reportTitle.textContent =  
-    getFormattedDateTitle();  
-  
-  for(const [index, hotel] of routeData.entries()){  
-  
-    const deliveryImages = [];  
-  
-    for(const photoId of hotel.deliveryPhotos || []){  
-  
-      const photo =  
-        await getPhoto(photoId);  
-  
-      if(photo?.image){  
-  
-        deliveryImages.push(photo.image);  
-  
-      }  
-  
-    }  
-  
-    const pickupImages = [];  
-  
-    for(const photoId of hotel.pickupPhotos || []){  
-  
-      const photo =  
-        await getPhoto(photoId);  
-  
-      if(photo?.image){  
-  
-        pickupImages.push(photo.image);  
-  
-      }  
-  
-    }  
-  
-    const card =  
-      document.createElement('div');  
-  
-    card.className = 'report-item';  
-  
-    card.innerHTML = `  
-  
-      <div class="report-top-line">  
-  
-        <span class="report-order">  
-          ${index + 1}°  
-        </span>  
-  
-        <span class="report-hotel-name">  
-          ${hotel.name}  
-        </span>  
-  
-        <div class="report-time">  
-          🚥 ${hotel.arrival || '--:--'}  
-          -  
-          🏁 ${hotel.departure || '--:--'}  
-        </div>  
-  
-      </div>  
-  
-      <div class="report-photos">  
-  
-        <div class="report-photo-group">  
-  
-          <div class="report-photo-label">  
-            Entrega  
-          </div>  
-  
-          <div class="report-photo-list">  
-  
-            ${  
-              deliveryImages.length  
-              ? deliveryImages.map(src=>`  
-                <img src="${src}">  
-              `).join('')  
-              : '<div class="empty-photo">Sem fotos</div>'  
-            }  
-  
-          </div>  
-  
-        </div>  
-  
-        <div class="report-photo-group">  
-  
-          <div class="report-photo-label">  
-            Coleta  
-          </div>  
-  
-          <div class="report-photo-list">  
-  
-            ${  
-              pickupImages.length  
-              ? pickupImages.map(src=>`  
-                <img src="${src}">  
-              `).join('')  
-              : '<div class="empty-photo">Sem fotos</div>'  
-            }  
-  
-          </div>  
-  
-        </div>  
-  
-      </div>  
-  
-    `;  
-  
-    reportRouteList.appendChild(card);  
-  
-  }  
-  
-}  
-  
-  
-function hideAllScreens(){  
-  
-  screenSelect.style.display = 'none';  
-  
-  screenRoute.style.display = 'none';  
-  
-  screenMode.style.display = 'none';  
-  
-  screenReport.classList.add('hidden');  
-  
-}  
-  
-// ===== ABRIR TELA =====  
-  
-async function openReportScreen(routeData){  
-  
-  hideAllScreens();  
-  
-  screenReport.classList.remove('hidden');  
-  
-  screenReport.style.display = 'block';  
-  
-  await renderFinalReport(routeData);  
-  
-}  
-  
-    // Init  
-  
-initDatabase()  
-.then(()=>{  
-  
-  loadCustomHotels();  
-  restoreAppState();  
-  renderSelection();  
-  
-});  
-  
-    // Register service worker  
-    if('serviceWorker' in navigator){  
-      navigator.serviceWorker.register('sw.js').catch(()=>{/* ignore */});  
-    }  
-  </script>  
+
+// ======================
+// SERVICE WORKER
+// ======================
+
+if('serviceWorker' in navigator){
+
+  navigator
+  .serviceWorker
+  .register('sw.js')
+  .catch(()=>{});
+
+}
+
+</script> 
   
 </body>  
 </html>
