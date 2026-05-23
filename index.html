@@ -290,29 +290,16 @@
   </div>  
   
 </div>  
-  </div>  
+  </div>
+
+
   
 <script src="data/dados.js"></script>  
-  <script>  
-  
+  <script type="module">
+    import { state } from './core/state.js';
 // Estado  
-  
-    let routingControl = null;  
-    let speechEnabled = false;  
-    let lastInstruction = '';  
-    let activeSet = new Set();  
-    let routeOrder = [];  
-    let routeReport = [];  
-    let currentIndex = 0;  
-    let userPosition = null;  
-    let watchId = null;  
-    let arrivalConfirmed = false;  
-    let map = null;  
     let userMarker = null;  
-    let hotelMarker = null;  
-    let db = null;  
-    let mapInitialized = false;  
-    let lastHeading = 0;  
+    let hotelMarker = null;
   
     const CUSTOM_HOTELS_KEY =  
   'rotaBuziosCustomHotels';  
@@ -404,13 +391,13 @@ function deleteCustomHotel(id){
   
   HOTELS.splice(index,1);  
   
-  activeSet.delete(id);  
+  state.activeSet.delete(id);  
   
-  routeOrder =  
-    routeOrder.filter(x => x !== id);  
+  state.routeOrder =  
+    state.routeOrder.filter(x => x !== id);  
   
-  routeReport =  
-    routeReport.filter(r => r.id !== id);  
+  state.routeReport =  
+    state.routeReport.filter(r => r.id !== id);  
   
   saveCustomHotels();  
   
@@ -521,15 +508,15 @@ function getPhoto(id){
   
 function saveAppState(){  
   
-  const data = {  
-  
-    activeSet: [...activeSet],  
-  
-    routeOrder,  
-  
-    routeReport,  
-  
-    currentIndex,  
+  const data = {
+
+  activeSet: [...state.activeSet],
+
+  routeOrder: state.routeOrder,
+
+  routeReport: state.routeReport,
+
+  currentIndex: state.currentIndex,  
   
     currentScreen:  
       screenMode.style.display === 'block'  
@@ -556,17 +543,17 @@ function restoreAppState(){
   
   const data = JSON.parse(saved);  
   
-  activeSet = new Set(data.activeSet || []);  
+  state.activeSet = new Set(data.activeSet || []);  
   
-  routeOrder = data.routeOrder || [];  
+  state.routeOrder = data.routeOrder || [];  
   
-  routeReport = data.routeReport || [];  
+  state.routeReport = data.routeReport || [];  
   
-  currentIndex = data.currentIndex || 0;  
+  state.currentIndex = data.currentIndex || 0;  
   
   renderSelection();  
   
-  if(routeOrder.length){  
+  if(state.routeOrder.length){  
   
     renderRoute();  
   
@@ -630,7 +617,7 @@ function restoreAppState(){
       <input  
         type="checkbox"  
         data-id="${h.id}"  
-        ${activeSet.has(h.id)?'checked':''}  
+        ${state.activeSet.has(h.id)?'checked':''}  
       >  
   
       <span class="slider"></span>  
@@ -647,8 +634,13 @@ hotelListEl.appendChild(div);
       hotelListEl.querySelectorAll('input[type=checkbox]').forEach(cb=>{  
         cb.addEventListener('change', e=>{  
           const id = Number(e.target.dataset.id);  
-          if(e.target.checked) activeSet.add(id); else activeSet.delete(id);  
-          activeCountSelectEl.textContent = `${activeSet.size} hotéis ativos`;  
+          if(e.target.checked) { state.activeSet.add(id);
+}
+          else {
+  state.activeSet.delete(id);
+}  
+          activeCountSelectEl.textContent =
+`${state.activeSet.size} hotéis ativos`;  
         });  
       });  
 hotelListEl  
@@ -665,8 +657,8 @@ hotelListEl
   });  
   
 });  
-      const text =  
-  `${activeSet.size} hotéis ativos`;  
+      const text =
+`${state.activeSet.size} hotéis ativos`;  
   
 activeCountSelectEl.textContent = text;  
   
@@ -748,14 +740,16 @@ document.getElementById('saveHotel')
 // Gera rota (Tela 2) a partir dos ativos  
   
     function generateRoute(){  
-      const active = HOTELS.filter(h=>activeSet.has(h.id));  
+      const active = HOTELS.filter(h=>state.activeSet.has(h.id)); 
       if(active.length===0){ alert('Selecione ao menos um hotel.'); return;   
 saveAppState();  
 }  
   
 // inicializa ordem pela ordem de ativação (inserção em activeSet não tem ordem; usar HOTELS order)  
   
-      routeOrder = HOTELS.filter(h=>activeSet.has(h.id)).map(h=>h.id);  
+      state.routeOrder = HOTELS
+.filter(h=>state.activeSet.has(h.id))
+.map(h=>h.id);
       renderRoute();  
   
 // trocar telas  
@@ -771,7 +765,7 @@ saveAppState();
   
   routeListEl.innerHTML = '';  
   
-  routeOrder.forEach((id, idx)=>{  
+  state.routeOrder.forEach((id, idx)=>{  
   
     const h = HOTELS.find(x=>x.id===id);  
   
@@ -807,9 +801,10 @@ saveAppState();
   
     item.querySelector('button').addEventListener('click', ()=>{  
   
-      activeSet.delete(id);  
+      state.activeSet.delete(id);  
   
-      routeOrder = routeOrder.filter(x => x !== id);  
+      state.routeOrder =
+state.routeOrder.filter(x => x !== id); 
   
       renderSelection();  
   
@@ -893,14 +888,14 @@ saveAppState();
   
       });  
   
-      const fromIndex = routeOrder.indexOf(id);  
+      const fromIndex = state.routeOrder.indexOf(id);  
   
       if(targetIndex !== null){  
   
-        routeOrder.splice(  
+        state.routeOrder.splice(  
           targetIndex,  
           0,  
-          routeOrder.splice(fromIndex,1)[0]  
+          state.routeOrder.splice(fromIndex,1)[0]  
         );  
   
       }  
@@ -917,7 +912,8 @@ saveAppState();
   
   });  
   
-  routeReport = routeOrder.map(id=>({  
+  state.routeReport =
+state.routeOrder.map(id=>({  
   
   id,  
   
@@ -936,7 +932,7 @@ saveAppState();
 }));  
   
   const text =  
-  `${activeSet.size} hotéis ativos`;  
+  `${state.activeSet.size} hotéis ativos`;  
   
 activeCountSelectEl.textContent = text;  
   
@@ -1035,7 +1031,8 @@ function startGpsTracking(){
     return;  
   }  
   
-  watchId = navigator.geolocation.watchPosition(  
+  state.watchId =
+navigator.geolocation.watchPosition(  
   
     pos=>{  
   
@@ -1112,25 +1109,27 @@ function startGpsTracking(){
   
 }  
   
-function stopGpsTracking(){  
-  
-  if(watchId !== null){  
-  
-    navigator.geolocation.clearWatch(watchId);  
-  
-    watchId = null;  
-  
-  }  
-  
-}  
+function stopGpsTracking(){
+
+  if(state.watchId !== null){
+
+    navigator.geolocation.clearWatch(
+      state.watchId
+    );
+
+    state.watchId = null;
+
+  }
+
+}
   
 function checkArrival(){  
   
-  if(currentIndex >= routeOrder.length) return;  
+  if(state.currentIndex >= state.routeOrder.length) return;  
   
   if(arrivalConfirmed) return;  
   
-  const id = routeOrder[currentIndex];  
+  const id = state.routeOrder[state.currentIndex];  
   
   const hotel = HOTELS.find(h=>h.id===id);  
   
@@ -1160,7 +1159,7 @@ const hotelLng = parsed.lng;
   
     if(ok){  
   
-      routeReport[currentIndex].arrival =  
+      state.routeReport[state.currentIndex].arrival =  
         new Date().toISOString();  
   
       renderReportMode();  
@@ -1243,12 +1242,12 @@ function updateMap(){
   
   if(!map) return;  
   
-  if(currentIndex >= routeOrder.length)  
+  if(state.currentIndex >= state.routeOrder.length)  
     return;  
   
   const currentHotel =  
     HOTELS.find(  
-      h=>h.id===routeOrder[currentIndex]  
+      h=>h.id===state.routeOrder[state.currentIndex]  
     );  
   
   const parsed =  
@@ -1267,10 +1266,11 @@ const hotelLat = parsed.lat;
   
 const hotelLng = parsed.lng;  
   
-  // limpa rota antiga  
-  if(!routingControl){  
+  // limpa rota antiga 
+  const waypoints = [];  
+  if(!state.routingControl){  
   
-  routingControl = L.Routing.control({  
+  state.routingControl = L.Routing.control({  
   
     waypoints,  
   
@@ -1294,12 +1294,10 @@ const hotelLng = parsed.lng;
   
 }else{  
   
-  routingControl.setWaypoints(waypoints);  
+  state.routingControl.setWaypoints(waypoints);  
   
 }  
-  
-  const waypoints = [];  
-  
+    
   // usuário  
   if(userPosition){  
   
@@ -1320,13 +1318,13 @@ const hotelLng = parsed.lng;
   // próximos hotéis  
   for(let i=1;i<=2;i++){  
   
-    const idx = currentIndex + i;  
+    const idx = state.currentIndex + i;  
   
-    if(idx < routeOrder.length){  
+    if(idx < state.routeOrder.length){  
   
       const nextHotel =  
         HOTELS.find(  
-          h=>h.id===routeOrder[idx]  
+          h=>h.id===state.routeOrder[idx]  
         );  
   
       const nextParsed =  
@@ -1346,7 +1344,7 @@ if(nextParsed){
 }  
 }  
   
-  routingControl = L.Routing.control({  
+  state.routingControl = L.Routing.control({  
   
     waypoints,  
   
@@ -1369,7 +1367,7 @@ if(nextParsed){
   }).addTo(map);  
   
   // instruções voz  
-  routingControl.on(  
+  state.routingControl.on(  
     'routesfound',  
     function(e){  
   
@@ -1392,9 +1390,10 @@ if(nextParsed){
   
 }  
     function startModeRoute(){  
-      if(routeOrder.length===0){ alert('Gere a rota primeiro.'); return; }  
-      currentIndex = 0;  
-      routeReport = routeOrder.map(id=>({  
+      if(state.routeOrder.length===0){ alert('Gere a rota primeiro.'); return; }  
+      state.currentIndex = 0; 
+      state.routeReport =
+state.routeOrder.map(id=>({  
       id,  
       arrival:null,  
       departure:null,  
@@ -1417,12 +1416,13 @@ if(nextParsed){
     }  
   
     function updateModeUI(){  
-      if(currentIndex >= routeOrder.length){  
+      if(state.currentIndex >= state.routeOrder.length){  
         currentHotelEl.innerHTML = `<div><strong>Rota finalizada</strong></div>`;  
         nextTwoEl.innerHTML = '';  
         return;  
       }  
-      const id = routeOrder[currentIndex];  
+      const id =
+state.routeOrder[state.currentIndex];  
       const h = HOTELS.find(x=>x.id===id);  
       currentHotelEl.innerHTML = `<div style="font-weight:700">${h.name}</div><div class="muted">${h.address}</div>`;  
   
@@ -1430,9 +1430,9 @@ if(nextParsed){
   
       nextTwoEl.innerHTML = '';  
       for(let i=1;i<=2;i++){  
-        const idx = currentIndex + i;  
-        if(idx < routeOrder.length){  
-          const nh = HOTELS.find(x=>x.id===routeOrder[idx]);  
+        const idx = state.currentIndex + i;  
+        if(idx < state.routeOrder.length){  
+          const nh = HOTELS.find(x=>x.id===state.routeOrder[idx]);  
           const div = document.createElement('div');  
           div.className='next-card';  
           div.innerHTML = `<strong>${nh.name}</strong><div class="muted" style="font-size:0.85rem">${nh.address}</div>`;  
@@ -1443,11 +1443,11 @@ if(nextParsed){
 // set checkboxes from report  
   
   
-      const entry = routeReport[currentIndex];  
+      const entry = state.routeReport[state.currentIndex];  
       const nextBtn =  
   document.getElementById('btn-next');  
   
-if(currentIndex === routeOrder.length - 1){  
+if(state.currentIndex === state.routeOrder.length - 1){  
   
   nextBtn.textContent = 'Finalizar';  
   
@@ -1462,19 +1462,19 @@ if(currentIndex === routeOrder.length - 1){
   
 // Next hotel in mode - SCRIPT BOTAO PROXIMO HOTEL   
     document.getElementById('btn-next').addEventListener('click', ()=>{  
-      if(currentIndex >= routeOrder.length) return;  
+      if(state.currentIndex >= state.routeOrder.length) return;  
       const entrega = document.getElementById('chk-entrega').checked;  
       const coleta = document.getElementById('chk-coleta').checked;  
       const now = new Date();  
-      const entry = routeReport[currentIndex];  
+      const entry = state.routeReport[state.currentIndex];  
       if(!entry.arrival) entry.arrival = now.toISOString();  
       entry.entrega = entrega;  
       entry.coleta = coleta;  
       entry.departure = new Date().toISOString();  
       arrivalConfirmed = false;  
-      currentIndex++;  
+      state.currentIndex++;  
   
-if(currentIndex >= routeOrder.length){  
+if(state.currentIndex >= state.routeOrder.length){  
   
   document  
     .getElementById('btn-finish')  
@@ -1494,7 +1494,7 @@ if(currentIndex >= routeOrder.length){
   
     function renderReport(){  
       reportEl.innerHTML = '';  
-      routeReport.forEach((r, idx)=>{  
+      state.routeReport.forEach((r, idx)=>{  
         const h = HOTELS.find(x=>x.id===r.id);  
         const div = document.createElement('div');  
         div.className='report-row';  
@@ -1512,7 +1512,7 @@ if(currentIndex >= routeOrder.length){
   
     function renderReportMode(){  
       reportModeEl.innerHTML = '';  
-      routeReport.forEach((r, idx)=>{  
+      state.routeReport.forEach((r, idx)=>{  
         const h = HOTELS.find(x=>x.id===r.id);  
         const div = document.createElement('div');  
         div.className='report-row';  
@@ -1555,7 +1555,7 @@ document
 .getElementById('deliveryPhotosInput')  
 .addEventListener('change', async (e)=>{  
   
-  if(currentIndex >= routeReport.length)  
+  if(state.currentIndex >= state.routeReport.length)  
     return;  
   
   const images =  
@@ -1580,7 +1580,7 @@ for(const image of images){
   
 }  
   
-routeReport[currentIndex]  
+state.routeReport[state.currentIndex]  
   .deliveryPhotos  
   .push(...imageIds);  
   
@@ -1594,7 +1594,7 @@ document
 .getElementById('pickupPhotosInput')  
 .addEventListener('change', async (e)=>{  
   
-  if(currentIndex >= routeReport.length)  
+  if(state.currentIndex >= state.routeReport.length)  
     return;  
   
   const images =  
@@ -1619,7 +1619,7 @@ for(const image of images){
   
 }  
   
-routeReport[currentIndex]  
+state.routeReport[state.currentIndex]  
   .pickupPhotos  
   .push(...imageIds);  
   
@@ -1631,11 +1631,11 @@ routeReport[currentIndex]
   
 async function renderPhotoPreviews(){
 
-  if(currentIndex >= routeReport.length)
+  if(state.currentIndex >= state.routeReport.length)
     return;
 
   const entry =
-    routeReport[currentIndex];
+    state.routeReport[state.currentIndex];
 
   const deliveryPreview =
     document.getElementById(
@@ -1802,13 +1802,13 @@ voiceToggle.addEventListener('click', ()=>{
   
     stopGpsTracking();  
   
-    activeSet.clear();  
+    state.activeSet.clear();  
   
-    routeOrder=[];  
+    state.routeOrder=[];  
   
-    routeReport=[];  
+    state.routeReport=[];  
   
-    currentIndex=0;  
+    state.currentIndex=0;  
   
     renderSelection();  
   
@@ -1822,7 +1822,7 @@ voiceToggle.addEventListener('click', ()=>{
   
 });  
     document.getElementById('btn-export').addEventListener('click', ()=>{  
-      const data = {generatedAt: new Date().toISOString(), route: routeOrder, report: routeReport};  
+      const data = {generatedAt: new Date().toISOString(), route: state.routeOrder, report: state.routeReport};  
       const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});  
       const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download='relatorio_rota.json'; a.click();  
       URL.revokeObjectURL(a.href);  
@@ -1833,7 +1833,7 @@ voiceToggle.addEventListener('click', ()=>{
   
   stopGpsTracking();  
   
-  const finalData = routeReport.map(r=>{  
+  const finalData = state.routeReport.map(r=>{  
   
     const hotel =  
       HOTELS.find(h => h.id === r.id);  
@@ -1873,9 +1873,9 @@ voiceToggle.addEventListener('click', ()=>{
 });  
 document.getElementById('btn-open-maps').addEventListener('click', ()=>{  
   
-  if(currentIndex >= routeOrder.length) return;  
+  if(state.currentIndex >= state.routeOrder.length) return;  
   
-  const id = routeOrder[currentIndex];  
+  const id = state.routeOrder[state.currentIndex];  
   
   const hotel = HOTELS.find(h => h.id === id);  
   
@@ -1891,13 +1891,13 @@ document
   
   stopGpsTracking();  
   
-  activeSet.clear();  
+  state.activeSet.clear();  
   
-  routeOrder = [];  
+  state.routeOrder = [];  
   
-  routeReport = [];  
+  state.routeReport = [];  
   
-  currentIndex = 0;  
+  state.currentIndex = 0;  
   
   hideAllScreens();  
   
