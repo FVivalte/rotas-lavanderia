@@ -291,11 +291,8 @@
   
 </div>  
   </div>
-
-
-  
-<script src="data/dados.js"></script>  
   <script type="module">
+    import { HOTELS } from './data/dados.js';
     import { state } from './core/state.js';
 // Estado  
     let userMarker = null;  
@@ -421,26 +418,26 @@ function initDatabase(){
   
     request.onupgradeneeded = (e)=>{  
   
-      db = e.target.result;  
+      state.db = e.target.result; 
   
-      if(  
-        !db.objectStoreNames.contains(  
-          'photos'  
-        )  
-      ){  
-  
-        db.createObjectStore(  
-          'photos',  
-          { keyPath:'id' }  
-        );  
-  
-      }  
+      if(
+  !state.db.objectStoreNames.contains(
+    'photos'
+  )
+){
+
+  state.db.createObjectStore(
+    'photos',
+    { keyPath:'id' }
+  );
+
+}  
   
     };  
   
     request.onsuccess = (e)=>{  
   
-      db = e.target.result;  
+      state.db = e.target.result;  
   
       resolve();  
   
@@ -461,7 +458,7 @@ function savePhoto(photo){
   return new Promise((resolve,reject)=>{  
   
     const tx =  
-      db.transaction(  
+      state.db.transaction(  
         ['photos'],  
         'readwrite'  
       );  
@@ -485,7 +482,7 @@ function getPhoto(id){
   return new Promise((resolve,reject)=>{  
   
     const tx =  
-      db.transaction(  
+      state.db.transaction(  
         ['photos'],  
         'readonly'  
       );  
@@ -511,14 +508,12 @@ function saveAppState(){
   const data = {
 
   activeSet: [...state.activeSet],
-
+  speechEnabled: state.speechEnabled,
+  arrivalConfirmed: state.arrivalConfirmed,
   routeOrder: state.routeOrder,
-
   routeReport: state.routeReport,
-
   currentIndex: state.currentIndex,  
-  
-    currentScreen:  
+  currentScreen:  
       screenMode.style.display === 'block'  
         ? 'mode'  
         : screenRoute.style.display === 'block'  
@@ -526,7 +521,6 @@ function saveAppState(){
         : 'select'  
   
   };  
-  
   localStorage.setItem(  
     'rotaBuziosState',  
     JSON.stringify(data)  
@@ -534,56 +528,45 @@ function saveAppState(){
   
 }  
   
-function restoreAppState(){  
-  
-  const saved =  
-    localStorage.getItem('rotaBuziosState');  
-  
-  if(!saved) return;  
-  
-  const data = JSON.parse(saved);  
-  
-  state.activeSet = new Set(data.activeSet || []);  
-  
-  state.routeOrder = data.routeOrder || [];  
-  
-  state.routeReport = data.routeReport || [];  
-  
-  state.currentIndex = data.currentIndex || 0;  
-  
-  renderSelection();  
-  
-  if(state.routeOrder.length){  
-  
-    renderRoute();  
-  
-  }  
-  
-  if(data.currentScreen === 'route'){  
-  
-    screenSelect.style.display='none';  
-    screenRoute.style.display='block';  
-    screenMode.style.display='none';  
-  
-  }  
-  
-  if(data.currentScreen === 'mode'){  
-  
-    screenSelect.style.display='none';  
-    screenRoute.style.display='none';  
-    screenMode.style.display='block';  
-  
-    updateModeUI();  
-  
-    renderReportMode();  
-  
-    startGpsTracking();  
-  
-  }  
-  
-}  
-  
-  
+function restoreAppState(){
+  const saved =
+    localStorage.getItem('rotaBuziosState');
+  if(!saved) return;
+  let data;
+  try{
+    data = JSON.parse(saved);
+  }catch{
+    return;
+  }
+  state.speechEnabled =
+    data.speechEnabled || false;
+  state.arrivalConfirmed =
+    data.arrivalConfirmed || false;
+  state.activeSet =
+    new Set(data.activeSet || []);
+  state.routeOrder =
+    data.routeOrder || [];
+  state.routeReport =
+    data.routeReport || [];
+  state.currentIndex =
+    data.currentIndex || 0;
+  if(state.routeOrder.length){
+    renderRoute();
+  }
+  if(data.currentScreen === 'route'){
+    screenSelect.style.display='none';
+    screenRoute.style.display='block';
+    screenMode.style.display='none';
+  }
+  if(data.currentScreen === 'mode'){
+    screenSelect.style.display='none';
+    screenRoute.style.display='none';
+    screenMode.style.display='block';
+    updateModeUI();
+    renderReportMode();
+    startGpsTracking();
+  }
+}
 // Render seleção (Tela 1)  
   
     function renderSelection(){  
@@ -741,9 +724,12 @@ document.getElementById('saveHotel')
   
     function generateRoute(){  
       const active = HOTELS.filter(h=>state.activeSet.has(h.id)); 
-      if(active.length===0){ alert('Selecione ao menos um hotel.'); return;   
-saveAppState();  
-}  
+      if(active.length === 0){
+  alert('Selecione ao menos um hotel.');
+  return;
+}
+
+saveAppState();
   
 // inicializa ordem pela ordem de ativação (inserção em activeSet não tem ordem; usar HOTELS order)  
   
@@ -761,55 +747,36 @@ saveAppState();
   
 // Render route list (Tela 2)  
   
-    function renderRoute(){  
-  
-  routeListEl.innerHTML = '';  
-  
-  state.routeOrder.forEach((id, idx)=>{  
-  
-    const h = HOTELS.find(x=>x.id===id);  
-  
-    const item = document.createElement('div');  
-  
-    item.className = 'route-item';  
-  
-    item.dataset.id = id;  
-  
+    function renderRoute(){
+  routeListEl.innerHTML = '';
+  state.routeOrder.forEach((id, idx)=>{
+    const h = HOTELS.find(x=>x.id===id);
+    const item = document.createElement('div');
+    item.className = 'route-item';
+    item.dataset.id = id;
     item.innerHTML = `  
       <div>  
-        <strong>${idx+1}. ${h.name}</strong>  
-  
+        <strong>${idx+1}. ${h.name}</strong>
         <div class="muted" style="font-size:0.85rem">  
           ${h.address}  
         </div>  
-      </div>  
-  
-      <div style="display:flex;gap:8px;align-items:center">  
-  
-        <span class="drag">⋮⋮</span>  
-  
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <span class="drag">⋮⋮</span>
         <button class="ghost" data-id="${id}">  
           Remover  
-        </button>  
-  
+        </button>
       </div>  
-    `;  
-  
+    `;
     // ======================  
     // REMOVER HOTEL  
     // ======================  
-  
-    item.querySelector('button').addEventListener('click', ()=>{  
-  
-      state.activeSet.delete(id);  
-  
-      state.routeOrder =
-state.routeOrder.filter(x => x !== id); 
-  
-      renderSelection();  
-  
-      renderRoute();  
-  
+  item.querySelector('button').addEventListener('click', ()=>{  
+   state.activeSet.delete(id);
+   state.routeOrder = state.routeOrder.filter(x => x !== id); 
+    renderSelection();
+    saveAppState();
+    renderRoute();
     });  
   
     // ======================  
@@ -882,7 +849,8 @@ state.routeOrder.filter(x => x !== id);
   
         if(currentY < middle && targetIndex === null){  
   
-          targetIndex = index;  
+          targetIndex = index;
+          saveAppState();
   
         }  
   
@@ -912,24 +880,21 @@ state.routeOrder.filter(x => x !== id);
   
   });  
   
+  if(state.routeReport.length === 0){
+
   state.routeReport =
-state.routeOrder.map(id=>({  
-  
-  id,  
-  
-  arrival:null,  
-  
-  departure:null,  
-  
-  entrega:false,  
-  
-  coleta:false,  
-  
-  deliveryPhotos:[],  
-  
-  pickupPhotos:[]  
-  
-}));  
+    state.routeOrder.map(id=>({
+      id,
+      arrival:null,
+      departure:null,
+      entrega:false,
+      coleta:false,
+      deliveryPhotos:[],
+      pickupPhotos:[]
+
+    }));
+
+}  
   
   const text =  
   `${state.activeSet.size} hotéis ativos`;  
@@ -1044,30 +1009,30 @@ navigator.geolocation.watchPosition(
       const heading =  
         pos.coords.heading;  
   
-      userPosition = newPosition;  
+      state.userPosition = newPosition;  
   
       // CENTRALIZA APENAS NA PRIMEIRA VEZ  
-      if(map && !mapInitialized){  
+      if(state.map && !state.mapInitialized){  
   
-        map.setView(  
+        state.map.setView(  
           [  
-            userPosition.lat,  
-            userPosition.lng  
+            state.userPosition.lat,  
+            state.userPosition.lng  
           ],  
           17  
         );  
   
-        mapInitialized = true;  
+        state.mapInitialized = true;  
   
       }  
   
       // AUTO PAN SUAVE  
-      if(map){  
+      if(state.map){  
   
-        map.panTo(  
+        state.map.panTo(  
           [  
-            userPosition.lat,  
-            userPosition.lng  
+            state.userPosition.lat,  
+            state.userPosition.lng  
           ],  
           {  
             animate:true,  
@@ -1127,12 +1092,12 @@ function checkArrival(){
   
   if(state.currentIndex >= state.routeOrder.length) return;  
   
-  if(arrivalConfirmed) return;  
+  if(state.arrivalConfirmed) return;  
   
   const id = state.routeOrder[state.currentIndex];  
   
-  const hotel = HOTELS.find(h=>h.id===id);  
-  
+  const hotel = HOTELS.find(h=>h.id===id);
+  if(!hotel) return;
   const parsed =  
   parseCoords(hotel.coords);  
   
@@ -1141,17 +1106,17 @@ if(!parsed) return;
 const hotelLat = parsed.lat;  
   
 const hotelLng = parsed.lng;  
-  
+  if(!state.userPosition) return;
   const distance = getDistanceMeters(  
-    userPosition.lat,  
-    userPosition.lng,  
+    state.userPosition.lat,  
+    state.userPosition.lng,  
     hotelLat,  
     hotelLng  
   );  
   
   if(distance <= 90){  
   
-    arrivalConfirmed = true;  
+    state.arrivalConfirmed = true;  
   
     const ok = confirm(  
       `Você chegou em ${hotel.name}?`  
@@ -1175,11 +1140,11 @@ const hotelLng = parsed.lng;
   
   function speak(text){  
   
-  if(!speechEnabled) return;  
+  if(!state.speechEnabled) return;  
   
-  if(text === lastInstruction) return;  
+  if(text === state.lastInstruction) return;  
   
-  lastInstruction = text;  
+  state.lastInstruction = text;  
   
   const utter =  
     new SpeechSynthesisUtterance(text);  
@@ -1188,14 +1153,15 @@ const hotelLng = parsed.lng;
   
   utter.rate = 1;  
   
-  speechSynthesis.speak(utter);  
+  speechSynthesis.cancel();
+speechSynthesis.speak(utter);  
   
 }  
     function initMap(){  
   
-  if(map) return;  
+  if(state.map) return;  
   
-  map = L.map('map',{  
+  state.map = L.map('map',{  
   
   zoomControl:true,  
   
@@ -1217,14 +1183,14 @@ const hotelLng = parsed.lng;
     {  
       attribution:'© OpenStreetMap'  
     }  
-  ).addTo(map);  
+  ).addTo(state.map); 
   
 }  
   
 function rotateMap(angle){  
   
-  const mapPane =  
-    map.getPane('mapPane');  
+  const mapPane =
+  state.map.getPane('mapPane'); 
   
   mapPane.style.transformOrigin =  
     '50% 50%';  
@@ -1240,7 +1206,7 @@ function rotateMap(angle){
   
 function updateMap(){  
   
-  if(!map) return;  
+  if(!state.map) return;
   
   if(state.currentIndex >= state.routeOrder.length)  
     return;  
@@ -1267,129 +1233,80 @@ const hotelLat = parsed.lat;
 const hotelLng = parsed.lng;  
   
   // limpa rota antiga 
-  const waypoints = [];  
-  if(!state.routingControl){  
-  
-  state.routingControl = L.Routing.control({  
-  
-    waypoints,  
-  
-    routeWhileDragging:false,  
-  
-    addWaypoints:false,  
-  
-    draggableWaypoints:false,  
-  
-    fitSelectedRoutes:false,  
-  
-    show:false,  
-  
-    createMarker:(i,wp)=>{  
-  
-      return L.marker(wp.latLng);  
-  
-    }  
-  
-  }).addTo(map);  
-  
-}else{  
-  
-  state.routingControl.setWaypoints(waypoints);  
-  
-}  
+  const waypoints = [];
+
+if(state.userPosition){
+
+  waypoints.push(
+    L.latLng(
+      state.userPosition.lat,
+      state.userPosition.lng
+    )
+  );
+
+}
+
+waypoints.push(
+  L.latLng(hotelLat, hotelLng)
+);
+
+for(let i = 1; i <= 2; i++){
+
+  const idx = state.currentIndex + i;
+
+  if(idx < state.routeOrder.length){
+
+    const nextHotel =
+      HOTELS.find(
+        h => h.id === state.routeOrder[idx]
+      );
+
+    const nextParsed =
+      parseCoords(nextHotel.coords);
+
+    if(nextParsed){
+
+      waypoints.push(
+        L.latLng(
+          nextParsed.lat,
+          nextParsed.lng
+        )
+      );
+
+    }
+
+  }
+
+}
+
+if(!state.routingControl){
+
+  state.routingControl = L.Routing.control({
+
+    waypoints,
+
+    routeWhileDragging:false,
+    addWaypoints:false,
+    draggableWaypoints:false,
+    fitSelectedRoutes:false,
+    show:false,
+
+    createMarker:(i,wp)=>{
+      return L.marker(wp.latLng);
+    }
+
+  }).addTo(state.map);
+
+}else{
+
+  state.routingControl.setWaypoints(
+    waypoints
+  );
+
+} 
     
-  // usuário  
-  if(userPosition){  
-  
-    waypoints.push(  
-      L.latLng(  
-        userPosition.lat,  
-        userPosition.lng  
-      )  
-    );  
-  
-  }  
-  
-  // hotel atual  
-  waypoints.push(  
-    L.latLng(hotelLat,hotelLng)  
-  );  
-  
-  // próximos hotéis  
-  for(let i=1;i<=2;i++){  
-  
-    const idx = state.currentIndex + i;  
-  
-    if(idx < state.routeOrder.length){  
-  
-      const nextHotel =  
-        HOTELS.find(  
-          h=>h.id===state.routeOrder[idx]  
-        );  
-  
-      const nextParsed =  
-  parseCoords(nextHotel.coords);  
-  
-if(nextParsed){  
-  
-  waypoints.push(  
-    L.latLng(  
-      nextParsed.lat,  
-      nextParsed.lng  
-    )  
-  );  
-  
-}  
-  
-}  
-}  
-  
-  state.routingControl = L.Routing.control({  
-  
-    waypoints,  
-  
-    routeWhileDragging:false,  
-  
-    addWaypoints:false,  
-  
-    draggableWaypoints:false,  
-  
-    fitSelectedRoutes:false,  
-  
-    show:false,  
-  
-    createMarker:(i,wp)=>{  
-  
-      return L.marker(wp.latLng);  
-  
-    }  
-  
-  }).addTo(map);  
-  
-  // instruções voz  
-  state.routingControl.on(  
-    'routesfound',  
-    function(e){  
-  
-      const route = e.routes[0];  
-  
-      if(  
-        route.instructions &&  
-        route.instructions.length  
-      ){  
-  
-        const instruction =  
-          route.instructions[0].text;  
-  
-        speak(instruction);  
-  
-      }  
-  
-    }  
-  );  
-  
-}  
-    function startModeRoute(){  
+  // usuário
+function startModeRoute(){  
       if(state.routeOrder.length===0){ alert('Gere a rota primeiro.'); return; }  
       state.currentIndex = 0; 
       state.routeReport =
@@ -1405,7 +1322,8 @@ state.routeOrder.map(id=>({
 }));  
       screenSelect.style.display='none';  
       screenRoute.style.display='none';  
-      screenMode.style.display='block';  
+      screenMode.style.display='block';
+      state.mapInitialized = false;
       initMap();  
       updateMap();  
       startGpsTracking();  
@@ -1471,7 +1389,7 @@ if(state.currentIndex === state.routeOrder.length - 1){
       entry.entrega = entrega;  
       entry.coleta = coleta;  
       entry.departure = new Date().toISOString();  
-      arrivalConfirmed = false;  
+      state.arrivalConfirmed = false;  
       state.currentIndex++;  
   
 if(state.currentIndex >= state.routeOrder.length){  
@@ -1585,7 +1503,6 @@ state.routeReport[state.currentIndex]
   .push(...imageIds);  
   
   renderPhotoPreviews();  
-  
   saveAppState();  
   
 });  
@@ -1624,7 +1541,6 @@ state.routeReport[state.currentIndex]
   .push(...imageIds);  
   
   renderPhotoPreviews();  
-  
   saveAppState();  
   
 });  
@@ -1754,32 +1670,29 @@ document
 const voiceToggle =  
   document.getElementById('voiceToggle');  
   
-voiceToggle.addEventListener('click', ()=>{  
-  
-  speechEnabled = !speechEnabled;  
-  
-  if(speechEnabled){  
-  
-    voiceToggle.classList.remove('off');  
-  
-    voiceToggle.classList.add('on');  
-  
-    voiceToggle.textContent =  
-      '🔊 Voz ligada';  
-  
-  }else{  
-  
-    voiceToggle.classList.remove('on');  
-  
-    voiceToggle.classList.add('off');  
-  
-    voiceToggle.textContent =  
-      '🔇 Voz desligada';  
-  
-    speechSynthesis.cancel();  
-  
-  }  
-  
+voiceToggle.addEventListener('click', ()=>{
+  state.speechEnabled =
+  !state.speechEnabled;  
+    if(state.speechEnabled){
+
+  voiceToggle.classList.remove('off');
+
+  voiceToggle.classList.add('on');
+
+  voiceToggle.textContent =
+    '🔊 Voz ligada';
+
+}else{
+
+  voiceToggle.classList.remove('on');
+
+  voiceToggle.classList.add('off');
+
+  voiceToggle.textContent =
+    '🔇 Voz desligada';
+
+}  
+  saveAppState();
 });  
  document.getElementById('btn-generate').addEventListener('click', generateRoute);  
     document.getElementById('btn-back')  
@@ -1802,17 +1715,15 @@ voiceToggle.addEventListener('click', ()=>{
   
     stopGpsTracking();  
   
-    state.activeSet.clear();  
-  
-    state.routeOrder=[];  
-  
+    state.activeSet.clear();
+    state.routeOrder=[];
     state.routeReport=[];  
-  
-    state.currentIndex=0;  
-  
-    renderSelection();  
-  
-    renderRoute();  
+    state.currentIndex=0;
+    state.mapInitialized = false;
+    state.lastInstruction = '';
+    renderSelection();
+    renderRoute();
+    saveAppState();
   
     reportEl.innerHTML='';  
   
@@ -1821,13 +1732,29 @@ voiceToggle.addEventListener('click', ()=>{
   }  
   
 });  
-    document.getElementById('btn-export').addEventListener('click', ()=>{  
-      const data = {generatedAt: new Date().toISOString(), route: state.routeOrder, report: state.routeReport};  
-      const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});  
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download='relatorio_rota.json'; a.click();  
-      URL.revokeObjectURL(a.href);  
-    });  
-    document  
+    document
+.getElementById('btn-export')
+.addEventListener('click', ()=>{
+  const data = {
+    generatedAt: new Date().toISOString(),
+    route: state.routeOrder,
+    report: state.routeReport
+  };
+  const blob = new Blob(
+    [JSON.stringify(data,null,2)],
+    {type:'application/json'}
+  );
+  const a = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  a.href = url;
+  a.download = 'relatorio_rota.json';
+  a.click();
+  setTimeout(()=>{
+    URL.revokeObjectURL(url);
+  },1000);
+});
+  
+  document  
 .getElementById('btn-finish')  
 .addEventListener('click', ()=>{  
   
@@ -1878,7 +1805,7 @@ document.getElementById('btn-open-maps').addEventListener('click', ()=>{
   const id = state.routeOrder[state.currentIndex];  
   
   const hotel = HOTELS.find(h => h.id === id);  
-  
+  if(!hotel) return;
   window.open(  
     `https://www.google.com/maps?q=${hotel.coords}`,  
     '_blank'  
@@ -1889,21 +1816,17 @@ document
 .getElementById('btnNewRoute')  
 .addEventListener('click', ()=>{  
   
-  stopGpsTracking();  
-  
-  state.activeSet.clear();  
-  
-  state.routeOrder = [];  
-  
-  state.routeReport = [];  
-  
-  state.currentIndex = 0;  
-  
-  hideAllScreens();  
-  
-  screenSelect.style.display = 'block';  
-  
-  renderSelection();  
+  stopGpsTracking();
+  state.activeSet.clear();
+  state.routeOrder = [];
+  state.routeReport = [];
+  state.currentIndex = 0;
+  state.mapInitialized = false;
+  state.lastInstruction = '';
+  hideAllScreens();
+  screenSelect.style.display = 'block';
+  renderSelection();
+  saveAppState();
   
 });  
   
@@ -2103,9 +2026,7 @@ initDatabase()
 .then(()=>{  
   
   loadCustomHotels();  
-  
   restoreAppState();  
-  
   renderSelection();  
   
 });  
