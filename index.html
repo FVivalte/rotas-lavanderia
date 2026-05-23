@@ -1629,74 +1629,71 @@ routeReport[currentIndex]
   
 });  
   
-async function renderPhotoPreviews(){  
-  
-  if(currentIndex >= routeReport.length)  
-    return;  
-  
-  const entry =  
-    routeReport[currentIndex];  
-  
-  const deliveryPreview =  
-    document.getElementById(  
-      'deliveryPreview'  
-    );  
-  
-  const pickupPreview =  
-    document.getElementById(  
-      'pickupPreview'  
-    );  
-  
-  deliveryPreview.innerHTML = '';  
-  
-  pickupPreview.innerHTML = '';  
-  
-  for(const photoId of entry.deliveryPhotos){  
-  
-  const photo =  
-    await getPhoto(photoId);  
-  
-  if(!photo) continue;  
-  
-  const img =  
-    document.createElement('img');  
-  
-  img.src = photo.image;  
-  
-  img.className = 'preview-thumb';  
-  
-  deliveryPreview.appendChild(img);  
-  
+async function renderPhotoPreviews(){
+
+  if(currentIndex >= routeReport.length)
+    return;
+
+  const entry =
+    routeReport[currentIndex];
+
+  const deliveryPreview =
+    document.getElementById(
+      'deliveryPreview'
+    );
+
+  const pickupPreview =
+    document.getElementById(
+      'pickupPreview'
+    );
+
+  deliveryPreview.innerHTML = '';
+
+  pickupPreview.innerHTML = '';
+
+  // ENTREGA
+
+  for(const photoId of entry.deliveryPhotos){
+
+    const photo =
+      await getPhoto(photoId);
+
+    if(!photo) continue;
+
+    const img =
+      document.createElement('img');
+
+    img.src = photo.image;
+
+    img.className =
+      'preview-thumb';
+
+    deliveryPreview.appendChild(img);
+
+  }
+
+  // COLETA
+
+  for(const photoId of entry.pickupPhotos){
+
+    const photo =
+      await getPhoto(photoId);
+
+    if(!photo) continue;
+
+    const img =
+      document.createElement('img');
+
+    img.src = photo.image;
+
+    img.className =
+      'preview-thumb';
+
+    pickupPreview.appendChild(img);
+
+  }
+
 }  
-  
-    img.src = src;  
-  
-    img.className = 'preview-thumb';  
-  
-    deliveryPreview.appendChild(img);  
-  
-  });  
-  
-  for(const photoId of entry.pickupPhotos){  
-  
-  const photo =  
-    await getPhoto(photoId);  
-  
-  if(!photo) continue;  
-  
-  const img =  
-    document.createElement('img');  
-  
-  img.src = photo.image;  
-  
-  img.className = 'preview-thumb';  
-  
-  pickupPreview.appendChild(img);  
-  
-});  
-  
-}  
-  
 // Buttons  
   
 document  
