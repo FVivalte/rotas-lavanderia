@@ -1,7 +1,7 @@
 // ===============================
 // HOTELS.JS
 // ===============================
-
+const HOTELS = window.HOTELS;
 // Render seleção (Tela 1)
 
 function renderSelection(){
