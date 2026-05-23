@@ -1,12 +1,22 @@
+// map/map.js
+
+import { state } from '../core/state.js';
+import { HOTELS } from '../data/dados.js';
+
+import {
+  currentHotelEl
+} from '../ui/elements.js';
+
+
 // =========================
-// MAPA / LEAFLET
+// INIT MAP
 // =========================
 
-function initMap(){
+export function initMap(){
 
-  if(map) return;
+  if(state.map) return;
 
-  map = L.map('map',{
+  state.map = L.map('map',{
 
     zoomControl:true,
     dragging:true,
@@ -24,23 +34,21 @@ function initMap(){
     {
       attribution:'© OpenStreetMap'
     }
-  ).addTo(map);
+  ).addTo(state.map);
 
 }
 
 
 // =========================
-// ROTAÇÃO MAPA
+// ROTATE MAP
 // =========================
 
-function rotateMap(angle){
+export function rotateMap(angle){
 
-  if(!map) return;
+  if(!state.map) return;
 
   const mapPane =
-    map.getPane('mapPane');
-
-  if(!mapPane) return;
+    state.map.getPane('mapPane');
 
   mapPane.style.transformOrigin =
     '50% 50%';
@@ -55,25 +63,112 @@ function rotateMap(angle){
 
 
 // =========================
-// ATUALIZAR MAPA / ROTA
+// PARSE COORDS
 // =========================
 
-function updateMap(){
+export function parseCoords(coords){
 
-  if(!map) return;
+  if(!coords) return null;
 
-  if(currentIndex >= routeOrder.length)
+  const parts = coords.split(',');
+
+  if(parts.length !== 2)
+    return null;
+
+  const lat =
+    Number(parts[0].trim());
+
+  const lng =
+    Number(parts[1].trim());
+
+  if(
+    isNaN(lat) ||
+    isNaN(lng)
+  ){
+    return null;
+  }
+
+  return { lat, lng };
+
+}
+
+
+// =========================
+// DISTÂNCIA
+// =========================
+
+export function getDistanceMeters(
+  lat1,
+  lon1,
+  lat2,
+  lon2
+){
+
+  const R = 6371e3;
+
+  const φ1 = lat1 * Math.PI/180;
+  const φ2 = lat2 * Math.PI/180;
+
+  const Δφ =
+    (lat2-lat1) * Math.PI/180;
+
+  const Δλ =
+    (lon2-lon1) * Math.PI/180;
+
+  const a =
+
+    Math.sin(Δφ/2) *
+    Math.sin(Δφ/2)
+
+    +
+
+    Math.cos(φ1) *
+    Math.cos(φ2) *
+
+    Math.sin(Δλ/2) *
+    Math.sin(Δλ/2);
+
+  const c =
+    2 * Math.atan2(
+      Math.sqrt(a),
+      Math.sqrt(1-a)
+    );
+
+  return R * c;
+
+}
+
+
+// =========================
+// UPDATE MAP
+// =========================
+
+export function updateMap(){
+
+  if(!state.map) return;
+
+  if(
+    state.currentIndex >=
+    state.routeOrder.length
+  ){
     return;
+  }
 
   const currentHotel =
     HOTELS.find(
-      h => h.id === routeOrder[currentIndex]
+      h =>
+        h.id ===
+        state.routeOrder[
+          state.currentIndex
+        ]
     );
 
   if(!currentHotel) return;
 
   const parsed =
-    parseCoords(currentHotel.coords);
+    parseCoords(
+      currentHotel.coords
+    );
 
   if(!parsed){
 
@@ -82,26 +177,21 @@ function updateMap(){
     );
 
     return;
-
   }
 
   const hotelLat = parsed.lat;
   const hotelLng = parsed.lng;
 
-  // =========================
-  // WAYPOINTS
-  // =========================
-
   const waypoints = [];
 
   // usuário
 
-  if(userPosition){
+  if(state.userPosition){
 
     waypoints.push(
       L.latLng(
-        userPosition.lat,
-        userPosition.lng
+        state.userPosition.lat,
+        state.userPosition.lng
       )
     );
 
@@ -120,19 +210,27 @@ function updateMap(){
 
   for(let i = 1; i <= 2; i++){
 
-    const idx = currentIndex + i;
+    const idx =
+      state.currentIndex + i;
 
-    if(idx < routeOrder.length){
+    if(
+      idx <
+      state.routeOrder.length
+    ){
 
       const nextHotel =
         HOTELS.find(
-          h => h.id === routeOrder[idx]
+          h =>
+            h.id ===
+            state.routeOrder[idx]
         );
 
       if(!nextHotel) continue;
 
       const nextParsed =
-        parseCoords(nextHotel.coords);
+        parseCoords(
+          nextHotel.coords
+        );
 
       if(nextParsed){
 
@@ -149,65 +247,146 @@ function updateMap(){
 
   }
 
-  // =========================
-  // REMOVE ROTA ANTIGA
-  // =========================
+  // rota
 
-  if(routingControl){
+  if(!state.routingControl){
 
-    map.removeControl(routingControl);
+    state.routingControl =
+      L.Routing.control({
+
+        waypoints,
+
+        routeWhileDragging:false,
+
+        addWaypoints:false,
+
+        draggableWaypoints:false,
+
+        fitSelectedRoutes:false,
+
+        show:false,
+
+        createMarker:(i,wp)=>{
+          return L.marker(
+            wp.latLng
+          );
+        }
+
+      }).addTo(state.map);
+
+  }else{
+
+    state.routingControl
+      .setWaypoints(
+        waypoints
+      );
 
   }
 
-  // =========================
-  // NOVA ROTA
-  // =========================
+}
 
-  routingControl = L.Routing.control({
 
-    waypoints,
+// =========================
+// CENTRALIZAR USUÁRIO
+// =========================
 
-    routeWhileDragging:false,
+export function centerUser(){
 
-    addWaypoints:false,
+  if(
+    !state.map ||
+    !state.userPosition
+  ){
+    return;
+  }
 
-    draggableWaypoints:false,
+  state.map.setView(
+    [
+      state.userPosition.lat,
+      state.userPosition.lng
+    ],
+    17
+  );
 
-    fitSelectedRoutes:false,
+}
 
-    show:false,
 
-    createMarker:(i, wp)=>{
+// =========================
+// PAN SUAVE
+// =========================
 
-      return L.marker(wp.latLng);
+export function panToUser(){
 
+  if(
+    !state.map ||
+    !state.userPosition
+  ){
+    return;
+  }
+
+  state.map.panTo(
+    [
+      state.userPosition.lat,
+      state.userPosition.lng
+    ],
+    {
+      animate:true,
+      duration:1
     }
+  );
 
-  }).addTo(map);
+}
 
-  // =========================
-  // INSTRUÇÕES DE VOZ
-  // =========================
 
-  routingControl.on(
-    'routesfound',
-    function(e){
+// =========================
+// LIMPAR ROTA
+// =========================
 
-      const route = e.routes[0];
+export function clearRoute(){
 
-      if(
-        route.instructions &&
-        route.instructions.length
-      ){
+  if(
+    state.map &&
+    state.routingControl
+  ){
 
-        const instruction =
-          route.instructions[0].text;
+    state.map.removeControl(
+      state.routingControl
+    );
 
-        speak(instruction);
+    state.routingControl = null;
 
-      }
+  }
 
-    }
+}
+
+
+// =========================
+// OPEN GOOGLE MAPS
+// =========================
+
+export function openCurrentHotelInMaps(){
+
+  if(
+    state.currentIndex >=
+    state.routeOrder.length
+  ){
+    return;
+  }
+
+  const id =
+    state.routeOrder[
+      state.currentIndex
+    ];
+
+  const hotel =
+    HOTELS.find(
+      h => h.id === id
+    );
+
+  if(!hotel) return;
+
+  window.open(
+    `https://www.google.com/maps?q=${hotel.coords}`,
+    '_blank'
   );
 
 }
