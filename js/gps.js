@@ -1,8 +1,29 @@
-// =============================
-// GPS / GEOLOCALIZAÇÃO
-// =============================
+// core/gps.js
 
-function startGpsTracking(){
+import { state } from './state.js';
+
+import {
+  renderReportMode,
+  updateModeUI
+} from '../ui/render.js';
+
+import {
+  updateMap
+} from './map.js';
+
+import {
+  parseCoords,
+  getDistanceMeters
+} from '../utils/helpers.js';
+
+import { HOTELS } from '../data/dados.js';
+
+
+// ======================
+// START GPS
+// ======================
+
+export function startGpsTracking(){
 
   if(!navigator.geolocation){
 
@@ -12,135 +33,161 @@ function startGpsTracking(){
 
   }
 
-  watchId = navigator.geolocation.watchPosition(
+  state.watchId =
+    navigator.geolocation.watchPosition(
 
-    pos=>{
+      pos => {
 
-      const newPosition = {
-        lat: pos.coords.latitude,
-        lng: pos.coords.longitude
-      };
+        const newPosition = {
 
-      const heading = pos.coords.heading;
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude
 
-      userPosition = newPosition;
+        };
 
-      // CENTRALIZA APENAS NA PRIMEIRA VEZ
-      if(map && !mapInitialized){
+        const heading =
+          pos.coords.heading;
 
-        map.setView(
-          [
-            userPosition.lat,
-            userPosition.lng
-          ],
-          17
-        );
+        state.userPosition =
+          newPosition;
 
-        mapInitialized = true;
+        // CENTRALIZA PRIMEIRA VEZ
 
+        if(
+          state.map &&
+          !state.mapInitialized
+        ){
+
+          state.map.setView(
+            [
+              state.userPosition.lat,
+              state.userPosition.lng
+            ],
+            17
+          );
+
+          state.mapInitialized = true;
+
+        }
+
+        // AUTO PAN
+
+        if(state.map){
+
+          state.map.panTo(
+            [
+              state.userPosition.lat,
+              state.userPosition.lng
+            ],
+            {
+              animate:true,
+              duration:1
+            }
+          );
+
+        }
+
+        // ROTAÇÃO
+
+        if(
+          heading !== null &&
+          !isNaN(heading)
+        ){
+
+          rotateMap(heading);
+
+        }
+
+        checkArrival();
+
+        updateMap();
+
+      },
+
+      err => {
+
+        console.log(err);
+
+      },
+
+      {
+        enableHighAccuracy:true,
+        maximumAge:1000,
+        timeout:5000
       }
 
-      // AUTO PAN SUAVE
-      if(map){
-
-        map.panTo(
-          [
-            userPosition.lat,
-            userPosition.lng
-          ],
-          {
-            animate:true,
-            duration:1
-          }
-        );
-
-      }
-
-      // ROTAÇÃO DO MAPA
-      if(
-        heading !== null &&
-        !isNaN(heading)
-      ){
-
-        rotateMap(heading);
-
-      }
-
-      checkArrival();
-
-      updateMap();
-
-    },
-
-    err=>{
-
-      console.log(err);
-
-    },
-
-    {
-      enableHighAccuracy:true,
-      maximumAge:1000,
-      timeout:5000
-    }
-
-  );
+    );
 
 }
 
-function stopGpsTracking(){
 
-  if(watchId !== null){
+// ======================
+// STOP GPS
+// ======================
 
-    navigator.geolocation.clearWatch(watchId);
+export function stopGpsTracking(){
 
-    watchId = null;
+  if(state.watchId !== null){
+
+    navigator.geolocation.clearWatch(
+      state.watchId
+    );
+
+    state.watchId = null;
 
   }
 
 }
 
-function checkArrival(){
 
-  if(currentIndex >= routeOrder.length)
+// ======================
+// CHECK ARRIVAL
+// ======================
+
+export function checkArrival(){
+
+  if(
+    state.currentIndex >=
+    state.routeOrder.length
+  ) return;
+
+  if(state.arrivalConfirmed)
     return;
 
-  if(arrivalConfirmed)
+  const id =
+    state.routeOrder[
+      state.currentIndex
+    ];
+
+  const hotel =
+    HOTELS.find(
+      h => h.id === id
+    );
+
+  if(!hotel) return;
+
+  const parsed =
+    parseCoords(hotel.coords);
+
+  if(!parsed) return;
+
+  if(!state.userPosition)
     return;
 
-  if(!userPosition)
-    return;
+  const distance =
+    getDistanceMeters(
 
-  const id = routeOrder[currentIndex];
+      state.userPosition.lat,
+      state.userPosition.lng,
 
-  const hotel = HOTELS.find(
-    h => h.id === id
-  );
+      parsed.lat,
+      parsed.lng
 
-  if(!hotel)
-    return;
-
-  const parsed = parseCoords(hotel.coords);
-
-  if(!parsed)
-    return;
-
-  const hotelLat = parsed.lat;
-  const hotelLng = parsed.lng;
-
-  const distance = getDistanceMeters(
-
-    userPosition.lat,
-    userPosition.lng,
-
-    hotelLat,
-    hotelLng
-
-  );
+    );
 
   if(distance <= 90){
 
-    arrivalConfirmed = true;
+    state.arrivalConfirmed = true;
 
     const ok = confirm(
       `Você chegou em ${hotel.name}?`
@@ -148,19 +195,44 @@ function checkArrival(){
 
     if(ok){
 
-      routeReport[currentIndex].arrival =
+      state.routeReport[
+        state.currentIndex
+      ].arrival =
         new Date().toISOString();
 
       renderReportMode();
 
-      saveAppState();
+      updateModeUI();
 
     }else{
 
-      arrivalConfirmed = false;
+      state.arrivalConfirmed = false;
 
     }
 
   }
+
+}
+
+
+// ======================
+// ROTATE MAP
+// ======================
+
+export function rotateMap(angle){
+
+  if(!state.map) return;
+
+  const mapPane =
+    state.map.getPane('mapPane');
+
+  mapPane.style.transformOrigin =
+    '50% 50%';
+
+  mapPane.style.transition =
+    'transform 0.5s linear';
+
+  mapPane.style.transform =
+    `rotate(${-angle}deg)`;
 
 }
