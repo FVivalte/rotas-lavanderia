@@ -565,6 +565,9 @@ function restoreAppState(){
     updateModeUI();
     renderReportMode();
     startGpsTracking();
+    initMap();
+    updateMap();
+    renderPhotoPreviews();
   }
 }
 // Render seleção (Tela 1)  
@@ -1118,18 +1121,18 @@ const hotelLng = parsed.lng;
   
     state.arrivalConfirmed = true;  
   
-    const ok = confirm(  
-      `Você chegou em ${hotel.name}?`  
-    );  
-  
-    if(ok){  
-  
-      state.routeReport[state.currentIndex].arrival =  
-        new Date().toISOString();  
-  
-      renderReportMode();  
-  
-    }  
+    const ok = confirm(`Você chegou em ${hotel.name}?`);
+
+if(ok){
+
+  state.arrivalConfirmed = true;
+
+  state.routeReport[state.currentIndex].arrival =
+    new Date().toISOString();
+
+  renderReportMode();
+
+}
   
   }  
   
@@ -1211,13 +1214,11 @@ function updateMap(){
   if(state.currentIndex >= state.routeOrder.length)  
     return;  
   
-  const currentHotel =  
-    HOTELS.find(  
-      h=>h.id===state.routeOrder[state.currentIndex]  
-    );  
-  
-  const parsed =  
-  parseCoords(currentHotel.coords);  
+  if(!currentHotel) return;
+
+const parsed = parseCoords(currentHotel.coords);
+
+if(!parsed) return;  
   
 if(!parsed){  
   
@@ -1708,31 +1709,49 @@ voiceToggle.addEventListener('click', ()=>{
   
 });  
     document.getElementById('btn-start-route').addEventListener('click', startModeRoute);  
-    document.getElementById('btn-reset')  
-.addEventListener('click', ()=>{  
-  
-  if(confirm('Limpar seleção?')){  
-  
-    stopGpsTracking();  
-  
+    document.getElementById('btn-reset')
+.addEventListener('click', ()=>{
+
+  if(confirm('Limpar seleção?')){
+
+    stopGpsTracking();
+
+    if(state.routingControl){
+
+      state.map.removeControl(
+        state.routingControl
+      );
+
+      state.routingControl = null;
+
+    }
+
     state.activeSet.clear();
-    state.routeOrder=[];
-    state.routeReport=[];  
-    state.currentIndex=0;
+
+    state.routeOrder = [];
+
+    state.routeReport = [];
+
+    state.currentIndex = 0;
+
     state.mapInitialized = false;
+
     state.lastInstruction = '';
+
     renderSelection();
+
     renderRoute();
+
     saveAppState();
-  
-    reportEl.innerHTML='';  
-  
-    reportModeEl.innerHTML='';  
-  
-  }  
-  
-});  
-    document
+
+    reportEl.innerHTML='';
+
+    reportModeEl.innerHTML='';
+
+  }
+
+});
+  document
 .getElementById('btn-export')
 .addEventListener('click', ()=>{
   const data = {
@@ -1812,22 +1831,42 @@ document.getElementById('btn-open-maps').addEventListener('click', ()=>{
   );  
 });  
   
-document  
-.getElementById('btnNewRoute')  
-.addEventListener('click', ()=>{  
-  
+document
+.getElementById('btnNewRoute')
+.addEventListener('click', ()=>{
+
   stopGpsTracking();
+
+  if(state.routingControl){
+
+    state.map.removeControl(
+      state.routingControl
+    );
+
+    state.routingControl = null;
+
+  }
+
   state.activeSet.clear();
+
   state.routeOrder = [];
+
   state.routeReport = [];
+
   state.currentIndex = 0;
+
   state.mapInitialized = false;
+
   state.lastInstruction = '';
+
   hideAllScreens();
+
   screenSelect.style.display = 'block';
+
   renderSelection();
+
   saveAppState();
-  
+
 });  
   
 // ===== TELA RELATÓRIO =====  
