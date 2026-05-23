@@ -1,9 +1,10 @@
-// ===============================
-// UTILS
-// ===============================
+// utils/utils.js
 
-// Converter string "lat,lng" em objeto
-function parseCoords(coords){
+// ======================
+// COORDENADAS
+// ======================
+
+export function parseCoords(coords){
 
   if(!coords) return null;
 
@@ -23,19 +24,16 @@ function parseCoords(coords){
     return null;
   }
 
-  return {
-    lat,
-    lng
-  };
+  return { lat, lng };
 
 }
 
 
-// ===============================
-// DISTÂNCIA ENTRE 2 PONTOS
-// ===============================
+// ======================
+// DISTÂNCIA
+// ======================
 
-function getDistanceMeters(
+export function getDistanceMeters(
   lat1,
   lon1,
   lat2,
@@ -55,10 +53,11 @@ function getDistanceMeters(
 
   const a =
     Math.sin(Δφ / 2) *
-    Math.sin(Δφ / 2)
-    +
+    Math.sin(Δφ / 2) +
+
     Math.cos(φ1) *
     Math.cos(φ2) *
+
     Math.sin(Δλ / 2) *
     Math.sin(Δλ / 2);
 
@@ -74,11 +73,84 @@ function getDistanceMeters(
 }
 
 
-// ===============================
-// DATA FORMATADA RELATÓRIO
-// ===============================
+// ======================
+// GOOGLE MAPS URL
+// ======================
 
-function getFormattedDateTitle(){
+export function buildGoogleMapsUrl(
+  order,
+  hotels
+){
+
+  if(order.length === 0){
+    return '';
+  }
+
+  const coords = order
+    .map(id => {
+
+      const hotel =
+        hotels.find(h => h.id === id);
+
+      if(!hotel) return null;
+
+      const parsed =
+        parseCoords(hotel.coords);
+
+      if(!parsed) return null;
+
+      return `${parsed.lat},${parsed.lng}`;
+
+    })
+    .filter(Boolean);
+
+  const origin = coords[0];
+
+  const destination =
+    coords[coords.length - 1];
+
+  const waypoints =
+    coords
+      .slice(1, coords.length - 1)
+      .join('|');
+
+  const base =
+    'https://www.google.com/maps/dir/?api=1';
+
+  const params =
+    new URLSearchParams();
+
+  params.set('origin', origin);
+
+  params.set(
+    'destination',
+    destination
+  );
+
+  if(waypoints){
+
+    params.set(
+      'waypoints',
+      waypoints
+    );
+
+  }
+
+  params.set(
+    'travelmode',
+    'driving'
+  );
+
+  return base + '&' + params.toString();
+
+}
+
+
+// ======================
+// DATA FORMATADA
+// ======================
+
+export function getFormattedDateTitle(){
 
   const now = new Date();
 
@@ -107,163 +179,113 @@ function getFormattedDateTitle(){
     now.getFullYear();
 
   return `
-ROTA do dia ${weekday}, ${day}/${month}/${year}
+ROTA do dia ${weekday},
+${day}/${month}/${year}
 `.trim();
 
 }
 
 
-// ===============================
-// URL GOOGLE MAPS
-// ===============================
+// ======================
+// LEITOR BASE64
+// ======================
 
-function buildGoogleMapsUrl(order){
+export function readFilesAsBase64(files){
 
-  if(order.length === 0){
-    return '';
-  }
+  return Promise.all(
 
-  const coords = order
-    .map(id => {
+    [...files].map(file => {
 
-      const hotel =
-        HOTELS.find(
-          h => h.id === id
-        );
+      return new Promise(resolve => {
 
-      if(!hotel){
-        return null;
-      }
+        const reader =
+          new FileReader();
 
-      const parsed =
-        parseCoords(hotel.coords);
+        reader.onload = () => {
 
-      if(!parsed){
-        return null;
-      }
+          resolve(reader.result);
 
-      return `${parsed.lat},${parsed.lng}`;
+        };
+
+        reader.readAsDataURL(file);
+
+      });
 
     })
-    .filter(Boolean);
 
-  if(coords.length === 0){
-    return '';
-  }
-
-  const origin =
-    coords[0];
-
-  const destination =
-    coords[coords.length - 1];
-
-  const waypoints =
-    coords
-      .slice(1, coords.length - 1)
-      .join('|');
-
-  const base =
-    'https://www.google.com/maps/dir/?api=1';
-
-  const params =
-    new URLSearchParams();
-
-  params.set(
-    'origin',
-    origin
-  );
-
-  params.set(
-    'destination',
-    destination
-  );
-
-  if(waypoints){
-
-    params.set(
-      'waypoints',
-      waypoints
-    );
-
-  }
-
-  params.set(
-    'travelmode',
-    'driving'
-  );
-
-  return (
-    base +
-    '&' +
-    params.toString()
   );
 
 }
 
 
-// ===============================
-// FORMATAR HORÁRIO
-// ===============================
+// ======================
+// SPEECH
+// ======================
 
-function formatTime(dateString){
+export function speak(text,state){
 
-  if(!dateString){
-    return '--:--';
-  }
-
-  return new Date(dateString)
-    .toLocaleTimeString(
-      'pt-BR',
-      {
-        hour:'2-digit',
-        minute:'2-digit'
-      }
-    );
-
-}
-
-
-// ===============================
-// GERAR ID ÚNICO
-// ===============================
-
-function generateId(prefix='id'){
-
-  return `
-${prefix}_${Date.now()}_${Math.random()}
-`.trim();
-
-}
-
-
-// ===============================
-// ABRIR GOOGLE MAPS
-// ===============================
-
-function openGoogleMaps(coords){
-
-  if(!coords){
+  if(!state.speechEnabled){
     return;
   }
 
-  window.open(
-    `https://www.google.com/maps?q=${coords}`,
-    '_blank'
-  );
+  if(text === state.lastInstruction){
+    return;
+  }
+
+  state.lastInstruction = text;
+
+  const utter =
+    new SpeechSynthesisUtterance(text);
+
+  utter.lang = 'pt-BR';
+
+  utter.rate = 1;
+
+  speechSynthesis.cancel();
+
+  speechSynthesis.speak(utter);
 
 }
 
 
-// ===============================
-// ESPERAR
-// ===============================
+// ======================
+// DOWNLOAD JSON
+// ======================
 
-function delay(ms){
+export function downloadJson(
+  filename,
+  data
+){
 
-  return new Promise(resolve => {
+  const blob = new Blob(
+    [
+      JSON.stringify(
+        data,
+        null,
+        2
+      )
+    ],
+    {
+      type:'application/json'
+    }
+  );
 
-    setTimeout(resolve, ms);
+  const a =
+    document.createElement('a');
 
-  });
+  const url =
+    URL.createObjectURL(blob);
+
+  a.href = url;
+
+  a.download = filename;
+
+  a.click();
+
+  setTimeout(()=>{
+
+    URL.revokeObjectURL(url);
+
+  },1000);
 
 }
