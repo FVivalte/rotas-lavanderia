@@ -1,2144 +1,568 @@
 <!doctype html>
 <html lang="pt-BR">
+
 <head>
+
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
+  <meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  />
+
   <title>Rota Búzios — PWA</title>
-  <meta name="theme-color" content="#0b63b7"/>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="stylesheet" href="style.css">
+
+  <meta
+    name="theme-color"
+    content="#0b63b7"
+  />
+
   <link
-  rel="stylesheet"
-  href="https://unpkg.com/leaflet/dist/leaflet.css"
-/>
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-   <link
- rel="stylesheet"
- href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css"
-/>
-<script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+    rel="manifest"
+    href="manifest.json"
+  />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <!-- CSS -->
+  <link
+    rel="stylesheet"
+    href="style.css"
+  />
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- LEAFLET -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet/dist/leaflet.css"
+  />
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <!-- ROUTING -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css"
+  />
+
+  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+
+  <!-- PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 </head>
+
 <body>
+
   <div class="app">
+
+    <!-- HEADER -->
+
     <header>
+
       <h1>Rota Búzios</h1>
-      <div class="muted">Offline • Azul</div>
+
+      <div class="muted">
+        Offline • Azul
+      </div>
+
     </header>
 
 
-    <!-- TELA 1: SELEÇÃO -->
 
+    <!-- ========================= -->
+    <!-- TELA 1 -->
+    <!-- ========================= -->
 
-    <section id="screen-select" class="card screen active">
-
-  <div class="screen-title">
-    <h2>Selecionar hotéis</h2>
-    <p>Ative os hotéis que farão parte da rota.</p>
-  </div>
-
-  <div class="top-actions">
-  <button id="btn-add-hotel" class="ghost">
-  + Adicionar hotel
-</button>
-  <button id="btn-generate" class="big-button">
-    Continuar para ordem da rota
-  </button>
-
-  <button id="btn-reset" class="ghost">
-    Limpar seleção
-  </button>
-
-</div>
-
-<div class="hotel-counter" id="activeCountSelect">
-  0 hotéis ativos
-</div>
-
-<div class="list" id="hotelList"></div>
-
-</section>
-
-
-    <!-- TELA 2: ROTA GERADA -->
-
-
-    <section id="screen-route" class="card screen">
-
-  <div class="screen-title">
-    <h2>Ordem da rota</h2>
-    <p>Arraste os hotéis para definir a sequência.</p>
-  </div>
-
-  <div class="top-actions">
-
-    <button id="btn-start-route" class="big-button">
-      Iniciar modo navegação
-    </button>
-
-    <button id="btn-back" class="ghost">
-      Voltar
-    </button>
-
-  </div>
-
-  <div class="route-list" id="routeList"></div>
-
-  <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
-    <button id="btn-export" class="ghost">
-      Exportar relatório
-    </button>
-
-    <div class="muted" id="activeCountRoute" style="align-self:center"></div>
-  </div>
-
-</section>
-
-
-    <!-- TELA 3: MODO ROTA -->
-
-
-    <section id="screen-mode" class="card screen">
-
-  <div class="screen-title">
-    <h2>Modo navegação</h2>
-    <p>Controle entregas e abra navegação individual.</p>
-  </div>
-
-  <div class="controls">
-    <button id="btn-finish" class="ghost">
-      Finalizar
-    </button>
-  </div>
-
-  <div class="mode">
-
-    <div id="currentHotel"></div>
-
-<div class="voice-toggle-bar">
-
-  <button
-    id="voiceToggle"
-    class="voice-toggle off"
-  >
-    🔇 Voz desligada
-  </button>
-
-</div>
-
-    <div id="map"></div>
-    <div class="check-group">
-      <label class="check-card">
-        <input type="checkbox" id="chk-entrega">
-        <span>Entrega</span>
-      </label>
-
-      <label class="check-card">
-        <input type="checkbox" id="chk-coleta">
-        <span>Coleta</span>
-      </label>
-
-    </div>
-
-<div class="photo-section">
-
-  <div class="photo-upload-group">
-
-  <label>
-    Fotos Entrega
-  </label>
-
-  <label class="camera-button">
-
-    📷
-
-    <input
-      type="file"
-      id="deliveryPhotosInput"
-      accept="image/*"
-      capture="environment"
-      multiple
-      hidden
+    <section
+      id="screen-select"
+      class="card screen active"
     >
 
-  </label>
+      <div class="screen-title">
 
-  <div class="photo-upload-group">
+        <h2>
+          Selecionar hotéis
+        </h2>
 
-  <label>
-    Fotos Coleta
-  </label>
+        <p>
+          Ative os hotéis que farão parte da rota.
+        </p>
 
-  <label class="camera-button">
-
-    📷
-
-    <input
-      type="file"
-      id="pickupPhotosInput"
-      accept="image/*"
-      capture="environment"
-      multiple
-      hidden
-    >
-
-  </label>
-
-  <div
-    class="photo-preview"
-    id="pickupPreview"
-  ></div>
-
-</div>
-
-</div>
-
-    <div class="mode-actions">
-
-      <button id="btn-open-maps" class="maps-button">
-        Navegar no Google Maps
-      </button>
-
-      <button id="btn-next">
-        Próximo hotel
-      </button>
-
-    </div>
-
-    <div>
-
-      <div class="muted">
-        Próximos hotéis
       </div>
 
-      <div class="next-two" id="nextTwo"></div>
+      <div class="top-actions">
 
-    </div>
-
-    <div>
-
-      <div class="muted">
-        Relatório parcial
-      </div>
-
-      <div class="report" id="reportMode"></div>
-
-    </div>
-
-  </div>
-
-</section>
-
-
-<!-- TELA 4 - RELATÓRIO FINAL -->
-
-
-<section id="screen-report" class="screen hidden">
-
-  <div class="report-header">
-    <h1 id="reportTitle">
-      ROTA do dia Segunda-feira, 19/05/2026
-    </h1>
-  </div>
-
-  <div id="reportRouteList" class="report-route-list"></div>
-
-  <div class="report-bottom-actions">
-    <button id="btnExportPdf">
-      Exportar PDF
-    </button>
-
-    <button id="btnNewRoute">
-      Nova Rota
-    </button>
-  </div>
-
-</section>
-
-    <footer>Instale como PWA para usar no celular • Servir via HTTPS para instalar</footer>
-
-<div id="hotelModal" class="modal">
-
-  <div class="modal-content">
-
-    <h3>Novo hotel</h3>
-
-    <input type="text" id="newName" placeholder="Nome">
-
-    <input type="text" id="newRegion" placeholder="Região">
-
-    <input type="text" id="newAddress" placeholder="Endereço">
-
-    <input type="text" id="newCoords" placeholder="Latitude,Longitude">
-
-    <div class="modal-actions">
-
-      <button id="saveHotel">
-        Salvar
-      </button>
-
-      <button id="closeModal" class="ghost">
-        Cancelar
-      </button>
-
-    </div>
-
-  </div>
-
-</div>
-  </div>
-
-<script src="dados.js"></script>
-  <script>
-
-// Estado
-
-    let routingControl = null;
-    let speechEnabled = false;
-    let lastInstruction = '';
-    let activeSet = new Set();
-    let routeOrder = [];
-    let routeReport = [];
-    let currentIndex = 0;
-    let userPosition = null;
-    let watchId = null;
-    let arrivalConfirmed = false;
-    let map = null;
-    let userMarker = null;
-    let hotelMarker = null;
-    let db = null;
-    let mapInitialized = false;
-    let lastHeading = 0;
-
-    const CUSTOM_HOTELS_KEY =
-  'rotaBuziosCustomHotels';
-
-// Elementos
-
-const screenSelect = document.getElementById('screen-select');
-const screenRoute = document.getElementById('screen-route');
-const screenMode = document.getElementById('screen-mode');
-const hotelListEl = document.getElementById('hotelList');
-const routeListEl = document.getElementById('routeList');
-const reportEl =
-  document.getElementById('report')
-  || document.createElement('div');
-const reportModeEl = document.getElementById('reportMode');
-const currentHotelEl = document.getElementById('currentHotel');
-const nextTwoEl = document.getElementById('nextTwo');
-const activeCountSelectEl =
-  document.getElementById('activeCountSelect');
-const activeCountRouteEl =
-  document.getElementById('activeCountRoute');
-
-function saveCustomHotels(){
-
-  const customHotels =
-    HOTELS.filter(h => h.custom);
-
-  localStorage.setItem(
-    CUSTOM_HOTELS_KEY,
-    JSON.stringify(customHotels)
-  );
-
-}
-
-function loadCustomHotels(){
-
-  const saved =
-    localStorage.getItem(
-      CUSTOM_HOTELS_KEY
-    );
-
-  if(!saved) return;
-
-  try{
-
-    const customHotels =
-      JSON.parse(saved);
-
-    customHotels.forEach(h=>{
-
-      const alreadyExists =
-        HOTELS.some(x=>x.id===h.id);
-
-      if(!alreadyExists){
-
-        HOTELS.push(h);
-
-      }
-
-    });
-
-  }catch(err){
-
-    console.log(
-      'Erro carregando hotéis',
-      err
-    );
-
-  }
-
-}
-
-function deleteCustomHotel(id){
-
-  const index =
-    HOTELS.findIndex(h => h.id === id);
-
-  if(index === -1) return;
-
-  const hotel = HOTELS[index];
-
-  if(!hotel.custom) return;
-
-  const ok = confirm(
-    `Excluir ${hotel.name}?`
-  );
-
-  if(!ok) return;
-
-  HOTELS.splice(index,1);
-
-  activeSet.delete(id);
-
-  routeOrder =
-    routeOrder.filter(x => x !== id);
-
-  routeReport =
-    routeReport.filter(r => r.id !== id);
-
-  saveCustomHotels();
-
-  renderSelection();
-
-  renderRoute();
-
-}
-
-// Salvar o App em segundo plano
-
-function initDatabase(){
-
-  return new Promise((resolve,reject)=>{
-
-    const request =
-      indexedDB.open(
-        'RotaBuziosDB',
-        1
-      );
-
-    request.onupgradeneeded = (e)=>{
-
-      db = e.target.result;
-
-      if(
-        !db.objectStoreNames.contains(
-          'photos'
-        )
-      ){
-
-        db.createObjectStore(
-          'photos',
-          { keyPath:'id' }
-        );
-
-      }
-
-    };
-
-    request.onsuccess = (e)=>{
-
-      db = e.target.result;
-
-      resolve();
-
-    };
-
-    request.onerror = (e)=>{
-
-      reject(e);
-
-    };
-
-  });
-
-}
-
-function savePhoto(photo){
-
-  return new Promise((resolve,reject)=>{
-
-    const tx =
-      db.transaction(
-        ['photos'],
-        'readwrite'
-      );
-
-    const store =
-      tx.objectStore('photos');
-
-    const request =
-      store.put(photo);
-
-    request.onsuccess = ()=>resolve();
-
-    request.onerror = err=>reject(err);
-
-  });
-
-}
-
-function getPhoto(id){
-
-  return new Promise((resolve,reject)=>{
-
-    const tx =
-      db.transaction(
-        ['photos'],
-        'readonly'
-      );
-
-    const store =
-      tx.objectStore('photos');
-
-    const request =
-      store.get(id);
-
-    request.onsuccess =
-      ()=>resolve(request.result);
-
-    request.onerror =
-      err=>reject(err);
-
-  });
-
-}
-
-function saveAppState(){
-
-  const data = {
-
-    activeSet: [...activeSet],
-
-    routeOrder,
-
-    routeReport,
-
-    currentIndex,
-
-    currentScreen:
-      screenMode.style.display === 'block'
-        ? 'mode'
-        : screenRoute.style.display === 'block'
-        ? 'route'
-        : 'select'
-
-  };
-
-  localStorage.setItem(
-    'rotaBuziosState',
-    JSON.stringify(data)
-  );
-
-}
-
-function restoreAppState(){
-
-  const saved =
-    localStorage.getItem('rotaBuziosState');
-
-  if(!saved) return;
-
-  const data = JSON.parse(saved);
-
-  activeSet = new Set(data.activeSet || []);
-
-  routeOrder = data.routeOrder || [];
-
-  routeReport = data.routeReport || [];
-
-  currentIndex = data.currentIndex || 0;
-
-  renderSelection();
-
-  if(routeOrder.length){
-
-    renderRoute();
-
-  }
-
-  if(data.currentScreen === 'route'){
-
-    screenSelect.style.display='none';
-    screenRoute.style.display='block';
-    screenMode.style.display='none';
-
-  }
-
-  if(data.currentScreen === 'mode'){
-
-    screenSelect.style.display='none';
-    screenRoute.style.display='none';
-    screenMode.style.display='block';
-
-    updateModeUI();
-
-    renderReportMode();
-
-    startGpsTracking();
-
-  }
-
-}
-
-
-// Render seleção (Tela 1)
-
-    function renderSelection(){
-      hotelListEl.innerHTML = '';
-      HOTELS.forEach(h=>{
-        const div = document.createElement('div');
-        div.className='item';
-        div.innerHTML = `
-  <div class="info">
-    <div class="name">${h.name}</div>
-    <div class="addr">${h.region} • ${h.address}</div>
-  </div>
-
-  <div class="right">
-
-    ${
-      h.custom
-      ? `
         <button
-          class="delete-hotel"
-          data-delete="${h.id}"
+          id="btn-add-hotel"
+          class="ghost"
         >
-          🗑️
+          + Adicionar hotel
         </button>
-      `
-      : ''
-    }
 
-    <label class="switch">
+        <button
+          id="btn-generate"
+          class="big-button"
+        >
+          Continuar para ordem da rota
+        </button>
 
-      <input
-        type="checkbox"
-        data-id="${h.id}"
-        ${activeSet.has(h.id)?'checked':''}
+        <button
+          id="btn-reset"
+          class="ghost"
+        >
+          Limpar seleção
+        </button>
+
+      </div>
+
+      <div
+        class="hotel-counter"
+        id="activeCountSelect"
+      >
+        0 hotéis ativos
+      </div>
+
+      <div
+        class="list"
+        id="hotelList"
+      ></div>
+
+    </section>
+
+
+
+    <!-- ========================= -->
+    <!-- TELA 2 -->
+    <!-- ========================= -->
+
+    <section
+      id="screen-route"
+      class="card screen"
+    >
+
+      <div class="screen-title">
+
+        <h2>
+          Ordem da rota
+        </h2>
+
+        <p>
+          Arraste os hotéis para definir a sequência.
+        </p>
+
+      </div>
+
+      <div class="top-actions">
+
+        <button
+          id="btn-start-route"
+          class="big-button"
+        >
+          Iniciar modo navegação
+        </button>
+
+        <button
+          id="btn-back"
+          class="ghost"
+        >
+          Voltar
+        </button>
+
+      </div>
+
+      <div
+        class="route-list"
+        id="routeList"
+      ></div>
+
+      <div
+        style="
+          margin-top:10px;
+          display:flex;
+          gap:8px;
+          flex-wrap:wrap
+        "
       >
 
-      <span class="slider"></span>
+        <button
+          id="btn-export"
+          class="ghost"
+        >
+          Exportar relatório
+        </button>
 
-    </label>
+        <div
+          class="muted"
+          id="activeCountRoute"
+          style="align-self:center"
+        ></div>
 
-  </div>
-`;
-
-hotelListEl.appendChild(div);
-      });
-
-// attach listeners to toggles
-      hotelListEl.querySelectorAll('input[type=checkbox]').forEach(cb=>{
-        cb.addEventListener('change', e=>{
-          const id = Number(e.target.dataset.id);
-          if(e.target.checked) activeSet.add(id); else activeSet.delete(id);
-          activeCountSelectEl.textContent = `${activeSet.size} hotéis ativos`;
-        });
-      });
-hotelListEl
-.querySelectorAll('[data-delete]')
-.forEach(btn=>{
-
-  btn.addEventListener('click', ()=>{
-
-    const id =
-      Number(btn.dataset.delete);
-
-    deleteCustomHotel(id);
-
-  });
-
-});
-      const text =
-  `${activeSet.size} hotéis ativos`;
-
-activeCountSelectEl.textContent = text;
-
-activeCountRouteEl.textContent = text;
-saveAppState();
-    }
-
-//Add hotel
-
-const modal = document.getElementById('hotelModal');
-
-document.getElementById('btn-add-hotel')
-.addEventListener('click', ()=>{
-
-  modal.classList.add('active');
-
-});
-
-document.getElementById('closeModal')
-.addEventListener('click', ()=>{
-
-  modal.classList.remove('active');
-
-});
-
-document.getElementById('saveHotel')
-.addEventListener('click', ()=>{
-
-  const name =
-    document.getElementById('newName').value;
-
-  const region =
-    document.getElementById('newRegion').value;
-
-  const address =
-    document.getElementById('newAddress').value;
-
-  const coords =
-    document.getElementById('newCoords').value;
-
-  const parsedCoords =
-    parseCoords(coords);
-
-  if(
-    !name ||
-    !address ||
-    !parsedCoords
-  ){
-    alert(
-      'Preencha nome, endereço e coordenadas válidas.'
-    );
-
-    return;
-  }
-
-  HOTELS.push({
-
-  id: Date.now(),
-
-  name,
-
-  region,
-
-  address,
-
-  coords,
-
-  custom:true
-
-});
-  saveCustomHotels();
-
-  renderSelection();
-
-  modal.classList.remove('active');
-
-});
-
-// Gera rota (Tela 2) a partir dos ativos
-
-    function generateRoute(){
-      const active = HOTELS.filter(h=>activeSet.has(h.id));
-      if(active.length===0){ alert('Selecione ao menos um hotel.'); return; 
-saveAppState();
-}
-
-// inicializa ordem pela ordem de ativação (inserção em activeSet não tem ordem; usar HOTELS order)
-
-      routeOrder = HOTELS.filter(h=>activeSet.has(h.id)).map(h=>h.id);
-      renderRoute();
-
-// trocar telas
-
-      screenSelect.style.display='none';
-      screenRoute.style.display='block';
-      screenMode.style.display='none';
-    }
-
-// Render route list (Tela 2)
-
-    function renderRoute(){
-
-  routeListEl.innerHTML = '';
-
-  routeOrder.forEach((id, idx)=>{
-
-    const h = HOTELS.find(x=>x.id===id);
-
-    const item = document.createElement('div');
-
-    item.className = 'route-item';
-
-    item.dataset.id = id;
-
-    item.innerHTML = `
-      <div>
-        <strong>${idx+1}. ${h.name}</strong>
-
-        <div class="muted" style="font-size:0.85rem">
-          ${h.address}
-        </div>
       </div>
 
-      <div style="display:flex;gap:8px;align-items:center">
+    </section>
 
-        <span class="drag">⋮⋮</span>
 
-        <button class="ghost" data-id="${id}">
-          Remover
+
+    <!-- ========================= -->
+    <!-- TELA 3 -->
+    <!-- ========================= -->
+
+    <section
+      id="screen-mode"
+      class="card screen"
+    >
+
+      <div class="screen-title">
+
+        <h2>
+          Modo navegação
+        </h2>
+
+        <p>
+          Controle entregas e abra navegação individual.
+        </p>
+
+      </div>
+
+      <div class="controls">
+
+        <button
+          id="btn-finish"
+          class="ghost"
+        >
+          Finalizar
         </button>
 
       </div>
-    `;
 
-    // ======================
-    // REMOVER HOTEL
-    // ======================
+      <div class="mode">
 
-    item.querySelector('button').addEventListener('click', ()=>{
+        <div id="currentHotel"></div>
 
-      activeSet.delete(id);
+        <!-- VOZ -->
 
-      routeOrder = routeOrder.filter(x => x !== id);
+        <div class="voice-toggle-bar">
 
-      renderSelection();
+          <button
+            id="voiceToggle"
+            class="voice-toggle off"
+          >
+            🔇 Voz desligada
+          </button>
 
-      renderRoute();
-
-    });
-
-    // ======================
-    // MOBILE DRAG
-    // ======================
-
-    const dragHandle = item.querySelector('.drag');
-
-    let draggingItem = null;
-
-    dragHandle.addEventListener('touchstart', ()=>{
-
-      draggingItem = item;
-
-      item.classList.add('dragging-mobile');
-
-    }, {passive:true});
-
-    dragHandle.addEventListener('touchmove', (e)=>{
-
-      if(!draggingItem) return;
-
-      const currentY = e.touches[0].clientY;
-
-      const items = [
-        ...routeListEl.querySelectorAll('.route-item')
-      ];
-
-      items.forEach(other=>{
-
-        other.classList.remove('over');
-
-        if(other === draggingItem) return;
-
-        const rect = other.getBoundingClientRect();
-
-        const middle = rect.top + rect.height / 2;
-
-        if(currentY < middle){
-
-          other.classList.add('over');
-
-        }
-
-      });
-
-    }, {passive:true});
-
-    dragHandle.addEventListener('touchend', (e)=>{
-
-      if(!draggingItem) return;
-
-      const currentY = e.changedTouches[0].clientY;
-
-      const items = [
-        ...routeListEl.querySelectorAll('.route-item')
-      ];
-
-      let targetIndex = null;
-
-      items.forEach((other,index)=>{
-
-        other.classList.remove('over');
-
-        if(other === draggingItem) return;
-
-        const rect = other.getBoundingClientRect();
-
-        const middle = rect.top + rect.height / 2;
-
-        if(currentY < middle && targetIndex === null){
-
-          targetIndex = index;
-
-        }
-
-      });
-
-      const fromIndex = routeOrder.indexOf(id);
-
-      if(targetIndex !== null){
-
-        routeOrder.splice(
-          targetIndex,
-          0,
-          routeOrder.splice(fromIndex,1)[0]
-        );
-
-      }
-
-      draggingItem.classList.remove('dragging-mobile');
-
-      draggingItem = null;
-
-      renderRoute();
-
-    }, {passive:true});
-
-    routeListEl.appendChild(item);
-
-  });
-
-  routeReport = routeOrder.map(id=>({
-
-  id,
-
-  arrival:null,
-
-  departure:null,
-
-  entrega:false,
-
-  coleta:false,
-
-  deliveryPhotos:[],
-
-  pickupPhotos:[]
-
-}));
-
-  const text =
-  `${activeSet.size} hotéis ativos`;
-
-activeCountSelectEl.textContent = text;
-
-activeCountRouteEl.textContent = text;
-saveAppState();
-}
-
-
-// Build Google Maps URL
-
-    function buildGoogleMapsUrl(order){
-      if(order.length===0) return '';
-      const coords = order
-  .map(id=>{
-
-    const hotel =
-      HOTELS.find(h=>h.id===id);
-
-    if(!hotel) return null;
-
-    const parsed =
-      parseCoords(hotel.coords);
-
-    if(!parsed) return null;
-
-    return `${parsed.lat},${parsed.lng}`;
-
-  })
-  .filter(Boolean);
-      const origin = coords[0];
-      const destination = coords[coords.length-1];
-      const waypoints = coords.slice(1,coords.length-1).join('|');
-      const base = 'https://www.google.com/maps/dir/?api=1';
-      const params = new URLSearchParams();
-      params.set('origin', origin);
-      params.set('destination', destination);
-      if(waypoints) params.set('waypoints', waypoints);
-      params.set('travelmode','driving');
-      return base + '&' + params.toString();
-    }
-
-
-// ATIVAR GPS
-
-function parseCoords(coords){
-
-  if(!coords) return null;
-
-  const parts = coords.split(',');
-
-  if(parts.length !== 2) return null;
-
-  const lat = Number(parts[0].trim());
-
-  const lng = Number(parts[1].trim());
-
-  if(
-    isNaN(lat) ||
-    isNaN(lng)
-  ){
-    return null;
-  }
-
-  return { lat, lng };
-
-}
-
-function getDistanceMeters(lat1, lon1, lat2, lon2){
-
-  const R = 6371e3;
-
-  const φ1 = lat1 * Math.PI/180;
-  const φ2 = lat2 * Math.PI/180;
-
-  const Δφ = (lat2-lat1) * Math.PI/180;
-  const Δλ = (lon2-lon1) * Math.PI/180;
-
-  const a =
-    Math.sin(Δφ/2) * Math.sin(Δφ/2) +
-    Math.cos(φ1) *
-    Math.cos(φ2) *
-    Math.sin(Δλ/2) *
-    Math.sin(Δλ/2);
-
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-
-  return R * c;
-}
-
-function startGpsTracking(){
-
-  if(!navigator.geolocation){
-
-    alert('GPS não suportado');
-
-    return;
-  }
-
-  watchId = navigator.geolocation.watchPosition(
-
-    pos=>{
-
-      const newPosition = {
-        lat: pos.coords.latitude,
-        lng: pos.coords.longitude
-      };
-
-      const heading =
-        pos.coords.heading;
-
-      userPosition = newPosition;
-
-      // CENTRALIZA APENAS NA PRIMEIRA VEZ
-      if(map && !mapInitialized){
-
-        map.setView(
-          [
-            userPosition.lat,
-            userPosition.lng
-          ],
-          17
-        );
-
-        mapInitialized = true;
-
-      }
-
-      // AUTO PAN SUAVE
-      if(map){
-
-        map.flyTo(
-  [
-    userPosition.lat,
-    userPosition.lng
-  ],
-  map.getZoom(),
-  {
-    animate:true,
-    duration:1
-  }
-);
-
-      }
-
-      // ROTAÇÃO DO MAPA
-      if(
-        heading !== null &&
-        !isNaN(heading)
-      ){
-
-        rotateMap(heading);
-
-      }
-
-      checkArrival();
-
-      updateMap();
-
-    },
-
-    err=>{
-
-      console.log(err);
-
-    },
-
-    {
-      enableHighAccuracy:true,
-      maximumAge:1000,
-      timeout:5000
-    }
-
-  );
-
-}
-
-function stopGpsTracking(){
-
-  if(watchId !== null){
-
-    navigator.geolocation.clearWatch(watchId);
-
-    watchId = null;
-
-  }
-
-}
-
-function checkArrival(){
-
-  if(currentIndex >= routeOrder.length) return;
-
-  if(arrivalConfirmed) return;
-
-  const id = routeOrder[currentIndex];
-
-  const hotel = HOTELS.find(h=>h.id===id);
-
-  const parsed =
-  parseCoords(hotel.coords);
-
-if(!parsed) return;
-
-const hotelLat = parsed.lat;
-
-const hotelLng = parsed.lng;
-
-  const distance = getDistanceMeters(
-    userPosition.lat,
-    userPosition.lng,
-    hotelLat,
-    hotelLng
-  );
-
-  if(distance <= 90){
-
-    arrivalConfirmed = true;
-
-    const ok = confirm(
-      `Você chegou em ${hotel.name}?`
-    );
-
-    if(ok){
-
-      routeReport[currentIndex].arrival =
-        new Date().toISOString();
-
-      renderReportMode();
-
-    }
-
-  }
-
-}
-
-
-// Start mode route (Tela 3)
-
-  function speak(text){
-
-  if(!speechEnabled) return;
-
-  if(text === lastInstruction) return;
-
-  lastInstruction = text;
-
-  const utter =
-    new SpeechSynthesisUtterance(text);
-
-  utter.lang = 'pt-BR';
-
-  utter.rate = 1;
-
-  speechSynthesis.speak(utter);
-
-}
-    function initMap(){
-
-  if(map) return;
-
-  map = L.map('map',{
-
-  zoomControl:true,
-
-  dragging:true,
-
-  touchZoom:true,
-
-  doubleClickZoom:true,
-
-  scrollWheelZoom:true
-
-}).setView(
-  [-22.75, -41.88],
-  13
-);
-
-  L.tileLayer(
-    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    {
-      attribution:'© OpenStreetMap'
-    }
-  ).addTo(map);
-
-}
-
-function rotateMap(angle){
-
-  const mapPane =
-    map.getPane('mapPane');
-
-  mapPane.style.transformOrigin =
-    '50% 50%';
-
-  mapPane.style.transition =
-    'transform 0.5s linear';
-
-  mapPane.style.transform =
-    `rotate(${-angle}deg)`;
-
-}
-
-
-function updateMap(){
-
-  if(!map) return;
-
-  if(currentIndex >= routeOrder.length)
-    return;
-
-  const currentHotel =
-    HOTELS.find(
-      h => h.id === routeOrder[currentIndex]
-    );
-
-  if(!currentHotel) return;
-
-  const parsed =
-    parseCoords(currentHotel.coords);
-
-  if(!parsed){
-
-    console.log(
-      'Coordenadas inválidas'
-    );
-
-    return;
-
-  }
-
-  const hotelLat = parsed.lat;
-  const hotelLng = parsed.lng;
-
-  // =========================
-  // WAYPOINTS
-  // =========================
-
-  const waypoints = [];
-
-  // posição usuário
-
-  if(userPosition){
-
-    waypoints.push(
-
-      L.latLng(
-        userPosition.lat,
-        userPosition.lng
-      )
-
-    );
-
-  }
-
-  // hotel atual
-
-  waypoints.push(
-
-    L.latLng(
-      hotelLat,
-      hotelLng
-    )
-
-  );
-
-  // próximos hotéis
-
-  for(let i = 1; i <= 2; i++){
-
-    const idx =
-      currentIndex + i;
-
-    if(idx < routeOrder.length){
-
-      const nextHotel =
-        HOTELS.find(
-          h => h.id === routeOrder[idx]
-        );
-
-      if(nextHotel){
-
-        const nextParsed =
-          parseCoords(
-            nextHotel.coords
-          );
-
-        if(nextParsed){
-
-          waypoints.push(
-
-            L.latLng(
-              nextParsed.lat,
-              nextParsed.lng
-            )
-
-          );
-
-        }
-
-      }
-
-    }
-
-  }
-
-  // =========================
-  // CRIA ROTA UMA VEZ
-  // =========================
-
-  if(!routingControl){
-
-    routingControl =
-      L.Routing.control({
-
-        waypoints,
-
-        routeWhileDragging:false,
-
-        addWaypoints:false,
-
-        draggableWaypoints:false,
-
-        fitSelectedRoutes:false,
-
-        show:false,
-
-        lineOptions:{
-          addWaypoints:false
-        },
-
-        createMarker:(i,wp)=>{
-
-          return L.marker(
-            wp.latLng
-          );
-
-        }
-
-      }).addTo(map);
-
-    // voz
-
-    routingControl.on(
-      'routesfound',
-      function(e){
-
-        const route =
-          e.routes[0];
-
-        if(
-          route.instructions &&
-          route.instructions.length
-        ){
-
-          const instruction =
-            route.instructions[0].text;
-
-          speak(instruction);
-
-        }
-
-      }
-    );
-
-  }else{
-
-    // apenas atualiza
-
-    routingControl.setWaypoints(
-      waypoints
-    );
-
-  }
-
-}
-    function startModeRoute(){
-      if(routeOrder.length===0){ alert('Gere a rota primeiro.'); return; }
-      currentIndex = 0;
-      routeReport = routeOrder.map(id=>({
-      id,
-      arrival:null,
-      departure:null,
-      entrega:false,
-      coleta:false,
-      deliveryPhotos:[],
-      pickupPhotos:[]
-
-}));
-      screenSelect.style.display='none';
-      screenRoute.style.display='none';
-      screenMode.style.display='block';
-      initMap();
-      mapInitialized = false;
-      updateMap();
-      startGpsTracking();
-      updateModeUI();
-      renderReportMode();
-      renderPhotoPreviews();
-      saveAppState();
-    }
-
-    function updateModeUI(){
-      if(currentIndex >= routeOrder.length){
-        currentHotelEl.innerHTML = `<div><strong>Rota finalizada</strong></div>`;
-        nextTwoEl.innerHTML = '';
-        return;
-      }
-      const id = routeOrder[currentIndex];
-      const h = HOTELS.find(x=>x.id===id);
-      currentHotelEl.innerHTML = `<div style="font-weight:700">${h.name}</div><div class="muted">${h.address}</div>`;
-
-// next two
-
-      nextTwoEl.innerHTML = '';
-      for(let i=1;i<=2;i++){
-        const idx = currentIndex + i;
-        if(idx < routeOrder.length){
-          const nh = HOTELS.find(x=>x.id===routeOrder[idx]);
-          const div = document.createElement('div');
-          div.className='next-card';
-          div.innerHTML = `<strong>${nh.name}</strong><div class="muted" style="font-size:0.85rem">${nh.address}</div>`;
-          nextTwoEl.appendChild(div);
-        }
-      }
-
-// set checkboxes from report
-
-
-      const entry = routeReport[currentIndex];
-      const nextBtn =
-  document.getElementById('btn-next');
-
-if(currentIndex === routeOrder.length - 1){
-
-  nextBtn.textContent = 'Finalizar';
-
-}else{
-
-  nextBtn.textContent = 'Próximo hotel';
-
-}
-      document.getElementById('chk-entrega').checked = entry.entrega;
-      document.getElementById('chk-coleta').checked = entry.coleta;
-    }
-
-// Next hotel in mode - SCRIPT BOTAO PROXIMO HOTEL 
-    document.getElementById('btn-next').addEventListener('click', ()=>{
-      if(currentIndex >= routeOrder.length) return;
-      const entrega = document.getElementById('chk-entrega').checked;
-      const coleta = document.getElementById('chk-coleta').checked;
-      const now = new Date();
-      const entry = routeReport[currentIndex];
-      if(!entry.arrival) entry.arrival = now.toISOString();
-      entry.entrega = entrega;
-      entry.coleta = coleta;
-      entry.departure = new Date().toISOString();
-      arrivalConfirmed = false;
-      currentIndex++;
-
-if(currentIndex >= routeOrder.length){
-
-  document
-    .getElementById('btn-finish')
-    .click();
-
-  return;
-
-}
-      updateModeUI();
-      renderPhotoPreviews();
-      updateMap();
-      renderReportMode();
-      saveAppState();
-    });
-
-// Render report (Tela 2)
-
-    function renderReport(){
-      reportEl.innerHTML = '';
-      routeReport.forEach((r, idx)=>{
-        const h = HOTELS.find(x=>x.id===r.id);
-        const div = document.createElement('div');
-        div.className='report-row';
-        div.innerHTML = `<div><strong>${idx+1}. ${h.name}</strong><div class="muted" style="font-size:0.85rem">${h.address}</div></div>
-                         <div style="text-align:right">
-                           <div class="muted">${r.arrival?('Cheg: '+new Date(r.arrival).toLocaleTimeString()):'Cheg: -'}</div>
-                           <div class="muted">${r.departure?('Sai: '+new Date(r.departure).toLocaleTimeString()):'Sai: -'}</div>
-                           <div class="muted">${r.entrega?'Entrega':''} ${r.coleta?'Coleta':''}</div>
-                         </div>`;
-        reportEl.appendChild(div);
-      });
-    }
-
-// Render report (Tela 3)
-
-    function renderReportMode(){
-      reportModeEl.innerHTML = '';
-      routeReport.forEach((r, idx)=>{
-        const h = HOTELS.find(x=>x.id===r.id);
-        const div = document.createElement('div');
-        div.className='report-row';
-        div.innerHTML = `<div><strong>${idx+1}. ${h.name}</strong></div>
-                         <div style="text-align:right">
-                           <div class="muted">${r.arrival?new Date(r.arrival).toLocaleTimeString():'-'}</div>
-                           <div class="muted">${r.departure?new Date(r.departure).toLocaleTimeString():'-'}</div>
-                         </div>`;
-        reportModeEl.appendChild(div);
-      });
-    }
-
-function readFilesAsBase64(files){
-
-  return Promise.all(
-
-    [...files].map(file => {
-
-      return new Promise(resolve => {
-
-        const reader = new FileReader();
-
-        reader.onload = () => {
-
-          resolve(reader.result);
-
-        };
-
-        reader.readAsDataURL(file);
-
-      });
-
-    })
-
-  );
-
-}
-
-document
-.getElementById('deliveryPhotosInput')
-.addEventListener('change', async (e)=>{
-
-  if(currentIndex >= routeReport.length)
-    return;
-
-  const images =
-    await readFilesAsBase64(e.target.files);
-
-  const imageIds = [];
-
-for(const image of images){
-
-  const id =
-    `delivery_${Date.now()}_${Math.random()}`;
-
-  await savePhoto({
-
-    id,
-
-    image
-
-  });
-
-  imageIds.push(id);
-
-}
-
-routeReport[currentIndex]
-  .deliveryPhotos
-  .push(...imageIds);
-
-  renderPhotoPreviews();
-
-  saveAppState();
-
-});
-
-document
-.getElementById('pickupPhotosInput')
-.addEventListener('change', async (e)=>{
-
-  if(currentIndex >= routeReport.length)
-    return;
-
-  const images =
-    await readFilesAsBase64(e.target.files);
-
-  const imageIds = [];
-
-for(const image of images){
-
-  const id =
-    `pickup_${Date.now()}_${Math.random()}`;
-
-  await savePhoto({
-
-    id,
-
-    image
-
-  });
-
-  imageIds.push(id);
-
-}
-
-routeReport[currentIndex]
-  .pickupPhotos
-  .push(...imageIds);
-
-  renderPhotoPreviews();
-
-  saveAppState();
-
-});
-
-async function renderPhotoPreviews(){
-
-  if(currentIndex >= routeReport.length)
-    return;
-
-  const entry =
-    routeReport[currentIndex];
-
-  const deliveryPreview =
-    document.getElementById(
-      'deliveryPreview'
-    );
-
-  const pickupPreview =
-    document.getElementById(
-      'pickupPreview'
-    );
-
-  deliveryPreview.innerHTML = '';
-
-  pickupPreview.innerHTML = '';
-
-  for(const photoId of entry.deliveryPhotos){
-
-  const photo =
-    await getPhoto(photoId);
-
-  if(!photo) continue;
-
-  const img =
-    document.createElement('img');
-
-  img.src = photo.image;
-
-  img.className = 'preview-thumb';
-
-  deliveryPreview.appendChild(img);
-
-}
-
-    img.src = src;
-
-    img.className = 'preview-thumb';
-
-    deliveryPreview.appendChild(img);
-
-  });
-
-  for(const photoId of entry.pickupPhotos){
-
-  const photo =
-    await getPhoto(photoId);
-
-  if(!photo) continue;
-
-  const img =
-    document.createElement('img');
-
-  img.src = photo.image;
-
-  img.className = 'preview-thumb';
-
-  pickupPreview.appendChild(img);
-
-});
-
-}
-
-// Buttons
-
-document
-.getElementById('btnExportPdf')
-.addEventListener('click', async ()=>{
-
-  const reportElement =
-    document.getElementById(
-      'screen-report'
-    );
-
-  await new Promise(resolve=>
-  setTimeout(resolve,500)
-);
-   const canvas =
-    await html2canvas(reportElement,{
-
-      scale:2,
-
-      useCORS:true
-
-    });
-
-  const imgData =
-    canvas.toDataURL('image/jpeg',1);
-
-  const { jsPDF } = window.jspdf;
-
-  const pdf =
-    new jsPDF(
-      'p',
-      'mm',
-      'a4'
-    );
-
-  const pdfWidth =
-    pdf.internal.pageSize.getWidth();
-
-  const pdfHeight =
-    (canvas.height * pdfWidth)
-    / canvas.width;
-
-  pdf.addImage(
-    imgData,
-    'JPEG',
-    0,
-    0,
-    pdfWidth,
-    pdfHeight
-  );
-
-  pdf.save(
-    `rota-${Date.now()}.pdf`
-  );
-
-});
-
-const voiceToggle =
-  document.getElementById('voiceToggle');
-
-voiceToggle.addEventListener('click', ()=>{
-
-  speechEnabled = !speechEnabled;
-
-  if(speechEnabled){
-
-    voiceToggle.classList.remove('off');
-
-    voiceToggle.classList.add('on');
-
-    voiceToggle.textContent =
-      '🔊 Voz ligada';
-
-  }else{
-
-    voiceToggle.classList.remove('on');
-
-    voiceToggle.classList.add('off');
-
-    voiceToggle.textContent =
-      '🔇 Voz desligada';
-
-    speechSynthesis.cancel();
-
-  }
-
-});
- document.getElementById('btn-generate').addEventListener('click', generateRoute);
-    document.getElementById('btn-back')
-.addEventListener('click', ()=>{
-
-  stopGpsTracking();
-
-  screenSelect.style.display='block';
-
-  screenRoute.style.display='none';
-
-  screenMode.style.display='none';
-
-});
-    document.getElementById('btn-start-route').addEventListener('click', startModeRoute);
-    document.getElementById('btn-reset')
-.addEventListener('click', ()=>{
-
-  if(confirm('Limpar seleção?')){
-
-    stopGpsTracking();
-
-    activeSet.clear();
-
-    routeOrder=[];
-
-    routeReport=[];
-
-    currentIndex=0;
-
-    renderSelection();
-
-    renderRoute();
-
-    reportEl.innerHTML='';
-
-    reportModeEl.innerHTML='';
-
-  }
-
-});
-    document.getElementById('btn-export').addEventListener('click', ()=>{
-      const data = {generatedAt: new Date().toISOString(), route: routeOrder, report: routeReport};
-      const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download='relatorio_rota.json'; a.click();
-      URL.revokeObjectURL(a.href);
-    });
-    document
-.getElementById('btn-finish')
-.addEventListener('click', ()=>{
-
-  stopGpsTracking();
-
-  const finalData = routeReport.map(r=>{
-
-    const hotel =
-      HOTELS.find(h => h.id === r.id);
-
-    return {
-
-  name: hotel.name,
-
-  arrival: r.arrival
-    ? new Date(r.arrival)
-        .toLocaleTimeString('pt-BR',{
-          hour:'2-digit',
-          minute:'2-digit'
-        })
-    : '--:--',
-
-  departure: r.departure
-    ? new Date(r.departure)
-        .toLocaleTimeString('pt-BR',{
-          hour:'2-digit',
-          minute:'2-digit'
-        })
-    : '--:--',
-
-  deliveryPhotos:
-    r.deliveryPhotos || [],
-
-  pickupPhotos:
-    r.pickupPhotos || []
-
-};
-
-  });
-
-  openReportScreen(finalData);
-
-});
-document.getElementById('btn-open-maps').addEventListener('click', ()=>{
-
-  if(currentIndex >= routeOrder.length) return;
-
-  const id = routeOrder[currentIndex];
-
-  const hotel = HOTELS.find(h => h.id === id);
-
-  window.open(
-    `https://www.google.com/maps?q=${hotel.coords}`,
-    '_blank'
-  );
-});
-
-document
-.getElementById('btnNewRoute')
-.addEventListener('click', ()=>{
-
-  stopGpsTracking();
-
-  activeSet.clear();
-
-  routeOrder = [];
-
-  routeReport = [];
-
-  currentIndex = 0;
-
-  hideAllScreens();
-
-  screenSelect.style.display = 'block';
-
-  renderSelection();
-
-});
-
-// ===== TELA RELATÓRIO =====
-
-const screenReport =
-  document.getElementById('screen-report');
-
-const reportRouteList =
-  document.getElementById('reportRouteList');
-
-const reportTitle =
-  document.getElementById('reportTitle');
-
-
-// ===== DATA FORMATADA =====
-
-function getFormattedDateTitle(){
-
-  const now = new Date();
-
-  const weekdays = [
-    'Domingo',
-    'Segunda-feira',
-    'Terça-feira',
-    'Quarta-feira',
-    'Quinta-feira',
-    'Sexta-feira',
-    'Sábado'
-  ];
-
-  const weekday =
-    weekdays[now.getDay()];
-
-  const day =
-    String(now.getDate()).padStart(2,'0');
-
-  const month =
-    String(now.getMonth() + 1)
-      .padStart(2,'0');
-
-  const year =
-    now.getFullYear();
-
-  return `ROTA do dia ${weekday}, ${day}/${month}/${year}`;
-}
-
-
-// ===== RENDER RELATÓRIO =====
-
-async function renderFinalReport(routeData){
-
-  reportRouteList.innerHTML = '';
-
-  reportTitle.textContent =
-    getFormattedDateTitle();
-
-  for(const [index, hotel] of routeData.entries()){
-
-    const deliveryImages = [];
-
-    for(const photoId of hotel.deliveryPhotos || []){
-
-      const photo =
-        await getPhoto(photoId);
-
-      if(photo?.image){
-
-        deliveryImages.push(photo.image);
-
-      }
-
-    }
-
-    const pickupImages = [];
-
-    for(const photoId of hotel.pickupPhotos || []){
-
-      const photo =
-        await getPhoto(photoId);
-
-      if(photo?.image){
-
-        pickupImages.push(photo.image);
-
-      }
-
-    }
-
-    const card =
-      document.createElement('div');
-
-    card.className = 'report-item';
-
-    card.innerHTML = `
-
-      <div class="report-top-line">
-
-        <span class="report-order">
-          ${index + 1}°
-        </span>
-
-        <span class="report-hotel-name">
-          ${hotel.name}
-        </span>
-
-        <div class="report-time">
-          🚥 ${hotel.arrival || '--:--'}
-          -
-          🏁 ${hotel.departure || '--:--'}
         </div>
 
-      </div>
+        <!-- MAPA -->
 
-      <div class="report-photos">
+        <div id="map"></div>
 
-        <div class="report-photo-group">
+        <!-- CHECKS -->
 
-          <div class="report-photo-label">
-            Entrega
+        <div class="check-group">
+
+          <label class="check-card">
+
+            <input
+              type="checkbox"
+              id="chk-entrega"
+            />
+
+            <span>
+              Entrega
+            </span>
+
+          </label>
+
+          <label class="check-card">
+
+            <input
+              type="checkbox"
+              id="chk-coleta"
+            />
+
+            <span>
+              Coleta
+            </span>
+
+          </label>
+
+        </div>
+
+        <!-- FOTOS -->
+
+        <div class="photo-section">
+
+          <!-- ENTREGA -->
+
+          <div class="photo-upload-group">
+
+            <label>
+              Fotos Entrega
+            </label>
+
+            <label class="camera-button">
+
+              📷
+
+              <input
+                type="file"
+                id="deliveryPhotosInput"
+                accept="image/*"
+                capture="environment"
+                multiple
+                hidden
+              />
+
+            </label>
+
+            <div
+              class="photo-preview"
+              id="deliveryPreview"
+            ></div>
+
           </div>
 
-          <div class="report-photo-list">
+          <!-- COLETA -->
 
-            ${
-              deliveryImages.length
-              ? deliveryImages.map(src=>`
-                <img src="${src}">
-              `).join('')
-              : '<div class="empty-photo">Sem fotos</div>'
-            }
+          <div class="photo-upload-group">
+
+            <label>
+              Fotos Coleta
+            </label>
+
+            <label class="camera-button">
+
+              📷
+
+              <input
+                type="file"
+                id="pickupPhotosInput"
+                accept="image/*"
+                capture="environment"
+                multiple
+                hidden
+              />
+
+            </label>
+
+            <div
+              class="photo-preview"
+              id="pickupPreview"
+            ></div>
 
           </div>
 
         </div>
 
-        <div class="report-photo-group">
+        <!-- BOTÕES -->
 
-          <div class="report-photo-label">
-            Coleta
+        <div class="mode-actions">
+
+          <button
+            id="btn-open-maps"
+            class="maps-button"
+          >
+            Navegar no Google Maps
+          </button>
+
+          <button id="btn-next">
+            Próximo hotel
+          </button>
+
+        </div>
+
+        <!-- PRÓXIMOS -->
+
+        <div>
+
+          <div class="muted">
+            Próximos hotéis
           </div>
 
-          <div class="report-photo-list">
+          <div
+            class="next-two"
+            id="nextTwo"
+          ></div>
 
-            ${
-              pickupImages.length
-              ? pickupImages.map(src=>`
-                <img src="${src}">
-              `).join('')
-              : '<div class="empty-photo">Sem fotos</div>'
-            }
+        </div>
 
+        <!-- RELATÓRIO -->
+
+        <div>
+
+          <div class="muted">
+            Relatório parcial
           </div>
+
+          <div
+            class="report"
+            id="reportMode"
+          ></div>
 
         </div>
 
       </div>
 
-    `;
-
-    reportRouteList.appendChild(card);
-
-  }
-
-}
+    </section>
 
 
-function hideAllScreens(){
 
-  screenSelect.style.display = 'none';
+    <!-- ========================= -->
+    <!-- TELA 4 -->
+    <!-- ========================= -->
 
-  screenRoute.style.display = 'none';
+    <section
+      id="screen-report"
+      class="screen hidden"
+    >
 
-  screenMode.style.display = 'none';
+      <div class="report-header">
 
-  screenReport.classList.add('hidden');
+        <h1 id="reportTitle">
+          ROTA do dia
+        </h1>
 
-}
+      </div>
 
-// ===== ABRIR TELA =====
+      <div
+        id="reportRouteList"
+        class="report-route-list"
+      ></div>
 
-async function openReportScreen(routeData){
+      <div class="report-bottom-actions">
 
-  hideAllScreens();
+        <button id="btnExportPdf">
+          Exportar PDF
+        </button>
 
-  screenReport.classList.remove('hidden');
+        <button id="btnNewRoute">
+          Nova rota
+        </button>
 
-  screenReport.style.display = 'block';
+      </div>
 
-  await renderFinalReport(routeData);
+    </section>
 
-}
-    
-    // Init
 
-initDatabase()
-.then(()=>{
 
-  loadCustomHotels();
+    <!-- FOOTER -->
 
-  restoreAppState();
+    <footer>
+      Instale como PWA para usar no celular
+    </footer>
 
-  renderSelection();
 
-});
 
-    // Register service worker
+    <!-- MODAL -->
+
+    <div
+      id="hotelModal"
+      class="modal"
+    >
+
+      <div class="modal-content">
+
+        <h3>
+          Novo hotel
+        </h3>
+
+        <input
+          type="text"
+          id="newName"
+          placeholder="Nome"
+        />
+
+        <input
+          type="text"
+          id="newRegion"
+          placeholder="Região"
+        />
+
+        <input
+          type="text"
+          id="newAddress"
+          placeholder="Endereço"
+        />
+
+        <input
+          type="text"
+          id="newCoords"
+          placeholder="Latitude,Longitude"
+        />
+
+        <div class="modal-actions">
+
+          <button id="saveHotel">
+            Salvar
+          </button>
+
+          <button
+            id="closeModal"
+            class="ghost"
+          >
+            Cancelar
+          </button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+
+
+  <!-- ========================= -->
+  <!-- DADOS -->
+  <!-- ========================= -->
+
+  <script src="data/dados.js"></script>
+
+
+
+  <!-- ========================= -->
+  <!-- JS MODULAR -->
+  <!-- ========================= -->
+
+  <script src="js/state.js"></script>
+
+  <script src="js/utils.js"></script>
+
+  <script src="js/storage.js"></script>
+
+  <script src="js/ui.js"></script>
+
+  <script src="js/hotels.js"></script>
+
+  <script src="js/route.js"></script>
+
+  <script src="js/map.js"></script>
+
+  <script src="js/gps.js"></script>
+
+  <script src="js/photos.js"></script>
+
+  <script src="js/navigation.js"></script>
+
+  <script src="js/report.js"></script>
+
+  <script src="js/app.js"></script>
+
+
+
+  <!-- SERVICE WORKER -->
+
+  <script>
+
     if('serviceWorker' in navigator){
-      navigator.serviceWorker.register('sw.js').catch(()=>{/* ignore */});
+
+      navigator.serviceWorker
+        .register('sw.js')
+        .catch(()=>{});
+
     }
+
   </script>
 
 </body>
