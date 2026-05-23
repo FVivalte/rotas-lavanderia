@@ -1,27 +1,20 @@
 <!doctype html>
 <html lang="pt-BR">
-
 <head>
-
   <meta charset="utf-8" />
-
   <meta
     name="viewport"
     content="width=device-width,initial-scale=1"
   />
-
   <title>Rota Búzios — PWA</title>
-
   <meta
     name="theme-color"
     content="#0b63b7"
   />
-
   <link
     rel="manifest"
     href="manifest.json"
   />
-
   <!-- CSS -->
   <link
     rel="stylesheet"
@@ -33,38 +26,30 @@
     rel="stylesheet"
     href="https://unpkg.com/leaflet/dist/leaflet.css"
   />
-
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
   <!-- ROUTING -->
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css"
   />
-
-  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
+ <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
 
   <!-- PDF -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+ <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 </head>
-
+  
 <body>
-
   <div class="app">
 
     <!-- HEADER -->
 
     <header>
-
-      <h1>Rota Búzios</h1>
-
+      <h1>Rota Búzios-RJ</h1>
       <div class="muted">
         Offline • Azul
       </div>
-
     </header>
 
 
@@ -77,56 +62,44 @@
       id="screen-select"
       class="card screen active"
     >
-
       <div class="screen-title">
-
         <h2>
           Selecionar hotéis
         </h2>
-
         <p>
           Ative os hotéis que farão parte da rota.
         </p>
-
       </div>
-
       <div class="top-actions">
-
         <button
           id="btn-add-hotel"
           class="ghost"
         >
           + Adicionar hotel
         </button>
-
         <button
           id="btn-generate"
           class="big-button"
         >
           Continuar para ordem da rota
         </button>
-
         <button
           id="btn-reset"
           class="ghost"
         >
           Limpar seleção
         </button>
-
       </div>
-
       <div
         class="hotel-counter"
         id="activeCountSelect"
       >
         0 hotéis ativos
       </div>
-
       <div
         class="list"
         id="hotelList"
       ></div>
-
     </section>
 
 
@@ -139,42 +112,32 @@
       id="screen-route"
       class="card screen"
     >
-
       <div class="screen-title">
-
         <h2>
           Ordem da rota
         </h2>
-
         <p>
           Arraste os hotéis para definir a sequência.
         </p>
-
       </div>
-
       <div class="top-actions">
-
         <button
           id="btn-start-route"
           class="big-button"
         >
           Iniciar modo navegação
         </button>
-
         <button
           id="btn-back"
           class="ghost"
         >
           Voltar
         </button>
-
       </div>
-
       <div
         class="route-list"
         id="routeList"
       ></div>
-
       <div
         style="
           margin-top:10px;
@@ -183,22 +146,18 @@
           flex-wrap:wrap
         "
       >
-
         <button
           id="btn-export"
           class="ghost"
         >
           Exportar relatório
         </button>
-
         <div
           class="muted"
           id="activeCountRoute"
           style="align-self:center"
         ></div>
-
       </div>
-
     </section>
 
 
@@ -211,47 +170,36 @@
       id="screen-mode"
       class="card screen"
     >
-
       <div class="screen-title">
-
         <h2>
           Modo navegação
         </h2>
-
         <p>
           Controle entregas e abra navegação individual.
         </p>
-
       </div>
-
       <div class="controls">
-
         <button
           id="btn-finish"
           class="ghost"
         >
           Finalizar
         </button>
-
       </div>
-
       <div class="mode">
-
         <div id="currentHotel"></div>
 
         <!-- VOZ -->
 
         <div class="voice-toggle-bar">
-
           <button
             id="voiceToggle"
             class="voice-toggle off"
           >
             🔇 Voz desligada
           </button>
-
         </div>
-
+        
         <!-- MAPA -->
 
         <div id="map"></div>
@@ -266,44 +214,31 @@
               type="checkbox"
               id="chk-entrega"
             />
-
             <span>
               Entrega
             </span>
-
           </label>
-
           <label class="check-card">
-
             <input
               type="checkbox"
               id="chk-coleta"
             />
-
             <span>
               Coleta
             </span>
-
           </label>
-
         </div>
 
         <!-- FOTOS -->
 
         <div class="photo-section">
-
           <!-- ENTREGA -->
-
           <div class="photo-upload-group">
-
             <label>
               Fotos Entrega
             </label>
-
             <label class="camera-button">
-
               📷
-
               <input
                 type="file"
                 id="deliveryPhotosInput"
@@ -312,28 +247,19 @@
                 multiple
                 hidden
               />
-
             </label>
-
             <div
               class="photo-preview"
               id="deliveryPreview"
             ></div>
-
           </div>
-
           <!-- COLETA -->
-
           <div class="photo-upload-group">
-
             <label>
               Fotos Coleta
             </label>
-
             <label class="camera-button">
-
               📷
-
               <input
                 type="file"
                 id="pickupPhotosInput"
@@ -342,67 +268,52 @@
                 multiple
                 hidden
               />
-
             </label>
-
             <div
               class="photo-preview"
               id="pickupPreview"
             ></div>
-
           </div>
-
         </div>
-
+        
         <!-- BOTÕES -->
-
+        
         <div class="mode-actions">
-
           <button
             id="btn-open-maps"
             class="maps-button"
           >
             Navegar no Google Maps
           </button>
-
           <button id="btn-next">
             Próximo hotel
           </button>
-
         </div>
 
         <!-- PRÓXIMOS -->
 
         <div>
-
           <div class="muted">
             Próximos hotéis
           </div>
-
           <div
             class="next-two"
             id="nextTwo"
           ></div>
-
         </div>
 
         <!-- RELATÓRIO -->
 
         <div>
-
           <div class="muted">
             Relatório parcial
           </div>
-
           <div
             class="report"
             id="reportMode"
           ></div>
-
         </div>
-
       </div>
-
     </section>
 
 
@@ -415,32 +326,23 @@
       id="screen-report"
       class="screen hidden"
     >
-
       <div class="report-header">
-
         <h1 id="reportTitle">
           ROTA do dia
         </h1>
-
       </div>
-
       <div
         id="reportRouteList"
         class="report-route-list"
       ></div>
-
       <div class="report-bottom-actions">
-
         <button id="btnExportPdf">
           Exportar PDF
         </button>
-
         <button id="btnNewRoute">
           Nova rota
         </button>
-
       </div>
-
     </section>
 
 
@@ -459,56 +361,43 @@
       id="hotelModal"
       class="modal"
     >
-
       <div class="modal-content">
-
         <h3>
           Novo hotel
         </h3>
-
         <input
           type="text"
           id="newName"
           placeholder="Nome"
         />
-
         <input
           type="text"
           id="newRegion"
           placeholder="Região"
         />
-
         <input
           type="text"
           id="newAddress"
           placeholder="Endereço"
         />
-
         <input
           type="text"
           id="newCoords"
           placeholder="Latitude,Longitude"
         />
-
         <div class="modal-actions">
-
           <button id="saveHotel">
             Salvar
           </button>
-
           <button
             id="closeModal"
             class="ghost"
           >
             Cancelar
           </button>
-
         </div>
-
       </div>
-
     </div>
-
   </div>
 
 
