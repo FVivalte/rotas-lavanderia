@@ -1,125 +1,20 @@
-// ========================================
-// STORAGE.JS
-// ========================================
+// core/storage.js
+
+import { HOTELS } from '../data/dados.js';
+import { state } from './state.js';
+
+const CUSTOM_HOTELS_KEY =
+  'rotaBuziosCustomHotels';
+
+const APP_STATE_KEY =
+  'rotaBuziosState';
 
 
-// ========================================
-// INDEXED DB
-// ========================================
-
-function initDatabase(){
-
-  return new Promise((resolve,reject)=>{
-
-    const request =
-      indexedDB.open(
-        'RotaBuziosDB',
-        1
-      );
-
-    request.onupgradeneeded = (e)=>{
-
-      db = e.target.result;
-
-      if(
-        !db.objectStoreNames.contains(
-          'photos'
-        )
-      ){
-
-        db.createObjectStore(
-          'photos',
-          { keyPath:'id' }
-        );
-
-      }
-
-    };
-
-    request.onsuccess = (e)=>{
-
-      db = e.target.result;
-
-      resolve();
-
-    };
-
-    request.onerror = (e)=>{
-
-      reject(e);
-
-    };
-
-  });
-
-}
-
-
-// ========================================
-// SALVAR FOTO
-// ========================================
-
-function savePhoto(photo){
-
-  return new Promise((resolve,reject)=>{
-
-    const tx =
-      db.transaction(
-        ['photos'],
-        'readwrite'
-      );
-
-    const store =
-      tx.objectStore('photos');
-
-    const request =
-      store.put(photo);
-
-    request.onsuccess = ()=>resolve();
-
-    request.onerror = err=>reject(err);
-
-  });
-
-}
-
-
-// ========================================
-// BUSCAR FOTO
-// ========================================
-
-function getPhoto(id){
-
-  return new Promise((resolve,reject)=>{
-
-    const tx =
-      db.transaction(
-        ['photos'],
-        'readonly'
-      );
-
-    const store =
-      tx.objectStore('photos');
-
-    const request =
-      store.get(id);
-
-    request.onsuccess =
-      ()=>resolve(request.result);
-
-    request.onerror =
-      err=>reject(err);
-
-  });
-
-}
-
-
-// ========================================
+// =========================
 // HOTÉIS CUSTOMIZADOS
-// ========================================
+// =========================
 
-function saveCustomHotels(){
+export function saveCustomHotels(){
 
   const customHotels =
     HOTELS.filter(h => h.custom);
@@ -131,8 +26,7 @@ function saveCustomHotels(){
 
 }
 
-
-function loadCustomHotels(){
+export function loadCustomHotels(){
 
   const saved =
     localStorage.getItem(
@@ -171,109 +65,115 @@ function loadCustomHotels(){
 }
 
 
-// ========================================
-// SALVAR ESTADO DO APP
-// ========================================
+// =========================
+// ESTADO DO APP
+// =========================
 
-function saveAppState(){
+export function saveAppState(currentScreen){
 
   const data = {
 
-    activeSet: [...activeSet],
+    activeSet:
+      [...state.activeSet],
 
-    routeOrder,
+    speechEnabled:
+      state.speechEnabled,
 
-    routeReport,
+    arrivalConfirmed:
+      state.arrivalConfirmed,
 
-    currentIndex,
+    routeOrder:
+      state.routeOrder,
 
-    currentScreen:
-      screenMode.style.display === 'block'
-        ? 'mode'
-        : screenRoute.style.display === 'block'
-        ? 'route'
-        : 'select'
+    routeReport:
+      state.routeReport,
+
+    currentIndex:
+      state.currentIndex,
+
+    currentScreen
 
   };
 
   localStorage.setItem(
-    'rotaBuziosState',
+    APP_STATE_KEY,
     JSON.stringify(data)
   );
 
 }
 
 
-// ========================================
-// RESTAURAR ESTADO
-// ========================================
-
-function restoreAppState(){
+export function loadAppState(){
 
   const saved =
     localStorage.getItem(
-      'rotaBuziosState'
+      APP_STATE_KEY
     );
 
-  if(!saved) return;
+  if(!saved) return null;
 
   try{
 
-    const data = JSON.parse(saved);
-
-    activeSet =
-      new Set(data.activeSet || []);
-
-    routeOrder =
-      data.routeOrder || [];
-
-    routeReport =
-      data.routeReport || [];
-
-    currentIndex =
-      data.currentIndex || 0;
-
-    renderSelection();
-
-    if(routeOrder.length){
-
-      renderRoute();
-
-    }
-
-    if(data.currentScreen === 'route'){
-
-      screenSelect.style.display='none';
-
-      screenRoute.style.display='block';
-
-      screenMode.style.display='none';
-
-    }
-
-    if(data.currentScreen === 'mode'){
-
-      screenSelect.style.display='none';
-
-      screenRoute.style.display='none';
-
-      screenMode.style.display='block';
-
-      updateModeUI();
-
-      renderReportMode();
-
-      startGpsTracking();
-
-    }
+    return JSON.parse(saved);
 
   }catch(err){
 
     console.log(
-      'Erro restaurando estado',
+      'Erro carregando estado',
       err
     );
 
+    return null;
+
   }
+
+}
+
+
+export function restoreAppState(){
+
+  const data = loadAppState();
+
+  if(!data) return;
+
+  state.speechEnabled =
+    data.speechEnabled || false;
+
+  state.arrivalConfirmed =
+    data.arrivalConfirmed || false;
+
+  state.activeSet =
+    new Set(data.activeSet || []);
+
+  state.routeOrder =
+    data.routeOrder || [];
+
+  state.routeReport =
+    data.routeReport || [];
+
+  state.currentIndex =
+    data.currentIndex || 0;
+
+}
+
+
+// =========================
+// RESET STORAGE
+// =========================
+
+export function clearAppState(){
+
+  localStorage.removeItem(
+    APP_STATE_KEY
+  );
+
+}
+
+
+export function clearCustomHotels(){
+
+  localStorage.removeItem(
+    CUSTOM_HOTELS_KEY
+  );
 
 }
