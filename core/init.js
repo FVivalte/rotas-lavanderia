@@ -1,6 +1,6 @@
 // core/init.js
 
-import { loadCustomHotels }
+import { loadCustomHotels } 
 from '../storage/storage.js';
 
 import { restoreAppState }
@@ -12,8 +12,26 @@ from '../storage/database.js';
 import { renderSelection }
 from '../ui/selection.js';
 
+import { renderRoute }
+from '../ui/route.js';
+
+import { updateModeUI }
+from '../ui/mode.js';
+
+import { initEvents }
+from '../events/events.js';
+
+import { startGpsTracking }
+from '../services/gps.js';
+
 import { state }
 from './state.js';
+
+import {
+  screenSelect,
+  screenRoute,
+  screenMode
+} from '../ui/elements.js';
 
 
 // ======================
@@ -24,17 +42,69 @@ export async function initApp(){
 
   try{
 
-    // inicia indexedDB
+    // indexedDB
     await initDatabase();
 
-    // carrega hotéis customizados
+    // hotéis customizados
     loadCustomHotels();
 
     // restaura estado salvo
     restoreAppState();
 
-    // render inicial
+    // listeners globais
+    initEvents();
+
+    // render inicial seleção
     renderSelection();
+
+    // ======================
+    // RESTORE SCREEN
+    // ======================
+
+    if(state.routeOrder.length){
+
+      renderRoute();
+
+    }
+
+    if(state.currentScreen === 'route'){
+
+      screenSelect.style.display = 'none';
+      screenRoute.style.display = 'block';
+      screenMode.style.display = 'none';
+
+    }
+
+    if(state.currentScreen === 'mode'){
+
+      screenSelect.style.display = 'none';
+      screenRoute.style.display = 'none';
+      screenMode.style.display = 'block';
+
+      updateModeUI();
+
+      startGpsTracking();
+
+    }
+
+    // ======================
+    // SERVICE WORKER
+    // ======================
+
+    if('serviceWorker' in navigator){
+
+      navigator.serviceWorker
+        .register('./sw.js')
+        .catch(err=>{
+
+          console.log(
+            'SW erro:',
+            err
+          );
+
+        });
+
+    }
 
     console.log(
       'App iniciado com sucesso'
