@@ -1,4 +1,4 @@
-HOTELS = [
+export const HOTELS = [
       {id:1,
 name:"Hotel Aretê",
 region:"Baía Formosa / Rasa",
