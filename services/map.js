@@ -46,6 +46,10 @@ export function initMap(){
 
 }
 
+setupCameraListeners(map);
+document
+  .getElementById('follow-btn')
+  .addEventListener('click', toggleFollowMode);
 
 // =========================
 // ROTATE MAP
