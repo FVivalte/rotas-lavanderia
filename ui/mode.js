@@ -47,13 +47,6 @@ import {
 
 } from '../storage/storage.js';
 
-import {
-
-  renderPhotoPreviews
-
-} from '../storage/database.js';
-
-
 // ======================
 // INICIAR MODO ROTA
 // ======================
