@@ -1,6 +1,6 @@
 // core/database.js
 
-import { state } from './state.js';
+import { state } from '../core/state.js';
 
 const DB_NAME = 'RotaBuziosDB';
 const DB_VERSION = 1;
