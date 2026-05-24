@@ -6,7 +6,15 @@ import { HOTELS } from '../data/dados.js';
 import {
   currentHotelEl
 } from '../ui/elements.js';
+import {
 
+  setupCameraListeners,
+
+  updateCamera,
+
+  toggleFollowMode
+
+} from '../service/map-camera.js';
 
 // =========================
 // INIT MAP
