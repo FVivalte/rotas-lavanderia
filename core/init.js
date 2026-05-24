@@ -25,7 +25,7 @@ import { startGpsTracking }
 from '../services/gps.js';
 
 import { state }
-from './state.js';
+from '../core/state.js';
 
 import {
   screenSelect,
