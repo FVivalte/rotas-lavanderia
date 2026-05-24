@@ -27,9 +27,6 @@ import {
 
 } from './route.js';
 
-import { state }
-from '../core/state.js';
-
 import { renderRoute }
 from './route.js';
 
