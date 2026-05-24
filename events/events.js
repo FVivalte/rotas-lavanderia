@@ -623,3 +623,7 @@ pickupPhotosInput
 
   }
 );
+
+export {
+  initEvents
+};
