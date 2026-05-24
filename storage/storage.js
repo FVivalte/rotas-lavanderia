@@ -1,8 +1,7 @@
 // core/storage.js
 
 import { HOTELS } from '../data/dados.js';
-import { state } from './state.js';
-
+import { state } from '../core/state.js';
 const CUSTOM_HOTELS_KEY =
   'rotaBuziosCustomHotels';
 
