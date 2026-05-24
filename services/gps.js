@@ -31,6 +31,13 @@ export function startGpsTracking(){
   if(!navigator.geolocation){
 
     alert('GPS não suportado');
+    updateCamera(
+  map,
+  lng,
+  lat,
+  heading,
+  speed
+);
 
     return;
 
