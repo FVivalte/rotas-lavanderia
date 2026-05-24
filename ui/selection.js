@@ -27,6 +27,61 @@ import {
 
 } from './route.js';
 
+import { HOTELS }
+from '../data/dados.js';
+
+import { state }
+from '../core/state.js';
+
+import { renderRoute }
+from './route.js';
+
+import {
+  screenSelect,
+  screenRoute,
+  screenMode
+} from './elements.js';
+
+import {
+  saveAppState
+} from '../storage/storage.js';
+
+
+// ======================
+// GERAR ROTA
+// ======================
+
+export function generateRoute(){
+
+  const active =
+    HOTELS.filter(
+      h => state.activeSet.has(h.id)
+    );
+
+  if(active.length === 0){
+
+    alert(
+      'Selecione ao menos um hotel.'
+    );
+
+    return;
+
+  }
+
+  state.routeOrder =
+    active.map(h => h.id);
+
+  renderRoute();
+
+  screenSelect.style.display = 'none';
+
+  screenRoute.style.display = 'block';
+
+  screenMode.style.display = 'none';
+
+  saveAppState();
+
+}
 
 // ======================
 // CONTADORES
