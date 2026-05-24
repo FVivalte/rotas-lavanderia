@@ -42,12 +42,8 @@ import {
 
 
 import {
-
-  generateRoute,
-  renderRoute
-
-} from '../ui/route.js';
-
+  generateRoute
+} from '../ui/selection.js';
 
 import {
 
