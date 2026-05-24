@@ -30,10 +30,6 @@ import {
   screenMode
 } from './elements.js';
 
-import {
-  saveAppState
-} from '../storage/storage.js';
-
 
 // ======================
 // GERAR ROTA
