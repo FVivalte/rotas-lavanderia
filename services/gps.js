@@ -13,7 +13,7 @@ import {
 
 import {
   renderReportMode
-} from '../report/report.js';
+} from '../ui/report.js';
 
 import {
   updateMap
