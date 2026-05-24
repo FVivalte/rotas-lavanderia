@@ -625,5 +625,5 @@ pickupPhotosInput
 );
 
 export {
-  initEvents
+  initEvents()
 };
