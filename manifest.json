@@ -1,5 +1,5 @@
 {
-  "name": "Rota Búzios",
+  "name": "Rota Pro Búzios",
   "short_name": "RotaBuzios",
   "description": "App PWA local para gerar e gerenciar rotas de hotéis em Búzios",
   "start_url": "./index.html",
