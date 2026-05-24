@@ -1,23 +1,26 @@
 // core/gps.js
-
-import { state } from './state.js';
+import { state }
+from '../core/state.js';
 
 import {
-  renderReportMode,
+  parseCoords,
+  getDistanceMeters
+} from '../utils/utils.js';
+
+import {
   updateModeUI
-} from '../ui/render.js';
+} from '../ui/mode.js';
+
+import {
+  renderReportMode
+} from '../report/report.js';
 
 import {
   updateMap
 } from './map.js';
 
-import {
-  parseCoords,
-  getDistanceMeters
-} from '../utils/helpers.js';
-
-import { HOTELS } from '../data/dados.js';
-
+import { HOTELS }
+from '../data/dados.js';
 
 // ======================
 // START GPS
