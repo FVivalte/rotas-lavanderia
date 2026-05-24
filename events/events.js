@@ -624,6 +624,10 @@ pickupPhotosInput
   }
 );
 
-export {
-  initEvents()
-};
+export function initEvents(){
+
+  console.log(
+    'Eventos iniciados'
+  );
+
+}
