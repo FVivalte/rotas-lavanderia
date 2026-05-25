@@ -17,31 +17,30 @@ import {
 
   btnAdicionarHotel,
   btnSalvarHotel,
-  btnCloseModal,
+  btnFecharModal,
 
   btnProximo,
   btnCriarRota,
   btnLimpar,
 
-  voiceToggle,
+  toggleVoz,
 
-  chkEntrega,
-  chkColeta,
+  checkEntrega,
+  checkColeta,
 
-  newName,
-  newRegion,
-  newAddress,
-  newCoords,
+  inputNomeHotel,
+  inputRegiaoHotel,
+  inputEnderecoHotel,
+  inputCoordsHotel,
 
-  modal,
+  modalHotel,
 
-  deliveryPhotosInput,
-  pickupPhotosInput,
+  inputFotosEntrega,
+  inputFotosColeta,
 
   telaSelecao,
   telaRota,
-  telaNavegacao,
-  telaRelatorio
+  telaNavegacao
 
 }
 from '../ui/elements.js';
@@ -54,22 +53,22 @@ from '../ui/screens.js';
 
 
 import {
-  generateRoute,
-  renderSelection
+  gerarRota,
+  renderizarSelecao
 }
 from '../ui/selection.js';
 
 
 import {
-  renderRoute
+  renderizarRota
 }
 from '../ui/route.js';
 
 
 import {
 
-  startModeRoute,
-  updateModeUI
+  iniciarModoRota,
+  atualizarModoUI
 
 }
 from '../ui/mode.js';
@@ -77,8 +76,8 @@ from '../ui/mode.js';
 
 import {
 
-  openReportScreen,
-  renderReportMode
+  abrirTelaRelatorio,
+  renderizarRelatorioModo
 
 }
 from '../ui/report.js';
@@ -128,9 +127,9 @@ if(btnCriarRota){
     'click',
     ()=>{
 
-      generateRoute();
+      gerarRota();
 
-      renderRoute();
+      renderizarRota();
 
       mostrarTela(
         telaRota
@@ -170,9 +169,9 @@ if(btnLimpar){
 
       state.lastInstruction = '';
 
-      renderSelection();
+      renderizarSelecao();
 
-      renderRoute();
+      renderizarRota();
 
       saveAppState();
 
@@ -214,7 +213,7 @@ if(btnIniciarRota){
     'click',
     ()=>{
 
-      startModeRoute();
+      iniciarModoRota();
 
       mostrarTela(
         telaNavegacao
@@ -249,10 +248,10 @@ if(btnProximo){
         ];
 
       entry.entrega =
-        chkEntrega.checked;
+        checkEntrega.checked;
 
       entry.coleta =
-        chkColeta.checked;
+        checkColeta.checked;
 
       entry.departure =
         new Date().toISOString();
@@ -273,9 +272,9 @@ if(btnProximo){
 
       }
 
-      updateModeUI();
+      atualizarModoUI();
 
-      renderReportMode();
+      renderizarRelatorioModo();
 
       saveAppState();
 
@@ -326,7 +325,7 @@ if(btnFinalizar){
 
         });
 
-      openReportScreen(
+      abrirTelaRelatorio(
         finalData
       );
 
@@ -356,7 +355,7 @@ if(btnNovaRota){
 
       state.currentIndex = 0;
 
-      renderSelection();
+      renderizarSelecao();
 
       saveAppState();
 
@@ -470,14 +469,14 @@ if(btnGoogleMaps){
 // VOZ
 // ======================
 
-if(voiceToggle){
+if(toggleVoz){
 
-  voiceToggle.addEventListener(
+  toggleVoz.addEventListener(
     'change',
     ()=>{
 
       state.speechEnabled =
-        voiceToggle.checked;
+        toggleVoz.checked;
 
       saveAppState();
 
@@ -497,7 +496,7 @@ if(btnAdicionarHotel){
     'click',
     ()=>{
 
-      modal?.classList.add(
+      modalHotel?.classList.add(
         'active'
       );
 
@@ -507,13 +506,13 @@ if(btnAdicionarHotel){
 }
 
 
-if(btnCloseModal){
+if(btnFecharModal){
 
-  btnCloseModal.addEventListener(
+  btnFecharModal.addEventListener(
     'click',
     ()=>{
 
-      modal?.classList.remove(
+      modalHotel?.classList.remove(
         'active'
       );
 
@@ -535,12 +534,12 @@ if(btnSalvarHotel){
 
       const coords =
         parseCoords(
-          newCoords.value
+          inputCoordsHotel.value
         );
 
       if(
-        !newName.value ||
-        !newAddress.value ||
+        !inputNomeHotel.value ||
+        !inputEnderecoHotel.value ||
         !coords
       ){
 
@@ -557,16 +556,16 @@ if(btnSalvarHotel){
         id: Date.now(),
 
         name:
-          newName.value,
+          inputNomeHotel.value,
 
         region:
-          newRegion.value,
+          inputRegiaoHotel.value,
 
         address:
-          newAddress.value,
+          inputEnderecoHotel.value,
 
         coords:
-          newCoords.value,
+          inputCoordsHotel.value,
 
         custom:true
 
@@ -574,9 +573,9 @@ if(btnSalvarHotel){
 
       saveCustomHotels();
 
-      renderSelection();
+      renderizarSelecao();
 
-      modal?.classList.remove(
+      modalHotel?.classList.remove(
         'active'
       );
 
@@ -590,9 +589,9 @@ if(btnSalvarHotel){
 // FOTO ENTREGA
 // ======================
 
-if(deliveryPhotosInput){
+if(inputFotosEntrega){
 
-  deliveryPhotosInput
+  inputFotosEntrega
   .addEventListener(
     'change',
     async e=>{
@@ -648,9 +647,9 @@ if(deliveryPhotosInput){
 // FOTO COLETA
 // ======================
 
-if(pickupPhotosInput){
+if(inputFotosColeta){
 
-  pickupPhotosInput
+  inputFotosColeta
   .addEventListener(
     'change',
     async e=>{
