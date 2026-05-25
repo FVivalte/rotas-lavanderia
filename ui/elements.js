@@ -119,12 +119,12 @@ export const modal =
 // BOTÕES
 // ======================
 
-export const btnCreateRoute =
+export const btnCriarRota =
   document.getElementById(
     'btn-create-route'
   );
 
-export const btnClear =
+export const btnLimpar =
   document.getElementById(
     'btn-clear'
   );
@@ -134,47 +134,47 @@ export const btnBack =
     'btn-back'
   );
 
-export const btnStartRoute =
+export const btnIniciarRota =
   document.getElementById(
     'btn-start-route'
   );
 
-export const btnNext =
+export const btnProximo =
   document.getElementById(
     'btn-next'
   );
 
-export const btnFinish =
+export const btnFinalizar =
   document.getElementById(
     'btn-finish'
   );
 
-export const btnExport =
+export const btnExportar =
   document.getElementById(
     'btn-export'
   );
 
-export const btnExportPdf =
+export const btnExportarPdf =
   document.getElementById(
     'btnExportPdf'
   );
 
-export const btnOpenMaps =
+export const btnGoogleMaps =
   document.getElementById(
     'btn-open-maps'
   );
 
-export const btnNewRoute =
+export const btnNovaRota =
   document.getElementById(
     'btnNewRoute'
   );
 
-export const btnAddHotel =
+export const btnAdicionarHotel =
   document.getElementById(
     'btn-add-hotel'
   );
 
-export const btnSaveHotel =
+export const btnSalvaHotel =
   document.getElementById(
     'saveHotel'
   );
