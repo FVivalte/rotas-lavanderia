@@ -8,45 +8,49 @@ from '../core/state.js';
 
 import {
 
-  routeListEl,
-  activeCountSelectEl,
-  activeCountRouteEl
+  listaRotaEl,
+  contadorAtivosSelecaoEl,
+  contadorAtivosRotaEl
 
-} from './elements.js';
-
-import {
-
-  renderSelection
-
-} from './selection.js';
+}
+from './elements.js';
 
 import {
 
-  renderReport
+  renderizarSelecao
 
-} from './report.js';
+}
+from './selection.js';
 
 import {
 
-  saveAppState
+  renderizarRelatorio
 
-} from '../storage/storage.js';
+}
+from './report.js';
+
+import {
+
+  salvarEstadoApp
+
+}
+from '../storage/storage.js';
 
 
 // ======================
 // CONTADORES
 // ======================
 
-function updateCounters(){
+function atualizarContadores(){
 
-  const text =
+  const texto =
     `${state.activeSet.size} hotéis ativos`;
 
-  activeCountSelectEl.textContent =
-    text;
+  contadorAtivosSelecaoEl.textContent =
+    texto;
 
-  activeCountRouteEl.textContent =
-    text;
+  contadorAtivosRotaEl.textContent =
+    texto;
 
 }
 
@@ -55,9 +59,11 @@ function updateCounters(){
 // RENDER ROTA
 // ======================
 
-export function renderRoute(){
+export function renderizarRota(){
 
-  routeListEl.innerHTML = '';
+  if(!listaRotaEl) return;
+
+  listaRotaEl.innerHTML = '';
 
   state.routeOrder.forEach(
     (id, idx)=>{
@@ -135,11 +141,11 @@ export function renderRoute(){
               x => x !== id
             );
 
-          renderSelection();
+          renderizarSelecao();
 
-          renderRoute();
+          renderizarRota();
 
-          saveAppState();
+          salvarEstadoApp();
 
         }
       );
@@ -152,13 +158,13 @@ export function renderRoute(){
       const dragHandle =
         item.querySelector('.drag');
 
-      let draggingItem = null;
+      let itemArrastando = null;
 
       dragHandle.addEventListener(
         'touchstart',
         ()=>{
 
-          draggingItem = item;
+          itemArrastando = item;
 
           item.classList.add(
             'dragging-mobile'
@@ -172,14 +178,14 @@ export function renderRoute(){
         'touchmove',
         e=>{
 
-          if(!draggingItem)
+          if(!itemArrastando)
             return;
 
-          const currentY =
+          const posicaoY =
             e.touches[0].clientY;
 
           const items = [
-            ...routeListEl.querySelectorAll(
+            ...listaRotaEl.querySelectorAll(
               '.route-item'
             )
           ];
@@ -190,17 +196,17 @@ export function renderRoute(){
               'over'
             );
 
-            if(other === draggingItem)
+            if(other === itemArrastando)
               return;
 
             const rect =
               other.getBoundingClientRect();
 
-            const middle =
+            const meio =
               rect.top +
               rect.height / 2;
 
-            if(currentY < middle){
+            if(posicaoY < meio){
 
               other.classList.add(
                 'over'
@@ -218,19 +224,19 @@ export function renderRoute(){
         'touchend',
         e=>{
 
-          if(!draggingItem)
+          if(!itemArrastando)
             return;
 
-          const currentY =
+          const posicaoY =
             e.changedTouches[0].clientY;
 
           const items = [
-            ...routeListEl.querySelectorAll(
+            ...listaRotaEl.querySelectorAll(
               '.route-item'
             )
           ];
 
-          let targetIndex = null;
+          let indiceDestino = null;
 
           items.forEach(
             (other,index)=>{
@@ -239,59 +245,59 @@ export function renderRoute(){
                 'over'
               );
 
-              if(other === draggingItem)
+              if(other === itemArrastando)
                 return;
 
               const rect =
                 other.getBoundingClientRect();
 
-              const middle =
+              const meio =
                 rect.top +
                 rect.height / 2;
 
               if(
-                currentY < middle &&
-                targetIndex === null
+                posicaoY < meio &&
+                indiceDestino === null
               ){
 
-                targetIndex = index;
+                indiceDestino = index;
 
               }
 
             }
           );
 
-          const fromIndex =
+          const indiceOrigem =
             state.routeOrder.indexOf(id);
 
-          if(targetIndex !== null){
+          if(indiceDestino !== null){
 
             state.routeOrder.splice(
-              targetIndex,
+              indiceDestino,
               0,
               state.routeOrder.splice(
-                fromIndex,
+                indiceOrigem,
                 1
               )[0]
             );
 
           }
 
-          draggingItem.classList.remove(
+          itemArrastando.classList.remove(
             'dragging-mobile'
           );
 
-          draggingItem = null;
+          itemArrastando = null;
 
-          renderRoute();
+          renderizarRota();
 
-          saveAppState();
+          salvarEstadoApp();
 
         },
         { passive:true }
       );
 
-      routeListEl.appendChild(item);
+      listaRotaEl.appendChild(item);
 
     }
   );
@@ -324,10 +330,10 @@ export function renderRoute(){
   }
 
 
-  updateCounters();
+  atualizarContadores();
 
-  renderReport();
+  renderizarRelatorio();
 
-  saveAppState();
+  salvarEstadoApp();
 
 }
