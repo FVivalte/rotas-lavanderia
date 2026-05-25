@@ -8,10 +8,8 @@ from '../core/state.js';
 
 import {
 
-  btnGenerate,
   btnBack,
   btnStartRoute,
-  btnReset,
   btnExport,
   btnFinish,
   btnNewRoute,
@@ -36,14 +34,21 @@ import {
   modal,
 
   deliveryPhotosInput,
-  pickupPhotosInput
+  pickupPhotosInput,
+
+  screenSelect,
+  screenRoute,
+  screenMode
 
 } from '../ui/elements.js';
 
 
 import {
-  generateRoute
+  generateRoute,
+  renderSelection,
+  renderRoute
 } from '../ui/selection.js';
+
 
 import {
 
@@ -51,13 +56,6 @@ import {
   updateModeUI
 
 } from '../ui/mode.js';
-
-
-import {
-
-  renderSelection
-
-} from '../ui/selection.js';
 
 
 import {
@@ -99,23 +97,24 @@ import {
 } from '../storage/database.js';
 
 
-import {
-
-  screenSelect,
-  screenRoute,
-  screenMode
-
-} from '../ui/elements.js';
-
-
 // ======================
-// GERAR ROTA
+// BOTÕES NOVOS
 // ======================
 
 const btnCreateRoute =
   document.getElementById(
     'btnCreateRoute'
   );
+
+const btnClear =
+  document.getElementById(
+    'btnClear'
+  );
+
+
+// ======================
+// GERAR ROTA
+// ======================
 
 if(btnCreateRoute){
 
@@ -128,510 +127,571 @@ if(btnCreateRoute){
 
 
 // ======================
+// LIMPAR ROTA
+// ======================
+
+if(btnClear){
+
+  btnClear.addEventListener(
+    'click',
+    ()=>{
+
+      if(
+        !confirm('Limpar rota?')
+      ){
+        return;
+      }
+
+      stopGpsTracking();
+
+      state.activeSet.clear();
+
+      state.routeOrder = [];
+
+      state.routeReport = [];
+
+      state.currentIndex = 0;
+
+      state.lastInstruction = '';
+
+      renderSelection();
+
+      renderRoute();
+
+      saveAppState();
+
+    }
+  );
+
+}
+
+
+// ======================
 // VOLTAR
 // ======================
 
-btnBack.addEventListener(
-  'click',
-  ()=>{
+if(btnBack){
 
-    stopGpsTracking();
+  btnBack.addEventListener(
+    'click',
+    ()=>{
 
-    screenSelect.style.display =
-      'block';
+      stopGpsTracking();
 
-    screenRoute.style.display =
-      'none';
+      screenSelect.style.display =
+        'block';
 
-    screenMode.style.display =
-      'none';
+      screenRoute.style.display =
+        'none';
 
-  }
-);
+      screenMode.style.display =
+        'none';
+
+    }
+  );
+
+}
 
 
 // ======================
 // INICIAR ROTA
 // ======================
 
-btnStartRoute.addEventListener(
-  'click',
-  startModeRoute
-);
+if(btnStartRoute){
 
+  btnStartRoute.addEventListener(
+    'click',
+    startModeRoute
+  );
 
-// ======================
-// RESET
-// ======================
-
-btnReset.addEventListener(
-  'click',
-  ()=>{
-
-    if(
-      !confirm('Limpar rota?')
-    ){
-      return;
-    }
-
-    stopGpsTracking();
-
-    state.activeSet.clear();
-
-    state.routeOrder = [];
-
-    state.routeReport = [];
-
-    state.currentIndex = 0;
-
-    state.lastInstruction = '';
-
-    renderSelection();
-
-    renderRoute();
-
-    saveAppState();
-
-  }
-);
+}
 
 
 // ======================
 // PRÓXIMO HOTEL
 // ======================
 
-btnNext.addEventListener(
-  'click',
-  ()=>{
+if(btnNext){
 
-    if(
-      state.currentIndex >=
-      state.routeOrder.length
-    ){
-      return;
+  btnNext.addEventListener(
+    'click',
+    ()=>{
+
+      if(
+        state.currentIndex >=
+        state.routeOrder.length
+      ){
+        return;
+      }
+
+      const entry =
+        state.routeReport[
+          state.currentIndex
+        ];
+
+      entry.entrega =
+        chkEntrega.checked;
+
+      entry.coleta =
+        chkColeta.checked;
+
+      entry.departure =
+        new Date().toISOString();
+
+      state.currentIndex++;
+
+      state.arrivalConfirmed =
+        false;
+
+      if(
+        state.currentIndex >=
+        state.routeOrder.length
+      ){
+
+        btnFinish?.click();
+
+        return;
+
+      }
+
+      updateModeUI();
+
+      renderReportMode();
+
+      saveAppState();
+
     }
+  );
 
-    const entry =
-      state.routeReport[
-        state.currentIndex
-      ];
-
-    entry.entrega =
-      chkEntrega.checked;
-
-    entry.coleta =
-      chkColeta.checked;
-
-    entry.departure =
-      new Date().toISOString();
-
-    state.currentIndex++;
-
-    state.arrivalConfirmed =
-      false;
-
-    if(
-      state.currentIndex >=
-      state.routeOrder.length
-    ){
-
-      btnFinish.click();
-
-      return;
-
-    }
-
-    updateModeUI();
-
-    renderReportMode();
-
-    saveAppState();
-
-  }
-);
+}
 
 
 // ======================
 // FINALIZAR ROTA
 // ======================
 
-btnFinish.addEventListener(
-  'click',
-  ()=>{
+if(btnFinish){
 
-    stopGpsTracking();
+  btnFinish.addEventListener(
+    'click',
+    ()=>{
 
-    const finalData =
-      state.routeReport.map(r=>{
+      stopGpsTracking();
 
-        const hotel =
-          HOTELS.find(
-            h => h.id === r.id
-          );
+      const finalData =
+        state.routeReport.map(r=>{
 
-        return {
+          const hotel =
+            HOTELS.find(
+              h => h.id === r.id
+            );
 
-          name:
-            hotel?.name || '',
+          return {
 
-          arrival:
-            r.arrival,
+            name:
+              hotel?.name || '',
 
-          departure:
-            r.departure,
+            arrival:
+              r.arrival,
 
-          deliveryPhotos:
-            r.deliveryPhotos || [],
+            departure:
+              r.departure,
 
-          pickupPhotos:
-            r.pickupPhotos || []
+            deliveryPhotos:
+              r.deliveryPhotos || [],
 
-        };
+            pickupPhotos:
+              r.pickupPhotos || []
 
-      });
+          };
 
-    openReportScreen(
-      finalData
-    );
+        });
 
-  }
-);
+      openReportScreen(
+        finalData
+      );
+
+    }
+  );
+
+}
 
 
 // ======================
 // NOVA ROTA
 // ======================
 
-btnNewRoute.addEventListener(
-  'click',
-  ()=>{
+if(btnNewRoute){
 
-    stopGpsTracking();
+  btnNewRoute.addEventListener(
+    'click',
+    ()=>{
 
-    state.activeSet.clear();
+      stopGpsTracking();
 
-    state.routeOrder = [];
+      state.activeSet.clear();
 
-    state.routeReport = [];
+      state.routeOrder = [];
 
-    state.currentIndex = 0;
+      state.routeReport = [];
 
-    hideAllScreens();
+      state.currentIndex = 0;
 
-    screenSelect.style.display =
-      'block';
+      hideAllScreens();
 
-    renderSelection();
+      screenSelect.style.display =
+        'block';
 
-    saveAppState();
+      renderSelection();
 
-  }
-);
+      saveAppState();
+
+    }
+  );
+
+}
 
 
 // ======================
 // EXPORT JSON
 // ======================
 
-btnExport.addEventListener(
-  'click',
-  ()=>{
+if(btnExport){
 
-    const data = {
+  btnExport.addEventListener(
+    'click',
+    ()=>{
 
-      generatedAt:
-        new Date().toISOString(),
+      const data = {
 
-      route:
-        state.routeOrder,
+        generatedAt:
+          new Date().toISOString(),
 
-      report:
-        state.routeReport
+        route:
+          state.routeOrder,
 
-    };
+        report:
+          state.routeReport
 
-    const blob =
-      new Blob(
-        [JSON.stringify(data,null,2)],
-        {
-          type:'application/json'
-        }
-      );
+      };
 
-    const a =
-      document.createElement('a');
+      const blob =
+        new Blob(
+          [JSON.stringify(data,null,2)],
+          {
+            type:'application/json'
+          }
+        );
 
-    const url =
-      URL.createObjectURL(blob);
+      const a =
+        document.createElement('a');
 
-    a.href = url;
+      const url =
+        URL.createObjectURL(blob);
 
-    a.download =
-      'relatorio_rota.json';
+      a.href = url;
 
-    a.click();
+      a.download =
+        'relatorio_rota.json';
 
-    setTimeout(()=>{
+      a.click();
 
-      URL.revokeObjectURL(url);
+      setTimeout(()=>{
 
-    },1000);
+        URL.revokeObjectURL(url);
 
-  }
-);
+      },1000);
+
+    }
+  );
+
+}
 
 
 // ======================
 // GOOGLE MAPS
 // ======================
 
-btnOpenMaps.addEventListener(
-  'click',
-  ()=>{
+if(btnOpenMaps){
 
-    if(
-      state.currentIndex >=
-      state.routeOrder.length
-    ){
-      return;
-    }
+  btnOpenMaps.addEventListener(
+    'click',
+    ()=>{
 
-    const id =
-      state.routeOrder[
-        state.currentIndex
-      ];
+      if(
+        state.currentIndex >=
+        state.routeOrder.length
+      ){
+        return;
+      }
 
-    const hotel =
-      HOTELS.find(
-        h => h.id === id
+      const id =
+        state.routeOrder[
+          state.currentIndex
+        ];
+
+      const hotel =
+        HOTELS.find(
+          h => h.id === id
+        );
+
+      if(!hotel) return;
+
+      window.open(
+        `https://www.google.com/maps?q=${hotel.coords}`,
+        '_blank'
       );
 
-    if(!hotel) return;
+    }
+  );
 
-    window.open(
-      `https://www.google.com/maps?q=${hotel.coords}`,
-      '_blank'
-    );
-
-  }
-);
+}
 
 
 // ======================
 // VOZ
 // ======================
 
-voiceToggle.addEventListener(
-  'click',
-  ()=>{
+if(voiceToggle){
 
-    state.speechEnabled =
-      !state.speechEnabled;
+  voiceToggle.addEventListener(
+    'click',
+    ()=>{
 
-    if(state.speechEnabled){
+      state.speechEnabled =
+        !state.speechEnabled;
 
-      voiceToggle.textContent =
-        '🔊 Voz ligada';
+      if(state.speechEnabled){
 
-    }else{
+        voiceToggle.textContent =
+          '🔊 Voz ligada';
 
-      voiceToggle.textContent =
-        '🔇 Voz desligada';
+      }else{
+
+        voiceToggle.textContent =
+          '🔇 Voz desligada';
+
+      }
+
+      saveAppState();
 
     }
+  );
 
-    saveAppState();
-
-  }
-);
+}
 
 
 // ======================
 // MODAL HOTEL
 // ======================
 
-btnAddHotel.addEventListener(
-  'click',
-  ()=>{
+if(btnAddHotel){
 
-    modal.classList.add(
-      'active'
-    );
+  btnAddHotel.addEventListener(
+    'click',
+    ()=>{
 
-  }
-);
+      modal?.classList.add(
+        'active'
+      );
 
-btnCloseModal.addEventListener(
-  'click',
-  ()=>{
+    }
+  );
 
-    modal.classList.remove(
-      'active'
-    );
+}
 
-  }
-);
+if(btnCloseModal){
+
+  btnCloseModal.addEventListener(
+    'click',
+    ()=>{
+
+      modal?.classList.remove(
+        'active'
+      );
+
+    }
+  );
+
+}
 
 
 // ======================
 // SALVAR HOTEL
 // ======================
 
-btnSaveHotel.addEventListener(
-  'click',
-  ()=>{
+if(btnSaveHotel){
 
-    const coords =
-      parseCoords(
-        newCoords.value
+  btnSaveHotel.addEventListener(
+    'click',
+    ()=>{
+
+      const coords =
+        parseCoords(
+          newCoords.value
+        );
+
+      if(
+        !newName.value ||
+        !newAddress.value ||
+        !coords
+      ){
+
+        alert(
+          'Preencha corretamente.'
+        );
+
+        return;
+
+      }
+
+      HOTELS.push({
+
+        id: Date.now(),
+
+        name:
+          newName.value,
+
+        region:
+          newRegion.value,
+
+        address:
+          newAddress.value,
+
+        coords:
+          newCoords.value,
+
+        custom:true
+
+      });
+
+      saveCustomHotels();
+
+      renderSelection();
+
+      modal?.classList.remove(
+        'active'
       );
-
-    if(
-      !newName.value ||
-      !newAddress.value ||
-      !coords
-    ){
-
-      alert(
-        'Preencha corretamente.'
-      );
-
-      return;
 
     }
+  );
 
-    HOTELS.push({
-
-      id: Date.now(),
-
-      name:
-        newName.value,
-
-      region:
-        newRegion.value,
-
-      address:
-        newAddress.value,
-
-      coords:
-        newCoords.value,
-
-      custom:true
-
-    });
-
-    saveCustomHotels();
-
-    renderSelection();
-
-    modal.classList.remove(
-      'active'
-    );
-
-  }
-);
+}
 
 
 // ======================
 // FOTO ENTREGA
 // ======================
 
-deliveryPhotosInput
-.addEventListener(
-  'change',
-  async e=>{
+if(deliveryPhotosInput){
 
-    if(
-      state.currentIndex >=
-      state.routeReport.length
-    ){
-      return;
+  deliveryPhotosInput
+  .addEventListener(
+    'change',
+    async e=>{
+
+      if(
+        state.currentIndex >=
+        state.routeReport.length
+      ){
+        return;
+      }
+
+      const images =
+        await readFilesAsBase64(
+          e.target.files
+        );
+
+      const ids = [];
+
+      for(const image of images){
+
+        const id =
+          crypto.randomUUID();
+
+        await savePhoto({
+
+          id,
+          image
+
+        });
+
+        ids.push(id);
+
+      }
+
+      state.routeReport[
+        state.currentIndex
+      ]
+      .deliveryPhotos
+      .push(...ids);
+
+      saveAppState();
+
     }
+  );
 
-    const images =
-      await readFilesAsBase64(
-        e.target.files
-      );
-
-    const ids = [];
-
-    for(const image of images){
-
-      const id =
-        crypto.randomUUID();
-
-      await savePhoto({
-
-        id,
-        image
-
-      });
-
-      ids.push(id);
-
-    }
-
-    state.routeReport[
-      state.currentIndex
-    ]
-    .deliveryPhotos
-    .push(...ids);
-
-    saveAppState();
-
-  }
-);
+}
 
 
 // ======================
 // FOTO COLETA
 // ======================
 
-pickupPhotosInput
-.addEventListener(
-  'change',
-  async e=>{
+if(pickupPhotosInput){
 
-    if(
-      state.currentIndex >=
-      state.routeReport.length
-    ){
-      return;
+  pickupPhotosInput
+  .addEventListener(
+    'change',
+    async e=>{
+
+      if(
+        state.currentIndex >=
+        state.routeReport.length
+      ){
+        return;
+      }
+
+      const images =
+        await readFilesAsBase64(
+          e.target.files
+        );
+
+      const ids = [];
+
+      for(const image of images){
+
+        const id =
+          crypto.randomUUID();
+
+        await savePhoto({
+
+          id,
+          image
+
+        });
+
+        ids.push(id);
+
+      }
+
+      state.routeReport[
+        state.currentIndex
+      ]
+      .pickupPhotos
+      .push(...ids);
+
+      saveAppState();
+
     }
+  );
 
-    const images =
-      await readFilesAsBase64(
-        e.target.files
-      );
+}
 
-    const ids = [];
 
-    for(const image of images){
-
-      const id =
-        crypto.randomUUID();
-
-      await savePhoto({
-
-        id,
-        image
-
-      });
-
-      ids.push(id);
-
-    }
-
-    state.routeReport[
-      state.currentIndex
-    ]
-    .pickupPhotos
-    .push(...ids);
-
-    saveAppState();
-
-  }
-);
+// ======================
+// INIT
+// ======================
 
 export function initEvents(){
 
