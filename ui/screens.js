@@ -1,19 +1,19 @@
 import {
 
-  screenSelect,
-  screenRoute,
-  screenMode,
-  screenReport
+  telaSelecao,
+  telaRota,
+  telaNavegacao,
+  telaRelatorio
 
 }
 from './elements.js';
 
 const screens = [
 
-  screenSelect,
-  screenRoute,
-  screenMode,
-  screenReport
+  telaSelecao,
+  telaRota,
+  telaNavegacao,
+  telaRelatorio
 
 ];
 
