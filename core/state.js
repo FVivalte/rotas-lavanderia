@@ -1,4 +1,10 @@
+// core/state.js
+
 export const state = {
+
+  // ======================
+  // HOTÉIS
+  // ======================
 
   activeSet: new Set(),
 
@@ -6,11 +12,21 @@ export const state = {
 
   routeReport: [],
 
+
+  // ======================
+  // CONTROLE ROTA
+  // ======================
+
   currentIndex: 0,
 
-  userPosition: null,
+  arrivalConfirmed: false,
 
-  speechEnabled: false,
+
+  // ======================
+  // GPS / MAPA
+  // ======================
+
+  userPosition: null,
 
   routingControl: null,
 
@@ -18,13 +34,31 @@ export const state = {
 
   map: null,
 
-  db: null,
-
-  arrivalConfirmed: false,
-
   mapInitialized: false,
 
   lastInstruction: '',
 
-  lastHeading: 0
+  lastHeading: 0,
+
+
+  // ======================
+  // VOZ
+  // ======================
+
+  speechEnabled: false,
+
+
+  // ======================
+  // DATABASE
+  // ======================
+
+  db: null,
+
+
+  // ======================
+  // TELA ATUAL
+  // ======================
+
+  currentScreen: 'selection'
+
 };
