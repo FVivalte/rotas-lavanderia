@@ -12,17 +12,17 @@ import {
 from '../storage/database.js';
 
 import {
-  renderSelection
+  renderizarSelecao
 }
 from '../ui/selection.js';
 
 import {
-  renderRoute
+  renderizarRota
 }
 from '../ui/route.js';
 
 import {
-  updateModeUI
+  atualizarModoUI
 }
 from '../ui/mode.js';
 
@@ -89,7 +89,7 @@ export async function initApp(){
     // RENDER INICIAL
     // ======================
 
-    renderSelection();
+    renderizarSelecao();
 
     // ======================
     // RESTORE ROTA
@@ -97,7 +97,7 @@ export async function initApp(){
 
     if(state.routeOrder.length){
 
-      renderRoute();
+      renderizarRota();
 
     }
 
@@ -121,7 +121,7 @@ export async function initApp(){
           telaNavegacao
         );
 
-        updateModeUI();
+        atualizarModoUI();
 
         startGpsTracking();
 
@@ -186,7 +186,7 @@ export async function initApp(){
 // RESET GLOBAL
 // ======================
 
-export function resetAppState(){
+export function resetarEstadoApp(){
 
   state.activeSet.clear();
 
@@ -209,10 +209,10 @@ export function resetAppState(){
 // NOVA ROTA
 // ======================
 
-export function prepareNewRoute(){
+export function prepararNovaRota(){
 
-  resetAppState();
+  resetarEstadoApp();
 
-  renderSelection();
+  renderizarSelecao();
 
 }
