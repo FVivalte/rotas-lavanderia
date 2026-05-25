@@ -1,9 +1,13 @@
 // ui/route.js
 
-import { HOTELS }
+import {
+  HOTELS
+}
 from '../data/dados.js';
 
-import { state }
+import {
+  state
+}
 from '../core/state.js';
 
 import {
@@ -17,7 +21,7 @@ from './elements.js';
 
 import {
 
-  renderizarSelecao
+  renderSelection
 
 }
 from './selection.js';
@@ -46,11 +50,19 @@ function atualizarContadores(){
   const texto =
     `${state.activeSet.size} hotéis ativos`;
 
-  contadorSelecao.textContent =
-    texto;
+  if(contadorSelecao){
 
-  contadorRota.textContent =
-    texto;
+    contadorSelecao.textContent =
+      texto;
+
+  }
+
+  if(contadorRota){
+
+    contadorRota.textContent =
+      texto;
+
+  }
 
 }
 
@@ -61,9 +73,11 @@ function atualizarContadores(){
 
 export function renderizarRota(){
 
-  if(!listaRotaEl) return;
+  if(!listaRota){
+    return;
+  }
 
-  listaRotaEl.innerHTML = '';
+  listaRota.innerHTML = '';
 
   state.routeOrder.forEach(
     (id, idx)=>{
@@ -73,7 +87,9 @@ export function renderizarRota(){
           h => h.id === id
         );
 
-      if(!hotel) return;
+      if(!hotel){
+        return;
+      }
 
       const item =
         document.createElement('div');
@@ -141,7 +157,7 @@ export function renderizarRota(){
               x => x !== id
             );
 
-          renderizarSelecao();
+          renderSelection();
 
           renderizarRota();
 
@@ -178,14 +194,15 @@ export function renderizarRota(){
         'touchmove',
         e=>{
 
-          if(!itemArrastando)
+          if(!itemArrastando){
             return;
+          }
 
           const posicaoY =
             e.touches[0].clientY;
 
           const items = [
-            ...listaRotaEl.querySelectorAll(
+            ...listaRota.querySelectorAll(
               '.route-item'
             )
           ];
@@ -196,8 +213,9 @@ export function renderizarRota(){
               'over'
             );
 
-            if(other === itemArrastando)
+            if(other === itemArrastando){
               return;
+            }
 
             const rect =
               other.getBoundingClientRect();
@@ -224,14 +242,15 @@ export function renderizarRota(){
         'touchend',
         e=>{
 
-          if(!itemArrastando)
+          if(!itemArrastando){
             return;
+          }
 
           const posicaoY =
             e.changedTouches[0].clientY;
 
           const items = [
-            ...listaRotaEl.querySelectorAll(
+            ...listaRota.querySelectorAll(
               '.route-item'
             )
           ];
@@ -245,8 +264,9 @@ export function renderizarRota(){
                 'over'
               );
 
-              if(other === itemArrastando)
+              if(other === itemArrastando){
                 return;
+              }
 
               const rect =
                 other.getBoundingClientRect();
@@ -297,14 +317,14 @@ export function renderizarRota(){
         { passive:true }
       );
 
-      listaRotaEl.appendChild(item);
+      listaRota.appendChild(item);
 
     }
   );
 
 
   // ======================
-  // CRIA REPORT VAZIO
+  // CRIAR RELATÓRIO VAZIO
   // ======================
 
   if(
