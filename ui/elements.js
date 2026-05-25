@@ -176,7 +176,7 @@ export const btnAdicionarHotel =
 
 export const btnSalvarHotel =
   document.getElementById(
-    'salvarHotel'
+    'salvar-Hotel'
   );
 
 export const btnCloseModal =
