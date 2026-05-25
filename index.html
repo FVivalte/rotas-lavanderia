@@ -1,98 +1,77 @@
 <!doctype html>
 <html lang="pt-BR">
-
 <head>
-
   <meta charset="utf-8" />
-
   <meta
     name="viewport"
     content="width=device-width,initial-scale=1"
   />
-
   <title>Rota Búzios</title>
-
   <meta
     name="theme-color"
     content="#0b63b7"
   />
-
   <link
     rel="manifest"
     href="manifest.json"
   />
-
   <link
     rel="stylesheet"
     href="style.css"
   />
+  
+  <!-- MAPLIBRE GL -->
+  <link
+  href="https://unpkg.com/maplibre-gl@5.5.0/dist/maplibre-gl.css"
+  rel="stylesheet"
+/>
 
+<script src="https://unpkg.com/maplibre-gl@5.5.0/dist/maplibre-gl.js"></script>
   <!-- LEAFLET -->
-
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet/dist/leaflet.css"
   />
-
   <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
   <!-- LEAFLET ROUTING -->
-
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css"
   />
-
   <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
-
+  
   <!-- HTML2CANVAS -->
-
+  
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-
   <!-- JSPDF -->
-
   <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-
 </head>
-
 <body>
-
   <!-- ===================== -->
   <!-- TELA SELEÇÃO -->
   <!-- ===================== -->
 
   <section id="screen-select">
-
     <header class="topbar">
-
       <h1>
         Rota Búzios
       </h1>
-
       <div id="activeCountSelect">
         0 hotéis ativos
       </div>
-
     </header>
-
     <div id="hotelList"></div>
-
     <div class="bottom-actions">
-
       <button id="btn-add-hotel">
         + Hotel
       </button>
-
       <button id="btn-generate">
         Criar rota
       </button>
-
       <button id="btn-reset">
         Limpar
       </button>
-
     </div>
-
   </section>
 
 
@@ -144,31 +123,25 @@
     id="screen-mode"
     style="display:none"
   >
-
-    <div id="voiceToggle" class="off">
-      🔇 Voz desligada
-    </div>
-<button id="follow-btn">
-  📍 Seguir
-</button>
-
-    <div id="map"></div>
-
+<div id="map"></div>
+<div class="map-controls">
+  <button id="btnLocate">
+    📍
+  </button>
+  <label class="voice-toggle">
+    <input type="checkbox" id="voiceToggle">
+    <span>Voz</span>
+  </label>
+</div>
     <div id="currentHotel"></div>
-
     <div id="nextTwo"></div>
-
     <div class="mode-actions">
-
       <label>
-
         <input
           type="checkbox"
           id="chk-entrega"
         />
-
         Entrega
-
       </label>
 
       <label>
