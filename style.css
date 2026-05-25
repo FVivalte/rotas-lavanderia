@@ -23,17 +23,14 @@
 }
 
 body{
+
   margin:0;
-  background:
-    linear-gradient(
-      180deg,
-      #f6fbff 0%,
-      #e8f4ff 100%
-    );
+  padding:0;
 
-  color:var(--text);
+  overflow:hidden;
 
-  min-height:100vh;
+  font-family:sans-serif;
+
 }
 
 .app{
@@ -601,8 +598,10 @@ footer{
 }
 
 #map{
+
   position:fixed;
   inset:0;
+
 }
 
 .map-controls{
@@ -793,4 +792,76 @@ footer{
   background:#1976d2;
 
   color:white;
+}
+
+/* =========================
+   MAPA + PAINEL
+========================= */
+
+#homeScreen{
+
+  position:fixed;
+
+  left:0;
+  right:0;
+  bottom:0;
+
+  z-index:20;
+
+  display:flex;
+  flex-direction:column;
+
+  gap:10px;
+
+  padding:12px;
+
+  max-height:55vh;
+
+  background:
+    linear-gradient(
+      to top,
+      rgba(255,255,255,.98),
+      rgba(255,255,255,.88)
+    );
+
+  backdrop-filter:blur(10px);
+
+  border-top-left-radius:20px;
+  border-top-right-radius:20px;
+
+  overflow:hidden;
+
+}
+
+/* BOTÕES */
+
+.bottom-actions{
+
+  display:flex;
+
+  gap:10px;
+
+  position:sticky;
+
+  top:0;
+
+  z-index:5;
+
+  background:transparent;
+
+}
+
+/* LISTA */
+
+#hotelList{
+
+  overflow:auto;
+
+  display:flex;
+  flex-direction:column;
+
+  gap:10px;
+
+  padding-bottom:20px;
+
 }
