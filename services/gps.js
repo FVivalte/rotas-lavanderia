@@ -1,6 +1,11 @@
 // core/gps.js
+
 import { state }
 from '../core/state.js';
+
+import {
+  updateMap
+} from './map.js';
 
 import {
   parseCoords,
@@ -15,10 +20,6 @@ import {
   renderReportMode
 } from '../ui/report.js';
 
-import {
-  updateMap
-} from './map.js';
-
 import { HOTELS }
 from '../data/dados.js';
 
@@ -31,13 +32,6 @@ export function startGpsTracking(){
   if(!navigator.geolocation){
 
     alert('GPS não suportado');
-    updateCamera(
-  map,
-  lng,
-  lat,
-  heading,
-  speed
-);
 
     return;
 
@@ -48,69 +42,37 @@ export function startGpsTracking(){
 
       pos => {
 
-        const newPosition = {
+        const lat =
+          pos.coords.latitude;
 
-          lat: pos.coords.latitude,
-          lng: pos.coords.longitude
+        const lng =
+          pos.coords.longitude;
+
+        const heading =
+          pos.coords.heading || 0;
+
+        const speed =
+          pos.coords.speed || 0;
+
+        state.userPosition = {
+
+          lat,
+          lng,
+          heading,
+          speed
 
         };
 
-        const heading =
-          pos.coords.heading;
+        updateMap(
 
-        state.userPosition =
-          newPosition;
+          lng,
+          lat,
+          heading,
+          speed
 
-        // CENTRALIZA PRIMEIRA VEZ
-
-        if(
-          state.map &&
-          !state.mapInitialized
-        ){
-
-          state.map.setView(
-            [
-              state.userPosition.lat,
-              state.userPosition.lng
-            ],
-            17
-          );
-
-          state.mapInitialized = true;
-
-        }
-
-        // AUTO PAN
-
-        if(state.map){
-
-          state.map.panTo(
-            [
-              state.userPosition.lat,
-              state.userPosition.lng
-            ],
-            {
-              animate:true,
-              duration:1
-            }
-          );
-
-        }
-
-        // ROTAÇÃO
-
-        if(
-          heading !== null &&
-          !isNaN(heading)
-        ){
-
-          rotateMap(heading);
-
-        }
+        );
 
         checkArrival();
-
-        updateMap();
 
       },
 
@@ -121,15 +83,16 @@ export function startGpsTracking(){
       },
 
       {
+
         enableHighAccuracy:true,
         maximumAge:1000,
         timeout:5000
+
       }
 
     );
 
 }
-
 
 // ======================
 // STOP GPS
@@ -148,7 +111,6 @@ export function stopGpsTracking(){
   }
 
 }
-
 
 // ======================
 // CHECK ARRIVAL
@@ -221,28 +183,5 @@ export function checkArrival(){
     }
 
   }
-
-}
-
-
-// ======================
-// ROTATE MAP
-// ======================
-
-export function rotateMap(angle){
-
-  if(!state.map) return;
-
-  const mapPane =
-    state.map.getPane('mapPane');
-
-  mapPane.style.transformOrigin =
-    '50% 50%';
-
-  mapPane.style.transition =
-    'transform 0.5s linear';
-
-  mapPane.style.transform =
-    `rotate(${-angle}deg)`;
 
 }
