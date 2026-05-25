@@ -1,27 +1,32 @@
-// core/gps.js
+// services/gps.js
 
 import { state }
 from '../core/state.js';
 
 import {
   updateMap
-} from './map.js';
+}
+from './map.js';
 
 import {
   parseCoords,
   getDistanceMeters
-} from '../utils/utils.js';
+}
+from '../utils/utils.js';
 
 import {
-  updateModeUI
-} from '../ui/mode.js';
+  atualizarModoUI
+}
+from '../ui/mode.js';
 
 import {
-  renderReportMode
-} from '../ui/report.js';
+  renderizarRelatorioModo
+}
+from '../ui/report.js';
 
 import { HOTELS }
 from '../data/dados.js';
+
 
 // ======================
 // START GPS
@@ -72,7 +77,7 @@ export function startGpsTracking(){
 
         );
 
-        checkArrival();
+        verificarChegada();
 
       },
 
@@ -94,6 +99,7 @@ export function startGpsTracking(){
 
 }
 
+
 // ======================
 // STOP GPS
 // ======================
@@ -112,19 +118,23 @@ export function stopGpsTracking(){
 
 }
 
+
 // ======================
 // CHECK ARRIVAL
 // ======================
 
-export function checkArrival(){
+export function verificarChegada(){
 
   if(
     state.currentIndex >=
     state.routeOrder.length
-  ) return;
-
-  if(state.arrivalConfirmed)
+  ){
     return;
+  }
+
+  if(state.arrivalConfirmed){
+    return;
+  }
 
   const id =
     state.routeOrder[
@@ -136,15 +146,20 @@ export function checkArrival(){
       h => h.id === id
     );
 
-  if(!hotel) return;
+  if(!hotel){
+    return;
+  }
 
   const parsed =
     parseCoords(hotel.coords);
 
-  if(!parsed) return;
-
-  if(!state.userPosition)
+  if(!parsed){
     return;
+  }
+
+  if(!state.userPosition){
+    return;
+  }
 
   const distance =
     getDistanceMeters(
@@ -172,9 +187,9 @@ export function checkArrival(){
       ].arrival =
         new Date().toISOString();
 
-      renderReportMode();
+      renderizarRelatorioModo();
 
-      updateModeUI();
+      atualizarModoUI();
 
     }else{
 
