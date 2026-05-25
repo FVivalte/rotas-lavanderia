@@ -1,22 +1,28 @@
 // ui/report.js
 
-import { HOTELS } from '../data/dados.js';
+import {
+  HOTELS
+}
+from '../data/dados.js';
 
-import { state } from '../core/state.js';
+import {
+  state
+}
+from '../core/state.js';
 
 import {
 
-  routeReportList,
-  reportRouteList,
-  reportModeEl,
+  listaRelatorioRota,
+  listaRelatorioFinal,
+  relatorioModoEl,
   telaRelatorio,
-  reportTitle
+  tituloRelatorio
 
 }
 from './elements.js';
 
 import {
-  showScreen
+  mostrarTela
 }
 from './screens.js';
 
@@ -30,34 +36,42 @@ from '../storage/database.js';
 // RELATÓRIO TELA ROTA
 // ======================
 
-export function renderReport(){
+export function renderizarRelatorio(){
 
-  routeReportList.innerHTML = '';
+  if(!listaRelatorioRota){
+    return;
+  }
+
+  listaRelatorioRota.innerHTML = '';
 
   state.routeReport.forEach((r, idx)=>{
 
-    const h =
-      HOTELS.find(x => x.id === r.id);
+    const hotel =
+      HOTELS.find(
+        x => x.id === r.id
+      );
 
-    if(!h) return;
+    if(!hotel) return;
 
     const div =
       document.createElement('div');
 
-    div.className = 'report-row';
+    div.className =
+      'report-row';
 
     div.innerHTML = `
+
       <div>
 
         <strong>
-          ${idx + 1}. ${h.name}
+          ${idx + 1}. ${hotel.name}
         </strong>
 
         <div
           class="muted"
           style="font-size:0.85rem"
         >
-          ${h.address}
+          ${hotel.address}
         </div>
 
       </div>
@@ -96,9 +110,11 @@ export function renderReport(){
         </div>
 
       </div>
+
     `;
 
-    routeReportList.appendChild(div);
+    listaRelatorioRota
+      .appendChild(div);
 
   });
 
@@ -106,30 +122,38 @@ export function renderReport(){
 
 
 // ======================
-// RELATÓRIO TELA GPS
+// RELATÓRIO MODO GPS
 // ======================
 
-export function renderReportMode(){
+export function renderizarRelatorioModo(){
 
-  reportModeEl.innerHTML = '';
+  if(!relatorioModoEl){
+    return;
+  }
+
+  relatorioModoEl.innerHTML = '';
 
   state.routeReport.forEach((r, idx)=>{
 
-    const h =
-      HOTELS.find(x => x.id === r.id);
+    const hotel =
+      HOTELS.find(
+        x => x.id === r.id
+      );
 
-    if(!h) return;
+    if(!hotel) return;
 
     const div =
       document.createElement('div');
 
-    div.className = 'report-row';
+    div.className =
+      'report-row';
 
     div.innerHTML = `
+
       <div>
 
         <strong>
-          ${idx + 1}. ${h.name}
+          ${idx + 1}. ${hotel.name}
         </strong>
 
       </div>
@@ -159,9 +183,11 @@ export function renderReportMode(){
         </div>
 
       </div>
+
     `;
 
-    reportModeEl.appendChild(div);
+    relatorioModoEl
+      .appendChild(div);
 
   });
 
@@ -172,7 +198,7 @@ export function renderReportMode(){
 // DATA FORMATADA
 // ======================
 
-export function getFormattedDateTitle(){
+export function obterTituloData(){
 
   const now = new Date();
 
@@ -215,14 +241,18 @@ export function getFormattedDateTitle(){
 // RELATÓRIO FINAL
 // ======================
 
-export async function renderFinalReport(
+export async function renderizarRelatorioFinal(
   routeData
 ){
 
-  reportRouteList.innerHTML = '';
+  if(!listaRelatorioFinal){
+    return;
+  }
 
-  reportTitle.textContent =
-    getFormattedDateTitle();
+  listaRelatorioFinal.innerHTML = '';
+
+  tituloRelatorio.textContent =
+    obterTituloData();
 
   for(
     const [index, hotel]
@@ -297,65 +327,10 @@ export async function renderFinalReport(
 
       </div>
 
-      <div class="report-photos">
-
-        <div class="report-photo-group">
-
-          <div class="report-photo-label">
-            Entrega
-          </div>
-
-          <div class="report-photo-list">
-
-            ${
-              deliveryImages.length
-              ? deliveryImages
-                  .map(src => `
-                    <img src="${src}">
-                  `)
-                  .join('')
-              : `
-                <div class="empty-photo">
-                  Sem fotos
-                </div>
-              `
-            }
-
-          </div>
-
-        </div>
-
-        <div class="report-photo-group">
-
-          <div class="report-photo-label">
-            Coleta
-          </div>
-
-          <div class="report-photo-list">
-
-            ${
-              pickupImages.length
-              ? pickupImages
-                  .map(src => `
-                    <img src="${src}">
-                  `)
-                  .join('')
-              : `
-                <div class="empty-photo">
-                  Sem fotos
-                </div>
-              `
-            }
-
-          </div>
-
-        </div>
-
-      </div>
-
     `;
 
-    reportRouteList.appendChild(card);
+    listaRelatorioFinal
+      .appendChild(card);
 
   }
 
@@ -366,13 +341,15 @@ export async function renderFinalReport(
 // ABRIR RELATÓRIO
 // ======================
 
-export async function openReportScreen(
+export async function abrirTelaRelatorio(
   routeData
 ){
 
-  showScreen(telaRelatorio);
+  mostrarTela(
+    telaRelatorio
+  );
 
-  await renderFinalReport(
+  await renderizarRelatorioFinal(
     routeData
   );
 
