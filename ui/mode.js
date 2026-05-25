@@ -18,33 +18,39 @@ import {
 
   btnProximo
 
-} from './elements.js';
+}
+from './elements.js';
 
 import {
-  
+
   renderReportMode
 
-} from './report.js';
+}
+from './report.js';
 
 import {
 
   initMap,
   updateMap
 
-} from '../services/map.js';
+}
+from '../services/map.js';
 
 import {
 
   startGpsTracking,
   stopGpsTracking
 
-} from '../services/gps.js';
+}
+from '../services/gps.js';
 
 import {
 
   saveAppState
 
-} from '../storage/storage.js';
+}
+from '../storage/storage.js';
+
 
 // ======================
 // INICIAR MODO ROTA
@@ -66,7 +72,8 @@ export function startModeRoute(){
 
   state.currentIndex = 0;
 
-  state.arrivalConfirmed = false;
+  state.arrivalConfirmed =
+    false;
 
   state.routeReport =
     state.routeOrder.map(id => ({
@@ -84,10 +91,8 @@ export function startModeRoute(){
 
     }));
 
-    telaNavegacao.style.display =
-    'block';
-
-  state.mapInitialized = false;
+  state.mapInitialized =
+    false;
 
   initMap();
 
@@ -118,11 +123,15 @@ export function updateModeUI(){
   ){
 
     currentHotelEl.innerHTML = `
+
       <div>
+
         <strong>
           Rota finalizada
         </strong>
+
       </div>
+
     `;
 
     nextTwoEl.innerHTML = '';
@@ -146,11 +155,15 @@ export function updateModeUI(){
   currentHotelEl.innerHTML = `
 
     <div style="font-weight:700">
+
       ${hotel.name}
+
     </div>
 
     <div class="muted">
+
       ${hotel.address}
+
     </div>
 
   `;
@@ -186,8 +199,12 @@ function renderNextHotels(){
     const idx =
       state.currentIndex + i;
 
-    if(idx >= state.routeOrder.length)
+    if(
+      idx >=
+      state.routeOrder.length
+    ){
       continue;
+    }
 
     const hotel =
       HOTELS.find(
@@ -207,14 +224,18 @@ function renderNextHotels(){
     div.innerHTML = `
 
       <strong>
+
         ${hotel.name}
+
       </strong>
 
       <div
         class="muted"
         style="font-size:0.85rem"
       >
+
         ${hotel.address}
+
       </div>
 
     `;
@@ -327,5 +348,17 @@ export function finishModeRoute(){
   renderReportMode();
 
   saveAppState();
+
+}
+
+
+// ======================
+// FOTO PREVIEW
+// ======================
+
+function renderPhotoPreviews(){
+
+  // evitar erro temporário
+  // enquanto previews não foram migrados
 
 }
