@@ -1,142 +1,181 @@
-// ======================
-// CAMERA SETTINGS
-// ======================
-
-let followUser = true;
-
-let lastInteraction = 0;
-
-const FOLLOW_TIMEOUT = 5000;
+// services/map-camera.js
 
 // ======================
-// BUTTON FOLLOW
+// CONFIG CAMERA
 // ======================
 
-export function toggleFollowMode() {
+let seguirUsuario = true;
 
-  followUser = !followUser;
+let ultimaInteracao = 0;
 
-  const btn = document.getElementById('follow-btn');
+const TEMPO_RETORNO_CAMERA = 5000;
 
-  if (followUser) {
 
-    btn.classList.add('active');
+// ======================
+// BOTÃO SEGUIR
+// ======================
 
-  } else {
+export function alternarModoSeguir(){
 
-    btn.classList.remove('active');
+  seguirUsuario = !seguirUsuario;
 
-  }
+  atualizarBotaoSeguir();
+
 }
 
+
 // ======================
-// USER INTERACTION
+// LISTENERS MAPA
 // ======================
 
-export function setupCameraListeners(map) {
+export function configurarListenersCamera(
+  mapa
+){
 
-  map.on('dragstart', () => {
+  mapa.on(
+    'dragstart',
+    ()=>{
 
-    followUser = false;
+      seguirUsuario = false;
 
-    lastInteraction = Date.now();
+      ultimaInteracao =
+        Date.now();
 
-    updateFollowButton();
+      atualizarBotaoSeguir();
 
-  });
+    }
+  );
 
-  map.on('zoomstart', () => {
+  mapa.on(
+    'zoomstart',
+    ()=>{
 
-    followUser = false;
+      seguirUsuario = false;
 
-    lastInteraction = Date.now();
+      ultimaInteracao =
+        Date.now();
 
-    updateFollowButton();
+      atualizarBotaoSeguir();
 
-  });
+    }
+  );
+
 }
+
 
 // ======================
 // UPDATE CAMERA
 // ======================
 
-export function updateCamera(
-  map,
+export function atualizarCamera(
+
+  mapa,
   lng,
   lat,
   heading = 0,
   speed = 0
-) {
 
-  const now = Date.now();
+){
 
-  if (!followUser) {
+  const agora =
+    Date.now();
 
-    if (now - lastInteraction > FOLLOW_TIMEOUT) {
+  if(!seguirUsuario){
 
-      followUser = true;
+    if(
+      agora - ultimaInteracao >
+      TEMPO_RETORNO_CAMERA
+    ){
 
-      updateFollowButton();
+      seguirUsuario = true;
 
-    } else {
+      atualizarBotaoSeguir();
+
+    }else{
 
       return;
+
     }
+
   }
 
-  const zoom = getZoomBySpeed(speed);
+  const zoom =
+    obterZoomPorVelocidade(
+      speed
+    );
 
-  map.easeTo({
+  mapa.easeTo({
 
-    center: [lng, lat],
+    center:[lng,lat],
 
     zoom,
 
-    bearing: heading,
+    bearing:heading,
 
-    pitch: 55,
+    pitch:55,
 
-    duration: 1000,
+    duration:1000,
 
-    essential: true
+    essential:true
+
   });
+
 }
 
+
 // ======================
-// DYNAMIC ZOOM
+// ZOOM DINÂMICO
 // ======================
 
-function getZoomBySpeed(speed) {
+function obterZoomPorVelocidade(
+  speed
+){
 
-  const kmh = speed * 3.6;
+  const kmh =
+    speed * 3.6;
 
-  if (kmh < 5) return 17.5;
+  if(kmh < 5)
+    return 17.5;
 
-  if (kmh < 20) return 16.5;
+  if(kmh < 20)
+    return 16.5;
 
-  if (kmh < 40) return 15.5;
+  if(kmh < 40)
+    return 15.5;
 
-  if (kmh < 70) return 14.5;
+  if(kmh < 70)
+    return 14.5;
 
   return 13.5;
+
 }
 
+
 // ======================
-// BUTTON STATE
+// BOTÃO FOLLOW
 // ======================
 
-function updateFollowButton() {
+function atualizarBotaoSeguir(){
 
-  const btn = document.getElementById('follow-btn');
+  const btn =
+    document.getElementById(
+      'follow-btn'
+    );
 
-  if (!btn) return;
+  if(!btn) return;
 
-  if (followUser) {
+  if(seguirUsuario){
 
-    btn.classList.add('active');
+    btn.classList.add(
+      'active'
+    );
 
-  } else {
+  }else{
 
-    btn.classList.remove('active');
+    btn.classList.remove(
+      'active'
+    );
+
   }
+
 }
