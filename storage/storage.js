@@ -1,11 +1,24 @@
-// core/storage.js
+// storage/storage.js
 
-import { HOTELS } from '../data/dados.js';
-import { state } from '../core/state.js';
-const CUSTOM_HOTELS_KEY =
+import {
+  HOTELS
+}
+from '../data/dados.js';
+
+import {
+  state
+}
+from '../core/state.js';
+
+
+// =========================
+// CHAVES STORAGE
+// =========================
+
+const CHAVE_HOTEIS_CUSTOMIZADOS =
   'rotaBuziosCustomHotels';
 
-const APP_STATE_KEY =
+const CHAVE_ESTADO_APP =
   'rotaBuziosState';
 
 
@@ -13,38 +26,49 @@ const APP_STATE_KEY =
 // HOTÉIS CUSTOMIZADOS
 // =========================
 
-export function saveCustomHotels(){
+export function salvarHoteisCustomizados(){
 
-  const customHotels =
-    HOTELS.filter(h => h.custom);
+  const hoteisCustomizados =
+    HOTELS.filter(
+      h => h.custom
+    );
 
   localStorage.setItem(
-    CUSTOM_HOTELS_KEY,
-    JSON.stringify(customHotels)
+
+    CHAVE_HOTEIS_CUSTOMIZADOS,
+
+    JSON.stringify(
+      hoteisCustomizados
+    )
+
   );
 
 }
 
-export function loadCustomHotels(){
 
-  const saved =
+export function carregarHoteisCustomizados(){
+
+  const salvo =
     localStorage.getItem(
-      CUSTOM_HOTELS_KEY
+      CHAVE_HOTEIS_CUSTOMIZADOS
     );
 
-  if(!saved) return;
+  if(!salvo) return;
 
   try{
 
-    const customHotels =
-      JSON.parse(saved);
+    const hoteisCustomizados =
+      JSON.parse(salvo);
 
-    customHotels.forEach(h=>{
+    hoteisCustomizados
+    .forEach(h=>{
 
-      const alreadyExists =
-        HOTELS.some(x=>x.id===h.id);
+      const jaExiste =
+        HOTELS.some(
+          x => x.id === h.id
+        );
 
-      if(!alreadyExists){
+      if(!jaExiste){
 
         HOTELS.push(h);
 
@@ -55,8 +79,11 @@ export function loadCustomHotels(){
   }catch(err){
 
     console.log(
+
       'Erro carregando hotéis',
+
       err
+
     );
 
   }
@@ -65,10 +92,12 @@ export function loadCustomHotels(){
 
 
 // =========================
-// ESTADO DO APP
+// ESTADO APP
 // =========================
 
-export function saveAppState(currentScreen){
+export function salvarEstadoApp(
+  telaAtual
+){
 
   const data = {
 
@@ -90,36 +119,47 @@ export function saveAppState(currentScreen){
     currentIndex:
       state.currentIndex,
 
-    currentScreen
+    currentScreen:
+      telaAtual
 
   };
 
   localStorage.setItem(
-    APP_STATE_KEY,
+
+    CHAVE_ESTADO_APP,
+
     JSON.stringify(data)
+
   );
 
 }
 
 
-export function loadAppState(){
+// =========================
+// CARREGAR ESTADO
+// =========================
 
-  const saved =
+export function carregarEstadoApp(){
+
+  const salvo =
     localStorage.getItem(
-      APP_STATE_KEY
+      CHAVE_ESTADO_APP
     );
 
-  if(!saved) return null;
+  if(!salvo) return null;
 
   try{
 
-    return JSON.parse(saved);
+    return JSON.parse(salvo);
 
   }catch(err){
 
     console.log(
+
       'Erro carregando estado',
+
       err
+
     );
 
     return null;
@@ -129,9 +169,14 @@ export function loadAppState(){
 }
 
 
-export function restoreAppState(){
+// =========================
+// RESTAURAR ESTADO
+// =========================
 
-  const data = loadAppState();
+export function restaurarEstadoApp(){
+
+  const data =
+    carregarEstadoApp();
 
   if(!data) return;
 
@@ -142,7 +187,9 @@ export function restoreAppState(){
     data.arrivalConfirmed || false;
 
   state.activeSet =
-    new Set(data.activeSet || []);
+    new Set(
+      data.activeSet || []
+    );
 
   state.routeOrder =
     data.routeOrder || [];
@@ -153,26 +200,29 @@ export function restoreAppState(){
   state.currentIndex =
     data.currentIndex || 0;
 
+  state.currentScreen =
+    data.currentScreen || 'selecao';
+
 }
 
 
 // =========================
-// RESET STORAGE
+// LIMPAR STORAGE
 // =========================
 
-export function clearAppState(){
+export function limparEstadoApp(){
 
   localStorage.removeItem(
-    APP_STATE_KEY
+    CHAVE_ESTADO_APP
   );
 
 }
 
 
-export function clearCustomHotels(){
+export function limparHoteisCustomizados(){
 
   localStorage.removeItem(
-    CUSTOM_HOTELS_KEY
+    CHAVE_HOTEIS_CUSTOMIZADOS
   );
 
 }
