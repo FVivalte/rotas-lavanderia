@@ -112,10 +112,19 @@ import {
 // GERAR ROTA
 // ======================
 
-btnGenerate.addEventListener(
-  'click',
-  generateRoute
-);
+const btnCreateRoute =
+  document.getElementById(
+    'btnCreateRoute'
+  );
+
+if(btnCreateRoute){
+
+  btnCreateRoute.addEventListener(
+    'click',
+    generateRoute
+  );
+
+}
 
 
 // ======================
