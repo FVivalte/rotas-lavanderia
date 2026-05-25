@@ -8,18 +8,18 @@ from '../core/state.js';
 
 import {
 
-  btnBack,
-  btnStartRoute,
-  btnExport,
-  btnFinish,
-  btnNewRoute,
-  btnOpenMaps,
+  btnVolta,
+  btnIniciarRota,
+  btnExportar,
+  btnFinalizar,
+  btnNovaRota,
+  btnGoogleMaps,
 
-  btnAddHotel,
-  btnSaveHotel,
+  btnAdicionarHotel,
+  btnSalvaHotel,
   btnCloseModal,
 
-  btnNext,
+  btnProximo,
 
   voiceToggle,
 
@@ -36,10 +36,10 @@ import {
   deliveryPhotosInput,
   pickupPhotosInput,
 
-  screenSelect,
-  screenRoute,
-  screenMode,
-  screenReport
+  telaSelecao,
+  telaRota,
+  telaNavegacao,
+  telaRelatorio
 
 } from '../ui/elements.js';
 
@@ -117,14 +117,14 @@ from '../storage/database.js';
 // BOTÕES
 // ======================
 
-const btnCreateRoute =
+const btnCriarRota =
   document.getElementById(
-    'btn-create-route'
+    'btn-criar-rota'
   );
 
-const btnClear =
+const btnLimpar =
   document.getElementById(
-    'btn-clear'
+    'btn-limpar'
   );
 
 
@@ -132,9 +132,9 @@ const btnClear =
 // GERAR ROTA
 // ======================
 
-if(btnCreateRoute){
+if(btnCriarRota){
 
-  btnCreateRoute.addEventListener(
+  btnCriarRota.addEventListener(
     'click',
     ()=>{
 
@@ -154,9 +154,9 @@ if(btnCreateRoute){
 // LIMPAR ROTA
 // ======================
 
-if(btnClear){
+if(btnLimpar){
 
-  btnClear.addEventListener(
+  btnLimpar.addEventListener(
     'click',
     ()=>{
 
@@ -194,9 +194,9 @@ if(btnClear){
 // VOLTAR
 // ======================
 
-if(btnBack){
+if(btnVoltar){
 
-  btnBack.addEventListener(
+  btnVoltar.addEventListener(
     'click',
     ()=>{
 
@@ -214,9 +214,9 @@ if(btnBack){
 // INICIAR ROTA
 // ======================
 
-if(btnStartRoute){
+if(btnIniciarRota){
 
-  btnStartRoute.addEventListener(
+  btnIniciarRota.addEventListener(
     'click',
     ()=>{
 
@@ -234,9 +234,9 @@ if(btnStartRoute){
 // PRÓXIMO HOTEL
 // ======================
 
-if(btnNext){
+if(btnProximo){
 
-  btnNext.addEventListener(
+  btnProximo.addEventListener(
     'click',
     ()=>{
 
@@ -271,7 +271,7 @@ if(btnNext){
         state.routeOrder.length
       ){
 
-        btnFinish?.click();
+        btnFinalizar?.click();
 
         return;
 
@@ -293,9 +293,9 @@ if(btnNext){
 // FINALIZAR ROTA
 // ======================
 
-if(btnFinish){
+if(btnFinalizar){
 
-  btnFinish.addEventListener(
+  btnFinalizar.addEventListener(
     'click',
     ()=>{
 
@@ -344,9 +344,9 @@ if(btnFinish){
 // NOVA ROTA
 // ======================
 
-if(btnNewRoute){
+if(btnNovaRota){
 
-  btnNewRoute.addEventListener(
+  btnNovaRota.addEventListener(
     'click',
     ()=>{
 
@@ -376,9 +376,9 @@ if(btnNewRoute){
 // EXPORT JSON
 // ======================
 
-if(btnExport){
+if(btnExportar){
 
-  btnExport.addEventListener(
+  btnExportar.addEventListener(
     'click',
     ()=>{
 
@@ -432,9 +432,9 @@ if(btnExport){
 // GOOGLE MAPS
 // ======================
 
-if(btnOpenMaps){
+if(btnGoogleMaps){
 
-  btnOpenMaps.addEventListener(
+  btnGoogleMaps.addEventListener(
     'click',
     ()=>{
 
@@ -493,9 +493,9 @@ if(voiceToggle){
 // MODAL HOTEL
 // ======================
 
-if(btnAddHotel){
+if(btnAdicionarHotel){
 
-  btnAddHotel.addEventListener(
+  btnAdicionarHotel.addEventListener(
     'click',
     ()=>{
 
@@ -528,9 +528,9 @@ if(btnCloseModal){
 // SALVAR HOTEL
 // ======================
 
-if(btnSaveHotel){
+if(btnSalvaHotel){
 
-  btnSaveHotel.addEventListener(
+  btnSalvaHotel.addEventListener(
     'click',
     ()=>{
 
