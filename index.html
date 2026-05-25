@@ -1,100 +1,91 @@
 <!doctype html>
 <html lang="pt-BR">
+
 <head>
+
   <meta charset="utf-8" />
+
   <meta
     name="viewport"
     content="width=device-width,initial-scale=1"
   />
-  <title>Rota Búzios</title>
+
+  <title>
+    Rota Búzios
+  </title>
+
   <meta
     name="theme-color"
     content="#0b63b7"
   />
+
   <link
     rel="manifest"
     href="manifest.json"
   />
+
   <link
     rel="stylesheet"
     href="style.css"
   />
-  
-  <!-- MAPLIBRE GL -->
-  <link
-  href="https://unpkg.com/maplibre-gl@5.5.0/dist/maplibre-gl.css"
-  rel="stylesheet"
-/>
 
-<script src="https://unpkg.com/maplibre-gl@5.5.0/dist/maplibre-gl.js"></script>
-  <!-- LEAFLET -->
+  <!-- MAPLIBRE -->
+
   <link
+    href="https://unpkg.com/maplibre-gl@5.5.0/dist/maplibre-gl.css"
     rel="stylesheet"
-    href="https://unpkg.com/leaflet/dist/leaflet.css"
   />
-  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-  <!-- LEAFLET ROUTING -->
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.css"
-  />
-  <script src="https://unpkg.com/leaflet-routing-machine/dist/leaflet-routing-machine.js"></script>
-  
-  <!-- HTML2CANVAS -->
-  
-  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-  <!-- JSPDF -->
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+  <script src="https://unpkg.com/maplibre-gl@5.5.0/dist/maplibre-gl.js"></script>
+
 </head>
+
 <body>
+
   <!-- ===================== -->
   <!-- TELA SELEÇÃO -->
   <!-- ===================== -->
 
- <section id="screen-select" class="screen">
+  <section
+    id="tela-selecao"
+    class="screen"
+  >
 
-  <header class="topbar">
+    <header class="topbar">
 
-    <h1>
-      Rota Búzios
-    </h1>
+      <h1>
+        Rota Búzios
+      </h1>
 
-    <div id="activeCountSelect">
-      0 hotéis ativos
-    </div>
+      <div id="contadorSelecao">
+        0 hotéis ativos
+      </div>
 
-  </header>
+    </header>
 
-  <!-- PAINEL -->
+    <div id="painelInicial">
 
-  <div id="homeScreen">
-  <!-- LISTA -->
+      <div id="listaHoteis"></div>
 
-    <div id="hotelList"></div>
+      <div class="bottom-actions">
 
-  
+        <button id="btn-adicionar-hotel">
+          + Hotel
+        </button>
 
-    <!-- BOTÕES -->
+        <button id="btn-criar-rota">
+          Criar rota
+        </button>
 
-    <div class="bottom-actions">
+        <button id="btn-limpar">
+          Limpar
+        </button>
 
-      <button id="btn-adicionar-hotel">
-        + Hotel
-      </button>
-
-      <button id="btn-criar-rota">
-        Criar rota
-      </button>
-
-      <button id="btn-limpar">
-        Limpar
-      </button>
+      </div>
 
     </div>
 
-</div>
-
-</section>
+  </section>
 
 
   <!-- ===================== -->
@@ -102,8 +93,9 @@
   <!-- ===================== -->
 
   <section
-  id="tela-rota"
-  class="screen hidden">
+    id="tela-rota"
+    class="screen hidden"
+  >
 
     <header class="topbar">
 
@@ -111,15 +103,15 @@
         ←
       </button>
 
-      <div id="activeCountRoute">
+      <div id="contadorRota">
         0 hotéis ativos
       </div>
 
     </header>
 
-    <div id="routeList"></div>
+    <div id="listaRota"></div>
 
-<div id="routeReportList"></div>
+    <div id="listaRelatorioRota"></div>
 
     <div class="bottom-actions">
 
@@ -141,35 +133,55 @@
   <!-- ===================== -->
 
   <section
-  id="screen-mode"
-  class="screen hidden">
-    
-<div id="map"></div>
-<div class="map-controls">
-  <button id="btnLocate">
-    📍
-  </button>
-  <label class="voice-toggle">
-    <input type="checkbox" id="voiceToggle">
-    <span>Voz</span>
-  </label>
-</div>
-    <div id="currentHotel"></div>
-    <div id="nextTwo"></div>
-    <div class="mode-actions">
-      <label>
+    id="tela-navegacao"
+    class="screen hidden"
+  >
+
+    <div id="mapa"></div>
+
+    <div class="map-controls">
+
+      <button id="btn-localizar">
+        📍
+      </button>
+
+      <label class="voice-toggle">
+
         <input
           type="checkbox"
-          id="chk-entrega"
+          id="toggle-voz"
         />
+
+        <span>
+          Voz
+        </span>
+
+      </label>
+
+    </div>
+
+    <div id="hotelAtual"></div>
+
+    <div id="proximosHoteis"></div>
+
+    <div class="mode-actions">
+
+      <label>
+
+        <input
+          type="checkbox"
+          id="check-entrega"
+        />
+
         Entrega
+
       </label>
 
       <label>
 
         <input
           type="checkbox"
-          id="chk-coleta"
+          id="check-coleta"
         />
 
         Coleta
@@ -186,7 +198,7 @@
 
         <input
           type="file"
-          id="deliveryPhotosInput"
+          id="inputFotosEntrega"
           accept="image/*"
           multiple
           hidden
@@ -194,7 +206,7 @@
 
       </label>
 
-      <div id="deliveryPreview"></div>
+      <div id="previewEntrega"></div>
 
       <label class="camera-btn">
 
@@ -202,7 +214,7 @@
 
         <input
           type="file"
-          id="pickupPhotosInput"
+          id="inputFotosColeta"
           accept="image/*"
           multiple
           hidden
@@ -210,11 +222,11 @@
 
       </label>
 
-      <div id="pickupPreview"></div>
+      <div id="previewColeta"></div>
 
     </div>
 
-    <div id="reportMode"></div>
+    <div id="relatorioModo"></div>
 
     <div class="bottom-actions">
 
@@ -240,26 +252,27 @@
   <!-- ===================== -->
 
   <section
-  id="screen-report"
-  class="screen hidden">
+    id="tela-relatorio"
+    class="screen hidden"
+  >
 
     <header class="topbar">
 
-      <h2 id="reportTitle">
+      <h2 id="tituloRelatorio">
         Relatório
       </h2>
 
     </header>
 
-    <div id="reportRouteList"></div>
+    <div id="listaRelatorioFinal"></div>
 
     <div class="bottom-actions">
 
-      <button id="btnExportarPdf">
+      <button id="btn-exportar-pdf">
         Exportar PDF
       </button>
 
-      <button id="btnNovaRota">
+      <button id="btn-nova-rota">
         Nova rota
       </button>
 
@@ -273,7 +286,7 @@
   <!-- ===================== -->
 
   <div
-    id="hotelModal"
+    id="modalHotel"
     class="modal"
   >
 
@@ -284,32 +297,32 @@
       </h3>
 
       <input
-        id="newName"
+        id="novoNome"
         placeholder="Nome"
       />
 
       <input
-        id="newRegion"
+        id="novaRegiao"
         placeholder="Região"
       />
 
       <input
-        id="newAddress"
+        id="novoEndereco"
         placeholder="Endereço"
       />
 
       <input
-        id="newCoords"
+        id="novasCoords"
         placeholder="Lat,Lng"
       />
 
       <div class="modal-actions">
 
-        <button id="closeModal">
+        <button id="btn-fechar-modal">
           Cancelar
         </button>
 
-        <button id="salvarHotel">
+        <button id="btn-salvar-hotel">
           Salvar
         </button>
 
@@ -318,11 +331,6 @@
     </div>
 
   </div>
-
-
-  <!-- ===================== -->
-  <!-- MAIN -->
-  <!-- ===================== -->
 
   <script
     type="module"
