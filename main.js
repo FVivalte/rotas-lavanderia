@@ -5,7 +5,7 @@
 // ======================
 
 import {
-  initApp
+  iniciarApp
 } from './core/init.js';
 
 
@@ -17,17 +17,7 @@ import './events/events.js';
 
 
 // ======================
-// ESTILOS / CONFIG EXTRA
-// ======================
-
-// aqui pode futuramente entrar:
-// import './styles/theme.js';
-// import './services/notifications.js';
-// import './services/backgroundSync.js';
-
-
-// ======================
 // START APP
 // ======================
 
-initApp();
+iniciarApp();
