@@ -9,7 +9,7 @@ import {
   routeReportList,
   reportRouteList,
   reportModeEl,
-  screenReport,
+  telaRelatorio,
   reportTitle
 
 }
@@ -370,7 +370,7 @@ export async function openReportScreen(
   routeData
 ){
 
-  showScreen(screenReport);
+  showScreen(telaRelatorio);
 
   await renderFinalReport(
     routeData
