@@ -5,7 +5,7 @@ import { HOTELS } from '../data/dados.js';
 import { state } from '../core/state.js';
 
 import {
-  reportEl,
+  reportRouteList
   reportModeEl,
   screenReport,
   screenSelect,
@@ -26,7 +26,7 @@ import {
 
 export function renderReport(){
 
-  reportEl.innerHTML = '';
+  reportRouteList.innerHTML = '';
 
   state.routeReport.forEach((r, idx)=>{
 
@@ -84,7 +84,7 @@ export function renderReport(){
       </div>
     `;
 
-    reportEl.appendChild(div);
+    reportRouteList.appendChild(div);
 
   });
 
