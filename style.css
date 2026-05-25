@@ -34,17 +34,25 @@ body{
 }
 
 .app{
+
   width:100%;
-  max-width:960px;
-  margin:auto;
-  padding:18px;
+  height:100vh;
+
+  margin:0;
+  padding:0;
+
 }
 
 header{
+
   display:flex;
+
   justify-content:space-between;
+
   align-items:center;
-  margin-bottom:18px;
+
+  margin-bottom:8px;
+
 }
 
 header h1{
@@ -97,10 +105,14 @@ button.ghost{
 
 .list,
 .route-list{
+
   display:flex;
   flex-direction:column;
+
   gap:12px;
-  margin-top:18px;
+
+  margin-top:0;
+
 }
 
 .item,
@@ -280,9 +292,12 @@ footer{
     justify-content:space-between;
   }
 
-  button{
-    width:100%;
-  }
+  .controls button,
+.big-button{
+
+  width:100%;
+
+}
 }
 /* =========================
    V0.02
@@ -798,6 +813,14 @@ footer{
    MAPA + PAINEL
 ========================= */
 
+#screen-select{
+
+  position:fixed;
+
+  inset:0;
+
+}
+
 #homeScreen{
 
   position:fixed;
@@ -811,11 +834,12 @@ footer{
   display:flex;
   flex-direction:column;
 
-  gap:10px;
+  gap:8px;
 
   padding:12px;
 
   max-height:55vh;
+min-height:260px;
 
   background:
     linear-gradient(
@@ -833,6 +857,20 @@ footer{
 
 }
 
+/* HEADER */
+
+.topbar{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  padding:4px 2px;
+
+}
+
 /* BOTÕES */
 
 .bottom-actions{
@@ -841,19 +879,17 @@ footer{
 
   gap:10px;
 
-  position:sticky;
-
-  top:0;
-
-  z-index:5;
-
-  background:transparent;
-
 }
 
 /* LISTA */
-
 #hotelList{
+
+  -webkit-overflow-scrolling:touch;
+
+}
+#hotelList{
+
+  flex:1;
 
   overflow:auto;
 
@@ -863,13 +899,5 @@ footer{
   gap:10px;
 
   padding-bottom:20px;
-
-}
-#screen-select{
-
-  position:relative;
-
-  width:100%;
-  height:100vh;
 
 }
