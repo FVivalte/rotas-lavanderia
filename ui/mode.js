@@ -1,29 +1,36 @@
 // ui/mode.js
 
-import { HOTELS }
+import {
+  HOTELS
+}
 from '../data/dados.js';
 
-import { state }
+import {
+  state
+}
 from '../core/state.js';
 
 import {
 
   telaNavegacao,
 
-  currentHotelEl,
-  nextTwoEl,
+  hotelAtual,
+  proximosHoteis,
 
-  chkEntrega,
-  chkColeta,
+  checkEntrega,
+  checkColeta,
 
-  btnProximo
+  btnProximo,
+
+  previewEntrega,
+  previewColeta
 
 }
 from './elements.js';
 
 import {
 
-  renderReportMode
+  renderizarRelatorioModo
 
 }
 from './report.js';
@@ -46,7 +53,7 @@ from '../services/gps.js';
 
 import {
 
-  saveAppState
+  salvarEstadoApp
 
 }
 from '../storage/storage.js';
@@ -56,7 +63,7 @@ from '../storage/storage.js';
 // INICIAR MODO ROTA
 // ======================
 
-export function startModeRoute(){
+export function iniciarModoRota(){
 
   if(
     state.routeOrder.length === 0
@@ -100,13 +107,13 @@ export function startModeRoute(){
 
   startGpsTracking();
 
-  updateModeUI();
+  atualizarModoUI();
 
-  renderReportMode();
+  renderizarRelatorioModo();
 
-  renderPhotoPreviews();
+  renderizarPreviewsFotos();
 
-  saveAppState();
+  salvarEstadoApp();
 
 }
 
@@ -115,26 +122,34 @@ export function startModeRoute(){
 // UPDATE UI
 // ======================
 
-export function updateModeUI(){
+export function atualizarModoUI(){
 
   if(
     state.currentIndex >=
     state.routeOrder.length
   ){
 
-    currentHotelEl.innerHTML = `
+    if(hotelAtual){
 
-      <div>
+      hotelAtual.innerHTML = `
 
-        <strong>
-          Rota finalizada
-        </strong>
+        <div>
 
-      </div>
+          <strong>
+            Rota finalizada
+          </strong>
 
-    `;
+        </div>
 
-    nextTwoEl.innerHTML = '';
+      `;
+
+    }
+
+    if(proximosHoteis){
+
+      proximosHoteis.innerHTML = '';
+
+    }
 
     return;
 
@@ -150,38 +165,52 @@ export function updateModeUI(){
       h => h.id === id
     );
 
-  if(!hotel) return;
+  if(!hotel){
+    return;
+  }
 
-  currentHotelEl.innerHTML = `
+  if(hotelAtual){
 
-    <div style="font-weight:700">
+    hotelAtual.innerHTML = `
 
-      ${hotel.name}
+      <div style="font-weight:700">
 
-    </div>
+        ${hotel.name}
 
-    <div class="muted">
+      </div>
 
-      ${hotel.address}
+      <div class="muted">
 
-    </div>
+        ${hotel.address}
 
-  `;
+      </div>
 
-  renderNextHotels();
+    `;
+
+  }
+
+  renderizarProximosHoteis();
 
   const entry =
     state.routeReport[
       state.currentIndex
     ];
 
-  chkEntrega.checked =
-    entry.entrega;
+  if(checkEntrega){
 
-  chkColeta.checked =
-    entry.coleta;
+    checkEntrega.checked =
+      entry.entrega;
 
-  updateNextButton();
+  }
+
+  if(checkColeta){
+
+    checkColeta.checked =
+      entry.coleta;
+
+  }
+
+  atualizarTextoBotao();
 
 }
 
@@ -190,9 +219,13 @@ export function updateModeUI(){
 // PRÓXIMOS HOTÉIS
 // ======================
 
-function renderNextHotels(){
+function renderizarProximosHoteis(){
 
-  nextTwoEl.innerHTML = '';
+  if(!proximosHoteis){
+    return;
+  }
+
+  proximosHoteis.innerHTML = '';
 
   for(let i = 1; i <= 2; i++){
 
@@ -213,7 +246,9 @@ function renderNextHotels(){
           state.routeOrder[idx]
       );
 
-    if(!hotel) continue;
+    if(!hotel){
+      continue;
+    }
 
     const div =
       document.createElement('div');
@@ -240,7 +275,8 @@ function renderNextHotels(){
 
     `;
 
-    nextTwoEl.appendChild(div);
+    proximosHoteis
+      .appendChild(div);
 
   }
 
@@ -251,7 +287,11 @@ function renderNextHotels(){
 // TEXTO BOTÃO
 // ======================
 
-function updateNextButton(){
+function atualizarTextoBotao(){
+
+  if(!btnProximo){
+    return;
+  }
 
   if(
     state.currentIndex ===
@@ -275,7 +315,7 @@ function updateNextButton(){
 // PRÓXIMO HOTEL
 // ======================
 
-export function nextHotel(){
+export function proximoHotel(){
 
   if(
     state.currentIndex >=
@@ -289,22 +329,22 @@ export function nextHotel(){
       state.currentIndex
     ];
 
-  const now =
+  const agora =
     new Date().toISOString();
 
   if(!entry.arrival){
 
-    entry.arrival = now;
+    entry.arrival = agora;
 
   }
 
-  entry.departure = now;
+  entry.departure = agora;
 
   entry.entrega =
-    chkEntrega.checked;
+    checkEntrega.checked;
 
   entry.coleta =
-    chkColeta.checked;
+    checkColeta.checked;
 
   state.arrivalConfirmed =
     false;
@@ -316,21 +356,21 @@ export function nextHotel(){
     state.routeOrder.length
   ){
 
-    finishModeRoute();
+    finalizarModoRota();
 
     return;
 
   }
 
-  updateModeUI();
+  atualizarModoUI();
 
-  renderReportMode();
+  renderizarRelatorioModo();
 
   updateMap();
 
-  renderPhotoPreviews();
+  renderizarPreviewsFotos();
 
-  saveAppState();
+  salvarEstadoApp();
 
 }
 
@@ -339,15 +379,15 @@ export function nextHotel(){
 // FINALIZAR
 // ======================
 
-export function finishModeRoute(){
+export function finalizarModoRota(){
 
   stopGpsTracking();
 
-  updateModeUI();
+  atualizarModoUI();
 
-  renderReportMode();
+  renderizarRelatorioModo();
 
-  saveAppState();
+  salvarEstadoApp();
 
 }
 
@@ -356,9 +396,18 @@ export function finishModeRoute(){
 // FOTO PREVIEW
 // ======================
 
-function renderPhotoPreviews(){
+function renderizarPreviewsFotos(){
 
-  // evitar erro temporário
-  // enquanto previews não foram migrados
+  if(previewEntrega){
+
+    previewEntrega.innerHTML = '';
+
+  }
+
+  if(previewColeta){
+
+    previewColeta.innerHTML = '';
+
+  }
 
 }
