@@ -1,38 +1,43 @@
 // ui/selection.js
 
-import { HOTELS }
+import {
+  HOTELS
+}
 from '../data/dados.js';
 
-import { state }
+import {
+  state
+}
 from '../core/state.js';
 
 import {
 
-  hotelListEl,
-  activeCountSelectEl,
-  activeCountRouteEl
+  listaHoteis,
+  contadorSelecao,
+  contadorRota,
 
-} from './elements.js';
-
-import {
-
-  saveAppState,
-  saveCustomHotels
-
-} from '../storage/storage.js';
-
-import { renderRoute }
-from './route.js';
-
-import {
+  telaSelecao,
   telaRota,
-  telaNavegacao,
-  telaRelatorio
+  telaNavegacao
+
 }
 from './elements.js';
 
 import {
-  showScreen
+
+  salvarEstadoApp,
+  salvarHoteisCustomizados
+
+}
+from '../storage/storage.js';
+
+import {
+  renderizarRota
+}
+from './route.js';
+
+import {
+  mostrarTela
 }
 from './screens.js';
 
@@ -41,14 +46,14 @@ from './screens.js';
 // GERAR ROTA
 // ======================
 
-export function generateRoute(){
+export function gerarRota(){
 
-  const active =
+  const ativos =
     HOTELS.filter(
       h => state.activeSet.has(h.id)
     );
 
-  if(active.length === 0){
+  if(ativos.length === 0){
 
     alert(
       'Selecione ao menos um hotel.'
@@ -59,34 +64,33 @@ export function generateRoute(){
   }
 
   state.routeOrder =
-    active.map(h => h.id);
+    ativos.map(h => h.id);
 
-  renderRoute();
+  renderizarRota();
 
-  telaSelecao.style.display = 'none';
-
-  telaRota.style.display = 'block';
-
-  telaNavegacao.style.display = 'none';
+  mostrarTela(
+    telaRota
+  );
 
   saveAppState();
 
 }
 
+
 // ======================
 // CONTADORES
 // ======================
 
-export function updateCounters(){
+export function atualizarContadores(){
 
-  const text =
+  const texto =
     `${state.activeSet.size} hotéis ativos`;
 
-  activeCountSelectEl.textContent =
-    text;
+  contadorSelecao.textContent =
+    texto;
 
-  activeCountRouteEl.textContent =
-    text;
+  contadorRota.textContent =
+    texto;
 
 }
 
@@ -95,7 +99,7 @@ export function updateCounters(){
 // REMOVER HOTEL
 // ======================
 
-export function deleteCustomHotel(id){
+export function removerHotelCustomizado(id){
 
   const index =
     HOTELS.findIndex(
@@ -129,11 +133,11 @@ export function deleteCustomHotel(id){
       r => r.id !== id
     );
 
-  saveCustomHotels();
+  salvarHoteisCustomizados();
 
-  renderSelection();
+  renderizarSelecao();
 
-  renderRoute();
+  renderizarRota();
 
 }
 
@@ -142,9 +146,9 @@ export function deleteCustomHotel(id){
 // RENDER SELEÇÃO
 // ======================
 
-export function renderSelection(){
+export function renderizarSelecao(){
 
-  hotelListEl.innerHTML = '';
+  listaHoteis.innerHTML = '';
 
   HOTELS.forEach(h=>{
 
@@ -203,7 +207,7 @@ export function renderSelection(){
 
     `;
 
-    hotelListEl.appendChild(div);
+    listaHoteis.appendChild(div);
 
   });
 
@@ -212,7 +216,7 @@ export function renderSelection(){
 // TOGGLES
 // ======================
 
-  hotelListEl
+  listaHoteis
   .querySelectorAll(
     'input[type=checkbox]'
   )
@@ -237,7 +241,7 @@ export function renderSelection(){
 
         }
 
-        updateCounters();
+        atualizarContadores();
 
         saveAppState();
 
@@ -251,7 +255,7 @@ export function renderSelection(){
 // BOTÃO DELETE
 // ======================
 
-  hotelListEl
+  listaHoteis
   .querySelectorAll(
     '[data-delete]'
   )
@@ -266,7 +270,7 @@ export function renderSelection(){
             btn.dataset.delete
           );
 
-        deleteCustomHotel(id);
+        removerHotelCustomizado(id);
 
       }
     );
@@ -278,7 +282,7 @@ export function renderSelection(){
 // FINAL
 // ======================
 
-  updateCounters();
+  atualizarContadores();
 
   saveAppState();
 
