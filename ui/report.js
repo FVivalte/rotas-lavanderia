@@ -104,7 +104,7 @@ export function renderizarRelatorio(){
 
         <div class="muted">
 
-          ${r.entrega ? 'Entrega' : ''}
+          ${r.entrega ? 'Entrega ' : ''}
           ${r.coleta ? 'Coleta' : ''}
 
         </div>
@@ -200,9 +200,9 @@ export function renderizarRelatorioModo(){
 
 export function obterTituloData(){
 
-  const now = new Date();
+  const agora = new Date();
 
-  const weekdays = [
+  const diasSemana = [
 
     'Domingo',
     'Segunda-feira',
@@ -214,24 +214,26 @@ export function obterTituloData(){
 
   ];
 
-  const weekday =
-    weekdays[now.getDay()];
+  const diaSemana =
+    diasSemana[agora.getDay()];
 
-  const day =
-    String(now.getDate())
-      .padStart(2,'0');
+  const dia =
+    String(
+      agora.getDate()
+    ).padStart(2,'0');
 
-  const month =
-    String(now.getMonth() + 1)
-      .padStart(2,'0');
+  const mes =
+    String(
+      agora.getMonth() + 1
+    ).padStart(2,'0');
 
-  const year =
-    now.getFullYear();
+  const ano =
+    agora.getFullYear();
 
   return `
-    ROTA do dia
-    ${weekday},
-    ${day}/${month}/${year}
+ROTA do dia
+${diaSemana},
+${dia}/${mes}/${ano}
   `;
 
 }
@@ -242,7 +244,7 @@ export function obterTituloData(){
 // ======================
 
 export async function renderizarRelatorioFinal(
-  routeData
+  dadosRota
 ){
 
   if(!listaRelatorioFinal){
@@ -251,15 +253,19 @@ export async function renderizarRelatorioFinal(
 
   listaRelatorioFinal.innerHTML = '';
 
-  tituloRelatorio.textContent =
-    obterTituloData();
+  if(tituloRelatorio){
+
+    tituloRelatorio.textContent =
+      obterTituloData();
+
+  }
 
   for(
     const [index, hotel]
-    of routeData.entries()
+    of dadosRota.entries()
   ){
 
-    const deliveryImages = [];
+    const imagensEntrega = [];
 
     for(
       const photoId
@@ -271,7 +277,7 @@ export async function renderizarRelatorioFinal(
 
       if(photo?.image){
 
-        deliveryImages.push(
+        imagensEntrega.push(
           photo.image
         );
 
@@ -279,7 +285,7 @@ export async function renderizarRelatorioFinal(
 
     }
 
-    const pickupImages = [];
+    const imagensColeta = [];
 
     for(
       const photoId
@@ -291,7 +297,7 @@ export async function renderizarRelatorioFinal(
 
       if(photo?.image){
 
-        pickupImages.push(
+        imagensColeta.push(
           photo.image
         );
 
@@ -327,6 +333,62 @@ export async function renderizarRelatorioFinal(
 
       </div>
 
+      <div class="report-photos">
+
+        <div class="report-photo-group">
+
+          <div class="report-photo-label">
+            Entrega
+          </div>
+
+          <div class="report-photo-list">
+
+            ${
+              imagensEntrega.length
+              ? imagensEntrega
+                  .map(src => `
+                    <img src="${src}">
+                  `)
+                  .join('')
+              : `
+                <div class="empty-photo">
+                  Sem fotos
+                </div>
+              `
+            }
+
+          </div>
+
+        </div>
+
+        <div class="report-photo-group">
+
+          <div class="report-photo-label">
+            Coleta
+          </div>
+
+          <div class="report-photo-list">
+
+            ${
+              imagensColeta.length
+              ? imagensColeta
+                  .map(src => `
+                    <img src="${src}">
+                  `)
+                  .join('')
+              : `
+                <div class="empty-photo">
+                  Sem fotos
+                </div>
+              `
+            }
+
+          </div>
+
+        </div>
+
+      </div>
+
     `;
 
     listaRelatorioFinal
@@ -342,7 +404,7 @@ export async function renderizarRelatorioFinal(
 // ======================
 
 export async function abrirTelaRelatorio(
-  routeData
+  dadosRota
 ){
 
   mostrarTela(
@@ -350,7 +412,7 @@ export async function abrirTelaRelatorio(
   );
 
   await renderizarRelatorioFinal(
-    routeData
+    dadosRota
   );
 
 }
