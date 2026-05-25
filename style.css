@@ -308,6 +308,13 @@ footer{
   padding:16px;
 }
 
+
+#screen-mode{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
 .hidden{
   display:none !important;
 }
@@ -617,10 +624,11 @@ footer{
 }
 
 #map{
-
-  position:fixed;
-  inset:0;
-
+  width:100%;
+  height:55vh;
+  border-radius:16px;
+  overflow:hidden;
+  flex-shrink:0;
 }
 
 .map-controls{
@@ -891,6 +899,7 @@ min-height:260px;
   -webkit-overflow-scrolling:touch;
 
 }
+
 #hotelList{
 
   flex:1;
@@ -904,4 +913,14 @@ min-height:260px;
 
   padding-bottom:20px;
 
+}
+#screen-route{
+  display:flex;
+  flex-direction:column;
+}
+
+#routeList{
+  flex:1;
+  overflow-y:auto;
+  padding-bottom:120px;
 }
