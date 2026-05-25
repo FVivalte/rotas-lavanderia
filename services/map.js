@@ -1,63 +1,124 @@
+// services/map.js
+
+import { HOTELS }
+from '../data/dados.js';
+
+import { state }
+from '../core/state.js';
+
+import {
+
+  atualizarCamera,
+  configurarListenersCamera
+
+}
+from './map-camera.js';
+
+
 // =========================
 // MAPA PRINCIPAL
 // =========================
 
-let map;
+let marcadorUsuario;
 
-let userMarker;
+
+// =========================
+// INIT MAP
+// =========================
 
 export function initMap(){
 
-  map = new maplibregl.Map({
+  if(state.mapInitialized){
+    return;
+  }
 
-    container:'map',
+  state.map =
+    new maplibregl.Map({
 
-    style:'https://demotiles.maplibre.org/style.json',
+      container:'map',
 
-    center:[-41.882, -22.757],
-    zoom:12,
+      style:
+        'https://demotiles.maplibre.org/style.json',
 
-    pitch:45,
-    bearing:0,
+      center:[
+        -41.882,
+        -22.757
+      ],
 
-    antialias:true
+      zoom:12,
 
-  });
+      pitch:45,
 
-  map.addControl(
+      bearing:0,
+
+      antialias:true
+
+    });
+
+  state.map.addControl(
+
     new maplibregl.NavigationControl(),
+
     'top-right'
+
   );
 
-  map.on('load',()=>{
+  state.map.on(
+    'load',
+    ()=>{
 
-    addHotels();
+      adicionarHoteis();
 
-    startLocationTracking();
+    }
+  );
 
-  });
+  configurarListenersCamera(
+    state.map
+  );
+
+  state.mapInitialized = true;
 
 }
+
 
 // =========================
 // HOTÉIS
 // =========================
 
-function addHotels(){
+function adicionarHoteis(){
 
   HOTELS.forEach(hotel=>{
 
-    const el = document.createElement('div');
+    if(!hotel.coords){
+      return;
+    }
 
-    el.className='hotel-marker';
+    const partes =
+      hotel.coords.split(',');
 
-    el.innerHTML='🏨';
+    if(partes.length < 2){
+      return;
+    }
+
+    const lat =
+      Number(partes[0]);
+
+    const lng =
+      Number(partes[1]);
+
+    const el =
+      document.createElement('div');
+
+    el.className =
+      'hotel-marker';
+
+    el.innerHTML = '🏨';
 
     new maplibregl.Marker(el)
 
       .setLngLat([
-        hotel.lng,
-        hotel.lat
+        lng,
+        lat
       ])
 
       .setPopup(
@@ -67,112 +128,107 @@ function addHotels(){
         })
 
         .setHTML(`
-          <strong>${hotel.name}</strong>
+
+          <strong>
+            ${hotel.name}
+          </strong>
+
           <br>
+
           ${hotel.region}
+
         `)
 
       )
 
-      .addTo(map);
+      .addTo(state.map);
 
   });
 
 }
 
-// =========================
-// GPS
-// =========================
-
-function startLocationTracking(){
-
-  navigator.geolocation.watchPosition(
-
-    position=>{
-
-      const lng = position.coords.longitude;
-
-      const lat = position.coords.latitude;
-
-      updateUserMarker(lng,lat);
-
-      autoCenter(lng,lat);
-
-    },
-
-    error=>{
-      console.log(error);
-    },
-
-    {
-      enableHighAccuracy:true,
-      maximumAge:0,
-      timeout:10000
-    }
-
-  );
-
-}
 
 // =========================
 // MARCADOR USUÁRIO
 // =========================
 
-function updateUserMarker(lng,lat){
+function atualizarMarcadorUsuario(
+  lng,
+  lat
+){
 
-  if(!userMarker){
+  if(!marcadorUsuario){
 
-    const el=document.createElement('div');
+    const el =
+      document.createElement('div');
 
-    el.className='user-marker';
+    el.className =
+      'user-marker';
 
-    el.innerHTML='📍';
+    el.innerHTML = '📍';
 
-    userMarker = new maplibregl.Marker(el)
+    marcadorUsuario =
+      new maplibregl.Marker(el)
 
-      .setLngLat([lng,lat])
+        .setLngLat([
+          lng,
+          lat
+        ])
 
-      .addTo(map);
+        .addTo(state.map);
 
     return;
+
   }
 
-  userMarker.setLngLat([lng,lat]);
+  marcadorUsuario.setLngLat([
+    lng,
+    lat
+  ]);
 
 }
 
-// =========================
-// AUTO CENTRALIZAR
-// =========================
-
-function autoCenter(lng,lat){
-
-  map.easeTo({
-
-    center:[lng,lat],
-
-    duration:1200,
-
-    zoom:16,
-
-    pitch:60,
-
-    bearing:0
-
-  });
-
-}
-
-export { map };
 
 // =========================
 // UPDATE MAP
 // =========================
 
-export function updateMap(lng, lat){
+export function updateMap(
 
-  updateUserMarker(lng, lat);
+  lng,
+  lat,
+  heading = 0,
+  speed = 0
 
-  autoCenter(lng, lat);
+){
+
+  if(!state.map){
+    return;
+  }
+
+  atualizarMarcadorUsuario(
+    lng,
+    lat
+  );
+
+  atualizarCamera(
+
+    state.map,
+
+    lng,
+    lat,
+
+    heading,
+    speed
+
+  );
 
 }
+
+
+// =========================
+// EXPORT MAP
+// =========================
+
+export const map =
+  ()=> state.map;
