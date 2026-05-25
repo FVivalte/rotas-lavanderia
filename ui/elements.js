@@ -5,16 +5,24 @@
 // ======================
 
 export const screenSelect =
-  document.getElementById('screen-select');
+  document.getElementById(
+    'screen-select'
+  );
 
 export const screenRoute =
-  document.getElementById('screen-route');
+  document.getElementById(
+    'screen-route'
+  );
 
 export const screenMode =
-  document.getElementById('screen-mode');
+  document.getElementById(
+    'screen-mode'
+  );
 
 export const screenReport =
-  document.getElementById('screen-report');
+  document.getElementById(
+    'screen-report'
+  );
 
 
 // ======================
@@ -22,18 +30,30 @@ export const screenReport =
 // ======================
 
 export const hotelListEl =
-  document.getElementById('hotelList');
+  document.getElementById(
+    'hotelList'
+  );
 
 export const routeListEl =
-  document.getElementById('routeList');
-
-export const reportModeEl =
-  document.getElementById('reportMode');
+  document.getElementById(
+    'routeList'
+  );
 
 export const routeReportList =
   document.getElementById(
     'routeReportList'
   );
+
+export const reportRouteList =
+  document.getElementById(
+    'reportRouteList'
+  );
+
+export const reportModeEl =
+  document.getElementById(
+    'reportMode'
+  );
+
 
 // ======================
 // CONTADORES
@@ -70,7 +90,9 @@ export const nextTwoEl =
 // ======================
 
 export const mapEl =
-  document.getElementById('map');
+  document.getElementById(
+    'map'
+  );
 
 
 // ======================
@@ -97,9 +119,14 @@ export const modal =
 // BOTÕES
 // ======================
 
-export const btnGenerate =
+export const btnCreateRoute =
   document.getElementById(
-    'btn-generate'
+    'btn-create-route'
+  );
+
+export const btnClear =
+  document.getElementById(
+    'btn-clear'
   );
 
 export const btnBack =
@@ -110,11 +137,6 @@ export const btnBack =
 export const btnStartRoute =
   document.getElementById(
     'btn-start-route'
-  );
-
-export const btnReset =
-  document.getElementById(
-    'btn-reset'
   );
 
 export const btnNext =
