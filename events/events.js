@@ -16,7 +16,7 @@ import {
   btnGoogleMaps,
 
   btnAdicionarHotel,
-  btnSalvaHotel,
+  btnSalvarHotel,
   btnCloseModal,
 
   btnProximo,
@@ -528,9 +528,9 @@ if(btnCloseModal){
 // SALVAR HOTEL
 // ======================
 
-if(btnSalvaHotel){
+if(btnSalvarHotel){
 
-  btnSalvaHotel.addEventListener(
+  btnSalvarHotel.addEventListener(
     'click',
     ()=>{
 
