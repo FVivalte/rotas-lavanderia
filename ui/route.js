@@ -8,9 +8,9 @@ from '../core/state.js';
 
 import {
 
-  listaRotaEl,
+  listaRota,
   contadorAtivosSelecao,
-  contadorAtivosRota
+  contadorRota
 
 }
 from './elements.js';
@@ -49,7 +49,7 @@ function atualizarContadores(){
   contadorAtivosSelecao.textContent =
     texto;
 
-  contadorAtivosRota.textContent =
+  contadorRota.textContent =
     texto;
 
 }
