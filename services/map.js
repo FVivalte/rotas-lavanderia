@@ -164,3 +164,15 @@ function autoCenter(lng,lat){
 }
 
 export { map };
+
+// =========================
+// UPDATE MAP
+// =========================
+
+export function updateMap(lng, lat){
+
+  updateUserMarker(lng, lat);
+
+  autoCenter(lng, lat);
+
+}
