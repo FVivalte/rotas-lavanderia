@@ -5,16 +5,16 @@
 // ======================
 
 export const screenSelect =
-  document.getElementById('screen-select');
+  document.getElementById(screen-select);
 
 export const screenRoute =
-  document.getElementById('screen-route');
+  document.getElementById(screen-route);
 
 export const screenMode =
-  document.getElementById('screen-mode');
+  document.getElementById(screen-mode);
 
 export const screenReport =
-  document.getElementById('screen-report');
+  document.getElementById(screen-report);
 
 
 // ======================
