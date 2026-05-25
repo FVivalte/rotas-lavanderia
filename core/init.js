@@ -1,37 +1,60 @@
 // core/init.js
 
-import { loadCustomHotels } 
+import {
+  loadCustomHotels,
+  restoreAppState
+}
 from '../storage/storage.js';
-
-import { restoreAppState }
-from '../storage/storage.js';
-
-import { initDatabase }
-from '../storage/database.js';
-
-import { renderSelection }
-from '../ui/selection.js';
-
-import { renderRoute }
-from '../ui/route.js';
-
-import { updateModeUI }
-from '../ui/mode.js';
-
-import { initEvents }
-from '../events/events.js';
-
-import { startGpsTracking }
-from '../services/gps.js';
-
-import { state }
-from '../core/state.js';
 
 import {
+  initDatabase
+}
+from '../storage/database.js';
+
+import {
+  renderSelection
+}
+from '../ui/selection.js';
+
+import {
+  renderRoute
+}
+from '../ui/route.js';
+
+import {
+  updateModeUI
+}
+from '../ui/mode.js';
+
+import {
+  initEvents
+}
+from '../events/events.js';
+
+import {
+  startGpsTracking
+}
+from '../services/gps.js';
+
+import {
+  state
+}
+from './state.js';
+
+import {
+
   telaSelecao,
   telaRota,
-  telaNavegacao
-} from '../ui/elements.js';
+  telaNavegacao,
+  telaRelatorio
+
+}
+from '../ui/elements.js';
+
+import {
+  mostrarTela
+}
+from '../ui/screens.js';
 
 
 // ======================
@@ -42,23 +65,34 @@ export async function initApp(){
 
   try{
 
-    // indexedDB
+    // ======================
+    // DATABASE
+    // ======================
+
     await initDatabase();
 
-    // hotéis customizados
+    // ======================
+    // STORAGE
+    // ======================
+
     loadCustomHotels();
 
-    // restaura estado salvo
     restoreAppState();
 
-    // listeners globais
+    // ======================
+    // EVENTS
+    // ======================
+
     initEvents();
 
-    // render inicial seleção
+    // ======================
+    // RENDER INICIAL
+    // ======================
+
     renderSelection();
 
     // ======================
-    // RESTORE SCREEN
+    // RESTORE ROTA
     // ======================
 
     if(state.routeOrder.length){
@@ -67,23 +101,45 @@ export async function initApp(){
 
     }
 
-    if(state.currentScreen === 'route'){
+    // ======================
+    // RESTORE TELA
+    // ======================
 
-      telaSelecao.style.display = 'none';
-      telaRota.style.display = 'block';
-      telaNavegacao.style.display = 'none';
+    switch(state.currentScreen){
 
-    }
+      case 'route':
 
-    if(state.currentScreen === 'mode'){
+        mostrarTela(
+          telaRota
+        );
 
-      telaSelecao.style.display = 'none';
-      telaRota.style.display = 'none';
-      telaNavegacao.style.display = 'block';
+        break;
 
-      updateModeUI();
+      case 'mode':
 
-      startGpsTracking();
+        mostrarTela(
+          telaNavegacao
+        );
+
+        updateModeUI();
+
+        startGpsTracking();
+
+        break;
+
+      case 'report':
+
+        mostrarTela(
+          telaRelatorio
+        );
+
+        break;
+
+      default:
+
+        mostrarTela(
+          telaSelecao
+        );
 
     }
 
