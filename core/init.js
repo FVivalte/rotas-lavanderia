@@ -28,9 +28,9 @@ import { state }
 from '../core/state.js';
 
 import {
-  screenSelect,
-  screenRoute,
-  screenMode
+  telaSelecao,
+  telaRota,
+  telaNavegacao
 } from '../ui/elements.js';
 
 
@@ -69,17 +69,17 @@ export async function initApp(){
 
     if(state.currentScreen === 'route'){
 
-      screenSelect.style.display = 'none';
-      screenRoute.style.display = 'block';
-      screenMode.style.display = 'none';
+      telaSelecao.style.display = 'none';
+      telaRota.style.display = 'block';
+      telaNavegacao.style.display = 'none';
 
     }
 
     if(state.currentScreen === 'mode'){
 
-      screenSelect.style.display = 'none';
-      screenRoute.style.display = 'none';
-      screenMode.style.display = 'block';
+      telaSelecao.style.display = 'none';
+      telaRota.style.display = 'none';
+      telaNavegacao.style.display = 'block';
 
       updateModeUI();
 
