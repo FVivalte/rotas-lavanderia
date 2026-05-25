@@ -1,3 +1,5 @@
+// ui/screens.js
+
 import {
 
   telaSelecao,
@@ -8,7 +10,7 @@ import {
 }
 from './elements.js';
 
-const screens = [
+const telas = [
 
   telaSelecao,
   telaRota,
@@ -17,13 +19,15 @@ const screens = [
 
 ];
 
-export function showScreen(screen){
+export function mostrarTela(tela){
 
-  screens.forEach(el=>{
+  telas.forEach(el=>{
+
     el.classList.add('hidden');
+
   });
 
-  screen.classList.remove('hidden');
+  tela.classList.remove('hidden');
 
   window.scrollTo(0,0);
 
