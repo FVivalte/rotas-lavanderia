@@ -30,9 +30,10 @@ export const routeListEl =
 export const reportModeEl =
   document.getElementById('reportMode');
 
-export const reportRouteList =
-  document.getElementById('reportRouteList');
-
+export const routeReportList =
+  document.getElementById(
+    'routeReportList'
+  );
 
 // ======================
 // CONTADORES
