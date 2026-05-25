@@ -5,7 +5,7 @@ import { HOTELS } from '../data/dados.js';
 import { state } from '../core/state.js';
 
 import {
-  reportRouteList
+  reportRouteList,
   reportModeEl,
   screenReport,
   screenSelect,
