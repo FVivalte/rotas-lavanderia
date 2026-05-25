@@ -25,10 +25,16 @@ import { renderRoute }
 from './route.js';
 
 import {
-  screenSelect,
   screenRoute,
-  screenMode
-} from './elements.js';
+  screenMode,
+  screenReport
+}
+from './elements.js';
+
+import {
+  showScreen
+}
+from './screens.js';
 
 
 // ======================
