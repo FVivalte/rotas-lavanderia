@@ -8,7 +8,7 @@ from '../core/state.js';
 
 import {
 
-  btnVolta,
+  btnVoltar,
   btnIniciarRota,
   btnExportar,
   btnFinalizar,
