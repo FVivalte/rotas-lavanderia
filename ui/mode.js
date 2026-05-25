@@ -21,8 +21,7 @@ import {
 } from './elements.js';
 
 import {
-
-  hideAllScreens,
+  
   renderReportMode
 
 } from './report.js';
@@ -84,8 +83,6 @@ export function startModeRoute(){
       pickupPhotos:[]
 
     }));
-
-  hideAllScreens();
 
   screenMode.style.display =
     'block';
