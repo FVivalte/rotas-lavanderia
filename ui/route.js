@@ -21,7 +21,7 @@ from './elements.js';
 
 import {
 
-  renderSelection
+  renderizarSelecao
 
 }
 from './selection.js';
