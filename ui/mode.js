@@ -16,7 +16,7 @@ import {
   chkEntrega,
   chkColeta,
 
-  btnNext
+  btnProximo
 
 } from './elements.js';
 
@@ -240,12 +240,12 @@ function updateNextButton(){
     state.routeOrder.length - 1
   ){
 
-    btnNext.textContent =
+    btnProximo.textContent =
       'Finalizar';
 
   }else{
 
-    btnNext.textContent =
+    btnProximo.textContent =
       'Próximo hotel';
 
   }
