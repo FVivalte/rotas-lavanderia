@@ -45,10 +45,12 @@ import {
 
 import {
   generateRoute,
-  renderSelection,
-  renderRoute
+  renderSelection
 } from '../ui/selection.js';
 
+import {
+  renderRoute
+} from '../ui/route.js';
 
 import {
 
