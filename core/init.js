@@ -61,7 +61,7 @@ from '../ui/screens.js';
 // INIT APP
 // ======================
 
-export async function initApp(){
+export async function iniciarApp(){
 
   try{
 
