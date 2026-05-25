@@ -38,35 +38,45 @@ import {
 
   screenSelect,
   screenRoute,
-  screenMode
+  screenMode,
+  screenReport
 
 } from '../ui/elements.js';
 
 
 import {
+  showScreen
+}
+from '../ui/screens.js';
+
+
+import {
   generateRoute,
   renderSelection
-} from '../ui/selection.js';
+}
+from '../ui/selection.js';
 
 import {
   renderRoute
-} from '../ui/route.js';
+}
+from '../ui/route.js';
 
 import {
 
   startModeRoute,
   updateModeUI
 
-} from '../ui/mode.js';
+}
+from '../ui/mode.js';
 
 
 import {
 
-  hideAllScreens,
   openReportScreen,
   renderReportMode
 
-} from '../ui/report.js';
+}
+from '../ui/report.js';
 
 
 import {
@@ -74,7 +84,8 @@ import {
   parseCoords,
   readFilesAsBase64
 
-} from '../utils/utils.js';
+}
+from '../utils/utils.js';
 
 
 import {
@@ -82,35 +93,38 @@ import {
   saveAppState,
   saveCustomHotels
 
-} from '../storage/storage.js';
+}
+from '../storage/storage.js';
 
 
 import {
 
   stopGpsTracking
 
-} from '../services/gps.js';
+}
+from '../services/gps.js';
 
 
 import {
 
   savePhoto
 
-} from '../storage/database.js';
+}
+from '../storage/database.js';
 
 
 // ======================
-// BOTÕES NOVOS
+// BOTÕES
 // ======================
 
 const btnCreateRoute =
   document.getElementById(
-    'btnCreateRoute'
+    'btn-create-route'
   );
 
 const btnClear =
   document.getElementById(
-    'btnClear'
+    'btn-clear'
   );
 
 
@@ -122,7 +136,15 @@ if(btnCreateRoute){
 
   btnCreateRoute.addEventListener(
     'click',
-    generateRoute
+    ()=>{
+
+      generateRoute();
+
+      renderRoute();
+
+      showScreen(screenRoute);
+
+    }
   );
 
 }
@@ -180,14 +202,7 @@ if(btnBack){
 
       stopGpsTracking();
 
-      screenSelect.style.display =
-        'block';
-
-      screenRoute.style.display =
-        'none';
-
-      screenMode.style.display =
-        'none';
+      showScreen(screenSelect);
 
     }
   );
@@ -203,7 +218,13 @@ if(btnStartRoute){
 
   btnStartRoute.addEventListener(
     'click',
-    startModeRoute
+    ()=>{
+
+      startModeRoute();
+
+      showScreen(screenMode);
+
+    }
   );
 
 }
@@ -339,14 +360,11 @@ if(btnNewRoute){
 
       state.currentIndex = 0;
 
-      hideAllScreens();
-
-      screenSelect.style.display =
-        'block';
-
       renderSelection();
 
       saveAppState();
+
+      showScreen(screenSelect);
 
     }
   );
@@ -457,23 +475,11 @@ if(btnOpenMaps){
 if(voiceToggle){
 
   voiceToggle.addEventListener(
-    'click',
+    'change',
     ()=>{
 
       state.speechEnabled =
-        !state.speechEnabled;
-
-      if(state.speechEnabled){
-
-        voiceToggle.textContent =
-          '🔊 Voz ligada';
-
-      }else{
-
-        voiceToggle.textContent =
-          '🔇 Voz desligada';
-
-      }
+        voiceToggle.checked;
 
       saveAppState();
 
@@ -612,10 +618,8 @@ if(deliveryPhotosInput){
           crypto.randomUUID();
 
         await savePhoto({
-
           id,
           image
-
         });
 
         ids.push(id);
@@ -667,10 +671,8 @@ if(pickupPhotosInput){
           crypto.randomUUID();
 
         await savePhoto({
-
           id,
           image
-
         });
 
         ids.push(id);
