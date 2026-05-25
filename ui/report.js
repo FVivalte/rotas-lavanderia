@@ -5,18 +5,25 @@ import { HOTELS } from '../data/dados.js';
 import { state } from '../core/state.js';
 
 import {
+
+  routeReportList,
   reportRouteList,
   reportModeEl,
   screenReport,
-  screenSelect,
-  screenRoute,
-  screenMode,
   reportTitle
-} from './elements.js';
+
+}
+from './elements.js';
+
+import {
+  showScreen
+}
+from './screens.js';
 
 import {
   getPhoto
-} from '../storage/database.js';
+}
+from '../storage/database.js';
 
 
 // ======================
@@ -25,7 +32,7 @@ import {
 
 export function renderReport(){
 
-  reportRouteList.innerHTML = '';
+  routeReportList.innerHTML = '';
 
   state.routeReport.forEach((r, idx)=>{
 
@@ -41,6 +48,7 @@ export function renderReport(){
 
     div.innerHTML = `
       <div>
+
         <strong>
           ${idx + 1}. ${h.name}
         </strong>
@@ -51,11 +59,13 @@ export function renderReport(){
         >
           ${h.address}
         </div>
+
       </div>
 
       <div style="text-align:right">
 
         <div class="muted">
+
           ${
             r.arrival
             ? 'Cheg: ' +
@@ -63,9 +73,11 @@ export function renderReport(){
                 .toLocaleTimeString()
             : 'Cheg: -'
           }
+
         </div>
 
         <div class="muted">
+
           ${
             r.departure
             ? 'Sai: ' +
@@ -73,17 +85,20 @@ export function renderReport(){
                 .toLocaleTimeString()
             : 'Sai: -'
           }
+
         </div>
 
         <div class="muted">
+
           ${r.entrega ? 'Entrega' : ''}
           ${r.coleta ? 'Coleta' : ''}
+
         </div>
 
       </div>
     `;
 
-    reportRouteList.appendChild(div);
+    routeReportList.appendChild(div);
 
   });
 
@@ -112,29 +127,35 @@ export function renderReportMode(){
 
     div.innerHTML = `
       <div>
+
         <strong>
           ${idx + 1}. ${h.name}
         </strong>
+
       </div>
 
       <div style="text-align:right">
 
         <div class="muted">
+
           ${
             r.arrival
             ? new Date(r.arrival)
                 .toLocaleTimeString()
             : '-'
           }
+
         </div>
 
         <div class="muted">
+
           ${
             r.departure
             ? new Date(r.departure)
                 .toLocaleTimeString()
             : '-'
           }
+
         </div>
 
       </div>
@@ -156,6 +177,7 @@ export function getFormattedDateTitle(){
   const now = new Date();
 
   const weekdays = [
+
     'Domingo',
     'Segunda-feira',
     'Terça-feira',
@@ -163,6 +185,7 @@ export function getFormattedDateTitle(){
     'Quinta-feira',
     'Sexta-feira',
     'Sábado'
+
   ];
 
   const weekday =
@@ -189,27 +212,12 @@ export function getFormattedDateTitle(){
 
 
 // ======================
-// ESCONDER TELAS
-// ======================
-
-export function hideAllScreens(){
-
-  screenSelect.style.display = 'none';
-
-  screenRoute.style.display = 'none';
-
-  screenMode.style.display = 'none';
-
-  screenReport.classList.add('hidden');
-
-}
-
-
-// ======================
 // RELATÓRIO FINAL
 // ======================
 
-export async function renderFinalReport(routeData){
+export async function renderFinalReport(
+  routeData
+){
 
   reportRouteList.innerHTML = '';
 
@@ -280,9 +288,11 @@ export async function renderFinalReport(routeData){
         </span>
 
         <div class="report-time">
+
           🚥 ${hotel.arrival || '--:--'}
           -
           🏁 ${hotel.departure || '--:--'}
+
         </div>
 
       </div>
@@ -356,16 +366,11 @@ export async function renderFinalReport(routeData){
 // ABRIR RELATÓRIO
 // ======================
 
-export async function openReportScreen(routeData){
+export async function openReportScreen(
+  routeData
+){
 
-  hideAllScreens();
-
-  screenReport.classList.remove(
-    'hidden'
-  );
-
-  screenReport.style.display =
-    'block';
+  showScreen(screenReport);
 
   await renderFinalReport(
     routeData
