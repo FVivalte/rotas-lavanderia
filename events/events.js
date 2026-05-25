@@ -20,6 +20,8 @@ import {
   btnCloseModal,
 
   btnProximo,
+  btnCriarRota,
+  btnLimpar,
 
   voiceToggle,
 
@@ -41,11 +43,12 @@ import {
   telaNavegacao,
   telaRelatorio
 
-} from '../ui/elements.js';
+}
+from '../ui/elements.js';
 
 
 import {
-  showScreen
+  mostrarTela
 }
 from '../ui/screens.js';
 
@@ -56,10 +59,12 @@ import {
 }
 from '../ui/selection.js';
 
+
 import {
   renderRoute
 }
 from '../ui/route.js';
+
 
 import {
 
@@ -114,21 +119,6 @@ from '../storage/database.js';
 
 
 // ======================
-// BOTÕES
-// ======================
-
-const btnCriarRota =
-  document.getElementById(
-    'btn-criar-rota'
-  );
-
-const btnLimpar =
-  document.getElementById(
-    'btn-limpar'
-  );
-
-
-// ======================
 // GERAR ROTA
 // ======================
 
@@ -142,7 +132,9 @@ if(btnCriarRota){
 
       renderRoute();
 
-      showScreen(screenRoute);
+      mostrarTela(
+        telaRota
+      );
 
     }
   );
@@ -202,7 +194,9 @@ if(btnVoltar){
 
       stopGpsTracking();
 
-      showScreen(screenSelect);
+      mostrarTela(
+        telaSelecao
+      );
 
     }
   );
@@ -222,7 +216,9 @@ if(btnIniciarRota){
 
       startModeRoute();
 
-      showScreen(screenMode);
+      mostrarTela(
+        telaNavegacao
+      );
 
     }
   );
@@ -364,7 +360,9 @@ if(btnNovaRota){
 
       saveAppState();
 
-      showScreen(screenSelect);
+      mostrarTela(
+        telaSelecao
+      );
 
     }
   );
@@ -508,6 +506,7 @@ if(btnAdicionarHotel){
 
 }
 
+
 if(btnCloseModal){
 
   btnCloseModal.addEventListener(
@@ -629,6 +628,11 @@ if(deliveryPhotosInput){
       state.routeReport[
         state.currentIndex
       ]
+      .deliveryPhotos ??= [];
+
+      state.routeReport[
+        state.currentIndex
+      ]
       .deliveryPhotos
       .push(...ids);
 
@@ -678,6 +682,11 @@ if(pickupPhotosInput){
         ids.push(id);
 
       }
+
+      state.routeReport[
+        state.currentIndex
+      ]
+      .pickupPhotos ??= [];
 
       state.routeReport[
         state.currentIndex
