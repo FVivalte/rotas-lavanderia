@@ -4,24 +4,24 @@
 // TELAS
 // ======================
 
-export const screenSelect =
+export const telaSelecao =
   document.getElementById(
-    'screen-select'
+    'tela-selecao'
   );
 
-export const screenRoute =
+export const telaRota =
   document.getElementById(
-    'screen-route'
+    'tela-rota'
   );
 
-export const screenMode =
+export const telaNavegacao =
   document.getElementById(
-    'screen-mode'
+    'tela-navegacao'
   );
 
-export const screenReport =
+export const telaRelatorio =
   document.getElementById(
-    'screen-report'
+    'tela-relatorio'
   );
 
 
@@ -121,62 +121,62 @@ export const modal =
 
 export const btnCriarRota =
   document.getElementById(
-    'btn-create-route'
+    'btn-criar-rota'
   );
 
 export const btnLimpar =
   document.getElementById(
-    'btn-clear'
+    'btn-limpar'
   );
 
-export const btnBack =
+export const btnVoltar =
   document.getElementById(
-    'btn-back'
+    'btn-voltar'
   );
 
 export const btnIniciarRota =
   document.getElementById(
-    'btn-start-route'
+    'btn-iniciar-rota'
   );
 
 export const btnProximo =
   document.getElementById(
-    'btn-next'
+    'btn-proximo'
   );
 
 export const btnFinalizar =
   document.getElementById(
-    'btn-finish'
+    'btn-finalizar'
   );
 
 export const btnExportar =
   document.getElementById(
-    'btn-export'
+    'btn-exportar'
   );
 
 export const btnExportarPdf =
   document.getElementById(
-    'btnExportPdf'
+    'btnExportarPdf'
   );
 
 export const btnGoogleMaps =
   document.getElementById(
-    'btn-open-maps'
+    'btn-google-maps'
   );
 
 export const btnNovaRota =
   document.getElementById(
-    'btnNewRoute'
+    'btnNovaRota'
   );
 
 export const btnAdicionarHotel =
   document.getElementById(
-    'btn-add-hotel'
+    'btn-adicionar-hotel'
   );
 
-export const btnSalvaHotel =
+export const btnSalvarHotel =
   document.getElementById(
-    'saveHotel'
+    'salvarHotel'
   );
 
 export const btnCloseModal =
