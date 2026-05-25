@@ -8,7 +8,7 @@ from '../core/state.js';
 
 import {
 
-  screenMode,
+  telaNavegacao,
 
   currentHotelEl,
   nextTwoEl,
@@ -84,7 +84,7 @@ export function startModeRoute(){
 
     }));
 
-  screenMode.style.display =
+    telaNavegacao.style.display =
     'block';
 
   state.mapInitialized = false;
