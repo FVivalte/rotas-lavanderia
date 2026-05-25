@@ -29,29 +29,29 @@ export const telaRelatorio =
 // LISTAS / CONTAINERS
 // ======================
 
-export const hotelListEl =
+export const listaHoteis =
   document.getElementById(
-    'hotelList'
+    'lista-hoteis'
   );
 
-export const routeListEl =
+export const listaRota =
   document.getElementById(
-    'routeList'
+    'lista-rota'
   );
 
-export const routeReportList =
+export const listaRelatorioRota =
   document.getElementById(
-    'routeReportList'
+    'lista-relatorio-rota'
   );
 
-export const reportRouteList =
+export const listaRelatorioFinal =
   document.getElementById(
-    'reportRouteList'
+    'lista-relatorio-final'
   );
 
-export const reportModeEl =
+export const relatorioModo =
   document.getElementById(
-    'reportMode'
+    'relatorio-modo'
   );
 
 
@@ -59,14 +59,14 @@ export const reportModeEl =
 // CONTADORES
 // ======================
 
-export const activeCountSelectEl =
+export const contadorSelecao =
   document.getElementById(
-    'activeCountSelect'
+    'contador-selecao'
   );
 
-export const activeCountRouteEl =
+export const contadorRota =
   document.getElementById(
-    'activeCountRoute'
+    'contador-rota'
   );
 
 
@@ -74,14 +74,14 @@ export const activeCountRouteEl =
 // HOTEL ATUAL / PRÓXIMOS
 // ======================
 
-export const currentHotelEl =
+export const hotelAtual =
   document.getElementById(
-    'currentHotel'
+    'hotel-atual'
   );
 
-export const nextTwoEl =
+export const proximosHoteis =
   document.getElementById(
-    'nextTwo'
+    'proximos-hoteis'
   );
 
 
@@ -89,9 +89,9 @@ export const nextTwoEl =
 // MAPA
 // ======================
 
-export const mapEl =
+export const mapa =
   document.getElementById(
-    'map'
+    'mapa'
   );
 
 
@@ -99,9 +99,9 @@ export const mapEl =
 // RELATÓRIO
 // ======================
 
-export const reportTitle =
+export const tituloRelatorio =
   document.getElementById(
-    'reportTitle'
+    'titulo-relatorio'
   );
 
 
@@ -109,9 +109,9 @@ export const reportTitle =
 // MODAL
 // ======================
 
-export const modal =
+export const modalHotel =
   document.getElementById(
-    'hotelModal'
+    'modal-hotel'
   );
 
 
@@ -156,7 +156,7 @@ export const btnExportar =
 
 export const btnExportarPdf =
   document.getElementById(
-    'btnExportarPdf'
+    'btn-exportar-pdf'
   );
 
 export const btnGoogleMaps =
@@ -166,7 +166,7 @@ export const btnGoogleMaps =
 
 export const btnNovaRota =
   document.getElementById(
-    'btnNovaRota'
+    'btn-nova-rota'
   );
 
 export const btnAdicionarHotel =
@@ -176,12 +176,12 @@ export const btnAdicionarHotel =
 
 export const btnSalvarHotel =
   document.getElementById(
-    'salvar-Hotel'
+    'btn-salvar-hotel'
   );
 
-export const btnCloseModal =
+export const btnFecharModal =
   document.getElementById(
-    'closeModal'
+    'btn-fechar-modal'
   );
 
 
@@ -189,19 +189,19 @@ export const btnCloseModal =
 // TOGGLE / CHECKBOX
 // ======================
 
-export const voiceToggle =
+export const toggleVoz =
   document.getElementById(
-    'voiceToggle'
+    'toggle-voz'
   );
 
-export const chkEntrega =
+export const checkEntrega =
   document.getElementById(
-    'chk-entrega'
+    'check-entrega'
   );
 
-export const chkColeta =
+export const checkColeta =
   document.getElementById(
-    'chk-coleta'
+    'check-coleta'
   );
 
 
@@ -209,24 +209,24 @@ export const chkColeta =
 // INPUTS DE FOTO
 // ======================
 
-export const deliveryPhotosInput =
+export const inputFotosEntrega =
   document.getElementById(
-    'deliveryPhotosInput'
+    'input-fotos-entrega'
   );
 
-export const pickupPhotosInput =
+export const inputFotosColeta =
   document.getElementById(
-    'pickupPhotosInput'
+    'input-fotos-coleta'
   );
 
-export const deliveryPreview =
+export const previewEntrega =
   document.getElementById(
-    'deliveryPreview'
+    'preview-entrega'
   );
 
-export const pickupPreview =
+export const previewColeta =
   document.getElementById(
-    'pickupPreview'
+    'preview-coleta'
   );
 
 
@@ -234,22 +234,22 @@ export const pickupPreview =
 // FORM NOVO HOTEL
 // ======================
 
-export const newName =
+export const inputNomeHotel =
   document.getElementById(
-    'newName'
+    'input-nome-hotel'
   );
 
-export const newRegion =
+export const inputRegiaoHotel =
   document.getElementById(
-    'newRegion'
+    'input-regiao-hotel'
   );
 
-export const newAddress =
+export const inputEnderecoHotel =
   document.getElementById(
-    'newAddress'
+    'input-endereco-hotel'
   );
 
-export const newCoords =
+export const inputCoordsHotel =
   document.getElementById(
-    'newCoords'
+    'input-coords-hotel'
   );
