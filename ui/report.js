@@ -14,7 +14,7 @@ import {
 
   listaRelatorioRota,
   listaRelatorioFinal,
-  relatorioModoEl,
+  relatorioModo,
   telaRelatorio,
   tituloRelatorio
 
@@ -127,11 +127,11 @@ export function renderizarRelatorio(){
 
 export function renderizarRelatorioModo(){
 
-  if(!relatorioModoEl){
+  if(!relatorioModo){
     return;
   }
 
-  relatorioModoEl.innerHTML = '';
+  relatorioModo.innerHTML = '';
 
   state.routeReport.forEach((r, idx)=>{
 
@@ -186,7 +186,7 @@ export function renderizarRelatorioModo(){
 
     `;
 
-    relatorioModoEl
+    relatorioModo
       .appendChild(div);
 
   });
