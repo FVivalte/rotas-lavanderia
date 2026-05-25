@@ -9,8 +9,8 @@ from '../core/state.js';
 import {
 
   listaRotaEl,
-  contadorAtivosSelecaoEl,
-  contadorAtivosRotaEl
+  contadorAtivosSelecao,
+  contadorAtivosRota
 
 }
 from './elements.js';
@@ -46,10 +46,10 @@ function atualizarContadores(){
   const texto =
     `${state.activeSet.size} hotéis ativos`;
 
-  contadorAtivosSelecaoEl.textContent =
+  contadorAtivosSelecao.textContent =
     texto;
 
-  contadorAtivosRotaEl.textContent =
+  contadorAtivosRota.textContent =
     texto;
 
 }
