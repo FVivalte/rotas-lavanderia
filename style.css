@@ -924,3 +924,101 @@ min-height:260px;
   overflow-y:auto;
   padding-bottom:120px;
 }
+
+/* =========================
+   COMPATIBILIDADE PT-BR
+========================= */
+
+/* telas */
+
+#tela-selecao,
+#tela-rota,
+#tela-navegacao,
+#tela-relatorio{
+  width:100%;
+  height:100vh;
+  overflow-y:auto;
+  box-sizing:border-box;
+  padding:16px;
+}
+
+/* listas */
+
+#lista-hoteis,
+#lista-rota{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+
+/* mapa */
+
+#mapa{
+  width:100%;
+  height:55vh;
+  border-radius:16px;
+  overflow:hidden;
+  flex-shrink:0;
+}
+
+/* hotel atual */
+
+#hotel-atual{
+  padding:18px;
+  border-radius:18px;
+  background:linear-gradient(
+    180deg,
+    #ffffff,
+    #f4f9ff
+  );
+
+  border:1px solid var(--border);
+}
+
+/* próximos hotéis */
+
+#proximos-hoteis{
+  display:flex;
+  gap:12px;
+}
+
+/* responsivo */
+
+@media(max-width:720px){
+
+  #proximos-hoteis{
+    flex-direction:column;
+  }
+
+}
+
+/* previews */
+
+#preview-entrega,
+#preview-coleta{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+}
+
+/* modal */
+
+#modal-hotel.active{
+  display:flex;
+}
+
+/* relatório */
+
+#lista-relatorio-rota,
+#lista-relatorio-final{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+/* follow button */
+
+#follow-btn.active{
+  background:#1976d2;
+  color:#fff;
+}
