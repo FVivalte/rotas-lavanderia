@@ -25,9 +25,9 @@ import { renderRoute }
 from './route.js';
 
 import {
-  screenRoute,
-  screenMode,
-  screenReport
+  telaRota,
+  telaNavegacao,
+  telaRelatorio
 }
 from './elements.js';
 
@@ -63,11 +63,11 @@ export function generateRoute(){
 
   renderRoute();
 
-  screenSelect.style.display = 'none';
+  telaSelecao.style.display = 'none';
 
-  screenRoute.style.display = 'block';
+  telaRota.style.display = 'block';
 
-  screenMode.style.display = 'none';
+  telaNavegacao.style.display = 'none';
 
   saveAppState();
 
