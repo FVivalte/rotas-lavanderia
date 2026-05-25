@@ -101,8 +101,9 @@ self.addEventListener(
 
           // salva novos arquivos
           if(
-            event.request.method === 'GET'
-          ){
+  event.request.method === 'GET' &&
+  event.request.url.startsWith('http')
+){
 
             const clone =
               networkResponse.clone();
