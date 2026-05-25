@@ -1,404 +1,166 @@
-// map/map.js
-
-import { state } from '../core/state.js';
-import { HOTELS } from '../data/dados.js';
-
-import {
-  currentHotelEl
-} from '../ui/elements.js';
-import {
-
-  setupCameraListeners,
-
-  updateCamera,
-
-  toggleFollowMode
-
-} from '../service/map-camera.js';
-
 // =========================
-// INIT MAP
+// MAPA PRINCIPAL
 // =========================
+
+let map;
+
+let userMarker;
 
 export function initMap(){
 
-  if(state.map) return;
+  map = new maplibregl.Map({
 
-  state.map = L.map('map',{
+    container:'map',
 
-    zoomControl:true,
-    dragging:true,
-    touchZoom:true,
-    doubleClickZoom:true,
-    scrollWheelZoom:true
+    style:'https://demotiles.maplibre.org/style.json',
 
-  }).setView(
-    [-22.75, -41.88],
-    13
+    center:[-41.882, -22.757],
+    zoom:12,
+
+    pitch:45,
+    bearing:0,
+
+    antialias:true
+
+  });
+
+  map.addControl(
+    new maplibregl.NavigationControl(),
+    'top-right'
   );
 
-  L.tileLayer(
-    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    {
-      attribution:'© OpenStreetMap'
-    }
-  ).addTo(state.map);
+  map.on('load',()=>{
+
+    addHotels();
+
+    startLocationTracking();
+
+  });
 
 }
 
-setupCameraListeners(map);
-document
-  .getElementById('follow-btn')
-  .addEventListener('click', toggleFollowMode);
-
 // =========================
-// ROTATE MAP
+// HOTÉIS
 // =========================
 
-export function rotateMap(angle){
+function addHotels(){
 
-  if(!state.map) return;
+  HOTELS.forEach(hotel=>{
 
-  const mapPane =
-    state.map.getPane('mapPane');
+    const el = document.createElement('div');
 
-  mapPane.style.transformOrigin =
-    '50% 50%';
+    el.className='hotel-marker';
 
-  mapPane.style.transition =
-    'transform 0.5s linear';
+    el.innerHTML='🏨';
 
-  mapPane.style.transform =
-    `rotate(${-angle}deg)`;
+    new maplibregl.Marker(el)
 
-}
+      .setLngLat([
+        hotel.lng,
+        hotel.lat
+      ])
 
+      .setPopup(
 
-// =========================
-// PARSE COORDS
-// =========================
+        new maplibregl.Popup({
+          offset:25
+        })
 
-export function parseCoords(coords){
+        .setHTML(`
+          <strong>${hotel.name}</strong>
+          <br>
+          ${hotel.region}
+        `)
 
-  if(!coords) return null;
-
-  const parts = coords.split(',');
-
-  if(parts.length !== 2)
-    return null;
-
-  const lat =
-    Number(parts[0].trim());
-
-  const lng =
-    Number(parts[1].trim());
-
-  if(
-    isNaN(lat) ||
-    isNaN(lng)
-  ){
-    return null;
-  }
-
-  return { lat, lng };
-
-}
-
-
-// =========================
-// DISTÂNCIA
-// =========================
-
-export function getDistanceMeters(
-  lat1,
-  lon1,
-  lat2,
-  lon2
-){
-
-  const R = 6371e3;
-
-  const φ1 = lat1 * Math.PI/180;
-  const φ2 = lat2 * Math.PI/180;
-
-  const Δφ =
-    (lat2-lat1) * Math.PI/180;
-
-  const Δλ =
-    (lon2-lon1) * Math.PI/180;
-
-  const a =
-
-    Math.sin(Δφ/2) *
-    Math.sin(Δφ/2)
-
-    +
-
-    Math.cos(φ1) *
-    Math.cos(φ2) *
-
-    Math.sin(Δλ/2) *
-    Math.sin(Δλ/2);
-
-  const c =
-    2 * Math.atan2(
-      Math.sqrt(a),
-      Math.sqrt(1-a)
-    );
-
-  return R * c;
-
-}
-
-
-// =========================
-// UPDATE MAP
-// =========================
-
-export function updateMap(){
-
-  if(!state.map) return;
-
-  if(
-    state.currentIndex >=
-    state.routeOrder.length
-  ){
-    return;
-  }
-
-  const currentHotel =
-    HOTELS.find(
-      h =>
-        h.id ===
-        state.routeOrder[
-          state.currentIndex
-        ]
-    );
-
-  if(!currentHotel) return;
-
-  const parsed =
-    parseCoords(
-      currentHotel.coords
-    );
-
-  if(!parsed){
-
-    alert(
-      `Coordenadas inválidas em ${currentHotel.name}`
-    );
-
-    return;
-  }
-
-  const hotelLat = parsed.lat;
-  const hotelLng = parsed.lng;
-
-  const waypoints = [];
-
-  // usuário
-
-  if(state.userPosition){
-
-    waypoints.push(
-      L.latLng(
-        state.userPosition.lat,
-        state.userPosition.lng
       )
-    );
 
-  }
+      .addTo(map);
 
-  // hotel atual
-
-  waypoints.push(
-    L.latLng(
-      hotelLat,
-      hotelLng
-    )
-  );
-
-  // próximos hotéis
-
-  for(let i = 1; i <= 2; i++){
-
-    const idx =
-      state.currentIndex + i;
-
-    if(
-      idx <
-      state.routeOrder.length
-    ){
-
-      const nextHotel =
-        HOTELS.find(
-          h =>
-            h.id ===
-            state.routeOrder[idx]
-        );
-
-      if(!nextHotel) continue;
-
-      const nextParsed =
-        parseCoords(
-          nextHotel.coords
-        );
-
-      if(nextParsed){
-
-        waypoints.push(
-          L.latLng(
-            nextParsed.lat,
-            nextParsed.lng
-          )
-        );
-
-      }
-
-    }
-
-  }
-
-  // rota
-
-  if(!state.routingControl){
-
-    state.routingControl =
-      L.Routing.control({
-
-        waypoints,
-
-        routeWhileDragging:false,
-
-        addWaypoints:false,
-
-        draggableWaypoints:false,
-
-        fitSelectedRoutes:false,
-
-        show:false,
-
-        createMarker:(i,wp)=>{
-          return L.marker(
-            wp.latLng
-          );
-        }
-
-      }).addTo(state.map);
-
-  }else{
-
-    state.routingControl
-      .setWaypoints(
-        waypoints
-      );
-
-  }
+  });
 
 }
 
-
 // =========================
-// CENTRALIZAR USUÁRIO
-// =========================
-
-export function centerUser(){
-
-  if(
-    !state.map ||
-    !state.userPosition
-  ){
-    return;
-  }
-
-  state.map.setView(
-    [
-      state.userPosition.lat,
-      state.userPosition.lng
-    ],
-    17
-  );
-
-}
-
-
-// =========================
-// PAN SUAVE
+// GPS
 // =========================
 
-export function panToUser(){
+function startLocationTracking(){
 
-  if(
-    !state.map ||
-    !state.userPosition
-  ){
-    return;
-  }
+  navigator.geolocation.watchPosition(
 
-  state.map.panTo(
-    [
-      state.userPosition.lat,
-      state.userPosition.lng
-    ],
+    position=>{
+
+      const lng = position.coords.longitude;
+
+      const lat = position.coords.latitude;
+
+      updateUserMarker(lng,lat);
+
+      autoCenter(lng,lat);
+
+    },
+
+    error=>{
+      console.log(error);
+    },
+
     {
-      animate:true,
-      duration:1
+      enableHighAccuracy:true,
+      maximumAge:0,
+      timeout:10000
     }
+
   );
 
 }
 
-
 // =========================
-// LIMPAR ROTA
-// =========================
-
-export function clearRoute(){
-
-  if(
-    state.map &&
-    state.routingControl
-  ){
-
-    state.map.removeControl(
-      state.routingControl
-    );
-
-    state.routingControl = null;
-
-  }
-
-}
-
-
-// =========================
-// OPEN GOOGLE MAPS
+// MARCADOR USUÁRIO
 // =========================
 
-export function openCurrentHotelInMaps(){
+function updateUserMarker(lng,lat){
 
-  if(
-    state.currentIndex >=
-    state.routeOrder.length
-  ){
+  if(!userMarker){
+
+    const el=document.createElement('div');
+
+    el.className='user-marker';
+
+    el.innerHTML='📍';
+
+    userMarker = new maplibregl.Marker(el)
+
+      .setLngLat([lng,lat])
+
+      .addTo(map);
+
     return;
   }
 
-  const id =
-    state.routeOrder[
-      state.currentIndex
-    ];
-
-  const hotel =
-    HOTELS.find(
-      h => h.id === id
-    );
-
-  if(!hotel) return;
-
-  window.open(
-    `https://www.google.com/maps?q=${hotel.coords}`,
-    '_blank'
-  );
+  userMarker.setLngLat([lng,lat]);
 
 }
+
+// =========================
+// AUTO CENTRALIZAR
+// =========================
+
+function autoCenter(lng,lat){
+
+  map.easeTo({
+
+    center:[lng,lat],
+
+    duration:1200,
+
+    zoom:16,
+
+    pitch:60,
+
+    bearing:0
+
+  });
+
+}
+
+export { map };
