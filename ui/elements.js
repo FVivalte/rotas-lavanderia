@@ -27,9 +27,6 @@ export const hotelListEl =
 export const routeListEl =
   document.getElementById('routeList');
 
-export const reportEl =
-  document.getElementById('report');
-
 export const reportModeEl =
   document.getElementById('reportMode');
 
