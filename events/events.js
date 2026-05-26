@@ -173,7 +173,7 @@ if(btnLimpar){
 
       renderizarRota();
 
-      saveAppState();
+      salvarEstadoApp();
 
     }
   );
@@ -276,7 +276,7 @@ if(btnProximo){
 
       renderizarRelatorioModo();
 
-      saveAppState();
+      salvarEstadoApp();
 
     }
   );
@@ -357,7 +357,7 @@ if(btnNovaRota){
 
       renderizarSelecao();
 
-      saveAppState();
+      salvarEstadoApp();
 
       mostrarTela(
         telaSelecao
@@ -478,7 +478,7 @@ if(toggleVoz){
       state.speechEnabled =
         toggleVoz.checked;
 
-      saveAppState();
+      salvarEstadoApp();
 
     }
   );
@@ -635,7 +635,7 @@ if(inputFotosEntrega){
       .deliveryPhotos
       .push(...ids);
 
-      saveAppState();
+      salvarEstadoApp();
 
     }
   );
@@ -693,7 +693,7 @@ if(inputFotosColeta){
       .pickupPhotos
       .push(...ids);
 
-      saveAppState();
+      salvarEstadoApp();
 
     }
   );
