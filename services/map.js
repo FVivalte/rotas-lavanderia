@@ -28,32 +28,23 @@ let marcadorUsuario;
 
 export function initMap(){
 
-  if(state.mapInitialized){
-    return;
-  }
+  map = new maplibregl.Map({
 
-  state.map =
-    new maplibregl.Map({
+    container:'mapa',
 
-      container:'map',
+    style:'https://demotiles.maplibre.org/style.json',
 
-      style:
-        'https://demotiles.maplibre.org/style.json',
+    center:[-41.882, -22.757],
 
-      center:[
-        -41.882,
-        -22.757
-      ],
+    zoom:12,
 
-      zoom:12,
+    pitch:45,
 
-      pitch:45,
+    bearing:0,
 
-      bearing:0,
+    antialias:true
 
-      antialias:true
-
-    });
+  });
 
   state.map.addControl(
 
