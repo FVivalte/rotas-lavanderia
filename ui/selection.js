@@ -72,7 +72,7 @@ export function gerarRota(){
     telaRota
   );
 
-  saveAppState();
+  salvarEstadoApp();
 
 }
 
