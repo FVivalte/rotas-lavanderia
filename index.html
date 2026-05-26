@@ -21,12 +21,12 @@
 
   <link
     rel="manifest"
-    href="manifest.json"
+    href="./manifest.json"
   />
 
   <link
     rel="stylesheet"
-    href="style.css"
+    href="./style.css"
   />
 
   <!-- MAPLIBRE -->
@@ -42,33 +42,36 @@
 
 <body>
 
-  <!-- ===================== -->
-  <!-- TELA SELEÇÃO -->
-  <!-- ===================== -->
+  <div class="app">
 
-  <section
-    id="tela-selecao"
-    class="screen"
-  >
+    <!-- ===================== -->
+    <!-- TELA SELEÇÃO -->
+    <!-- ===================== -->
 
-    <header class="topbar">
+    <section
+      id="tela-selecao"
+      class="screen active"
+    >
 
-      <h1>
-        Rota Búzios
-      </h1>
+      <header class="topbar">
 
-      <div id="contadorSelecao">
-        0 hotéis ativos
-      </div>
+        <h1>
+          Rota Búzios
+        </h1>
 
-    </header>
+        <div
+          id="contador-selecao"
+          class="hotel-counter"
+        >
+          0 hotéis ativos
+        </div>
 
-    <div id="painelInicial">
+      </header>
 
-     <div
-  id="lista-hoteis"
-  class="list"
-></div>
+      <div
+        id="lista-hoteis"
+        class="list"
+      ></div>
 
       <div class="bottom-actions">
 
@@ -86,248 +89,287 @@
 
       </div>
 
-    </div>
-
-  </section>
+    </section>
 
 
-  <!-- ===================== -->
-  <!-- TELA ROTA -->
-  <!-- ===================== -->
+    <!-- ===================== -->
+    <!-- TELA ROTA -->
+    <!-- ===================== -->
 
-  <section
-    id="tela-rota"
-    class="screen hidden"
-  >
+    <section
+      id="tela-rota"
+      class="screen hidden"
+    >
 
-    <header class="topbar">
+      <header class="topbar">
 
-      <button id="btn-voltar">
-        ←
-      </button>
+        <button id="btn-voltar">
+          ←
+        </button>
 
-      <div id="contadorRota">
-        0 hotéis ativos
+        <div
+          id="contador-rota"
+          class="hotel-counter"
+        >
+          0 hotéis ativos
+        </div>
+
+      </header>
+
+      <div
+        id="lista-rota"
+        class="route-list"
+      ></div>
+
+      <div
+        id="lista-relatorio-rota"
+        class="report"
+      ></div>
+
+      <div class="bottom-actions">
+
+        <button id="btn-iniciar-rota">
+          Iniciar rota
+        </button>
+
+        <button id="btn-exportar">
+          Exportar
+        </button>
+
       </div>
 
-    </header>
+    </section>
 
-    <div id="listaRota"></div>
 
-    <div id="listaRelatorioRota"></div>
+    <!-- ===================== -->
+    <!-- TELA NAVEGAÇÃO -->
+    <!-- ===================== -->
 
-    <div class="bottom-actions">
+    <section
+      id="tela-navegacao"
+      class="screen hidden"
+    >
 
-      <button id="btn-iniciar-rota">
-        Iniciar rota
+      <div id="mapa"></div>
+
+      <button
+        id="follow-btn"
+        class="active"
+      >
+        Centralizar
       </button>
 
-      <button id="btn-exportar">
-        Exportar
-      </button>
+      <div class="map-controls">
 
-    </div>
+        <label class="switch">
 
-  </section>
+          <input
+            type="checkbox"
+            id="toggle-voz"
+          />
 
+          <span class="slider"></span>
 
-  <!-- ===================== -->
-  <!-- TELA NAVEGAÇÃO -->
-  <!-- ===================== -->
+        </label>
 
-  <section
-    id="tela-navegacao"
-    class="screen hidden"
-  >
+      </div>
 
-    <div id="mapa"></div>
+      <div
+        id="hotel-atual"
+        class="card"
+      ></div>
 
-    <div class="map-controls">
+      <div
+        id="proximos-hoteis"
+        class="next-two"
+      ></div>
 
-      <button id="btn-localizar">
-        📍
-      </button>
+      <div class="check-group">
 
-      <label class="voice-toggle">
+        <label class="check-card">
 
-        <input
-          type="checkbox"
-          id="toggle-voz"
-        />
+          <input
+            type="checkbox"
+            id="check-entrega"
+          />
 
-        <span>
-          Voz
-        </span>
+          Entrega
 
-      </label>
+        </label>
 
-    </div>
+        <label class="check-card">
 
-    <div id="hotelAtual"></div>
+          <input
+            type="checkbox"
+            id="check-coleta"
+          />
 
-    <div id="proximosHoteis"></div>
+          Coleta
 
-    <div class="mode-actions">
+        </label>
 
-      <label>
+      </div>
 
-        <input
-          type="checkbox"
-          id="check-entrega"
-        />
+      <div class="photo-section">
 
-        Entrega
+        <div class="photo-upload-group">
 
-      </label>
+          <label class="camera-button">
 
-      <label>
+            📷
 
-        <input
-          type="checkbox"
-          id="check-coleta"
-        />
+            <input
+              type="file"
+              id="input-fotos-entrega"
+              accept="image/*"
+              multiple
+              hidden
+            />
 
-        Coleta
+          </label>
 
-      </label>
+          <div
+            id="preview-entrega"
+            class="photo-preview"
+          ></div>
 
-    </div>
+        </div>
 
-    <div class="photo-area">
+        <div class="photo-upload-group">
 
-      <label class="camera-btn">
+          <label class="camera-button">
 
-        📷
+            📷
 
-        <input
-          type="file"
-          id="inputFotosEntrega"
-          accept="image/*"
-          multiple
-          hidden
-        />
+            <input
+              type="file"
+              id="input-fotos-coleta"
+              accept="image/*"
+              multiple
+              hidden
+            />
 
-      </label>
+          </label>
 
-      <div id="previewEntrega"></div>
+          <div
+            id="preview-coleta"
+            class="photo-preview"
+          ></div>
 
-      <label class="camera-btn">
+        </div>
 
-        📷
+      </div>
 
-        <input
-          type="file"
-          id="inputFotosColeta"
-          accept="image/*"
-          multiple
-          hidden
-        />
+      <div
+        id="relatorio-modo"
+        class="report"
+      ></div>
 
-      </label>
+      <div class="bottom-actions">
 
-      <div id="previewColeta"></div>
-
-    </div>
-
-    <div id="relatorioModo"></div>
-
-    <div class="bottom-actions">
-
-      <button id="btn-google-maps">
-        Google Maps
-      </button>
-
-      <button id="btn-proximo">
-        Próximo hotel
-      </button>
-
-      <button id="btn-finalizar">
-        Finalizar
-      </button>
-
-    </div>
-
-  </section>
-
-
-  <!-- ===================== -->
-  <!-- TELA RELATÓRIO -->
-  <!-- ===================== -->
-
-  <section
-    id="tela-relatorio"
-    class="screen hidden"
-  >
-
-    <header class="topbar">
-
-      <h2 id="tituloRelatorio">
-        Relatório
-      </h2>
-
-    </header>
-
-    <div id="listaRelatorioFinal"></div>
-
-    <div class="bottom-actions">
-
-      <button id="btn-exportar-pdf">
-        Exportar PDF
-      </button>
-
-      <button id="btn-nova-rota">
-        Nova rota
-      </button>
-
-    </div>
-
-  </section>
-
-
-  <!-- ===================== -->
-  <!-- MODAL HOTEL -->
-  <!-- ===================== -->
-
-  <div
-    id="modalHotel"
-    class="modal"
-  >
-
-    <div class="modal-content">
-
-      <h3>
-        Novo hotel
-      </h3>
-
-      <input
-        id="novoNome"
-        placeholder="Nome"
-      />
-
-      <input
-        id="novaRegiao"
-        placeholder="Região"
-      />
-
-      <input
-        id="novoEndereco"
-        placeholder="Endereço"
-      />
-
-      <input
-        id="novasCoords"
-        placeholder="Lat,Lng"
-      />
-
-      <div class="modal-actions">
-
-        <button id="btn-fechar-modal">
-          Cancelar
+        <button id="btn-google-maps">
+          Google Maps
         </button>
 
-        <button id="btn-salvar-hotel">
-          Salvar
+        <button id="btn-proximo">
+          Próximo hotel
         </button>
+
+        <button id="btn-finalizar">
+          Finalizar
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================== -->
+    <!-- TELA RELATÓRIO -->
+    <!-- ===================== -->
+
+    <section
+      id="tela-relatorio"
+      class="screen hidden"
+    >
+
+      <header class="report-header">
+
+        <h1 id="titulo-relatorio">
+          Relatório
+        </h1>
+
+      </header>
+
+      <div
+        id="lista-relatorio-final"
+        class="report-route-list"
+      ></div>
+
+      <div class="report-bottom-actions">
+
+        <button id="btn-exportar-pdf">
+          Exportar PDF
+        </button>
+
+        <button id="btn-nova-rota">
+          Nova rota
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- ===================== -->
+    <!-- MODAL -->
+    <!-- ===================== -->
+
+    <div
+      id="modal-hotel"
+      class="modal"
+    >
+
+      <div class="modal-content">
+
+        <h3>
+          Novo hotel
+        </h3>
+
+        <input
+          id="input-nome-hotel"
+          placeholder="Nome do hotel"
+        />
+
+        <input
+          id="input-regiao-hotel"
+          placeholder="Região"
+        />
+
+        <input
+          id="input-endereco-hotel"
+          placeholder="Endereço"
+        />
+
+        <input
+          id="input-coords-hotel"
+          placeholder="-22.000,-41.000"
+        />
+
+        <div class="modal-actions">
+
+          <button
+            id="btn-fechar-modal"
+            class="ghost"
+          >
+            Cancelar
+          </button>
+
+          <button id="btn-salvar-hotel">
+            Salvar
+          </button>
+
+        </div>
 
       </div>
 
