@@ -16,7 +16,7 @@ from './map-camera.js';
 
 
 // =========================
-// MAPA PRINCIPAL
+// A PRINCIPAL
 // =========================
 
 let marcadorUsuario;
@@ -28,7 +28,7 @@ let marcadorUsuario;
 
 export function initMap(){
 
-  map = new maplibregl.Map({
+  state.map = new maplibregl.Map({
 
     container:'mapa',
 
