@@ -243,7 +243,7 @@ export function renderizarSelecao(){
 
         atualizarContadores();
 
-        saveAppState();
+        salvarEstadoApp();
 
       }
     );
