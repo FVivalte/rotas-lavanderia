@@ -1,8 +1,8 @@
 // core/init.js
 
 import {
-  loadCustomHotels,
-  restoreAppState
+  carregarEstadoApp,
+  restaurarEstadoApp
 }
 from '../storage/storage.js';
 
@@ -75,9 +75,9 @@ export async function iniciarApp(){
     // STORAGE
     // ======================
 
-    loadCustomHotels();
+    carregarEstadoApp();
 
-    restoreAppState();
+    restaurarEstadoApp();
 
     // ======================
     // EVENTS
