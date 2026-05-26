@@ -94,8 +94,8 @@ from '../utils/utils.js';
 
 import {
 
-  saveAppState,
-  saveCustomHotels
+  salvarEstadoApp,
+  salvarHoteisCustomizados
 
 }
 from '../storage/storage.js';
