@@ -143,9 +143,22 @@ function adicionarHoteis(){
 // =========================
 
 function atualizarMarcadorUsuario(
-  lng,
-  lat
+  lat,
+  lng
 ){
+
+  if(
+    typeof lat !== 'number' ||
+    typeof lng !== 'number' ||
+    isNaN(lat) ||
+    isNaN(lng)
+  ){
+    console.error(
+      'Coordenadas inválidas:',
+      { lat, lng }
+    );
+    return;
+  }
 
   if(!marcadorUsuario){
 
@@ -178,18 +191,15 @@ function atualizarMarcadorUsuario(
 
 }
 
-
 // =========================
 // UPDATE MAP
 // =========================
 
 export function updateMap(
-
-  lng,
   lat,
+  lng,
   heading = 0,
   speed = 0
-
 ){
 
   if(!state.map){
@@ -197,22 +207,17 @@ export function updateMap(
   }
 
   atualizarMarcadorUsuario(
-    lng,
-    lat
-  );
+  lat,
+  lng
+);
 
-  atualizarCamera(
-
-    state.map,
-
-    lng,
-    lat,
-
-    heading,
-    speed
-
-  );
-
+ atualizarCamera(
+  state.map,
+  lat,
+  lng,
+  heading,
+  speed
+);
 }
 
 
