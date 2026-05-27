@@ -37,7 +37,7 @@ from './report.js';
 
 import {
 
-  initMap,
+  inicializarMapa,
   updateMap
 
 }
