@@ -103,7 +103,17 @@ export function iniciarModoRota(){
 
   initMap();
 
-  if(state.userPosition){
+  if(
+
+  state.userPosition &&
+
+  typeof state.userPosition.lat === 'number' &&
+  typeof state.userPosition.lng === 'number' &&
+
+  !isNaN(state.userPosition.lat) &&
+  !isNaN(state.userPosition.lng)
+
+){
 
   updateMap(
 
