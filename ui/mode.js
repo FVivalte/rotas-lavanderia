@@ -1,11 +1,6 @@
 // ui/mode.js
 
 import {
-  inicializarMapa,
-  adicionarMarcadoresHoteis
-} from './services/map.js';
-
-import {
   HOTELS
 }
 from '../data/dados.js';
@@ -43,6 +38,7 @@ from './report.js';
 import {
 
   inicializarMapa,
+  adicionarMarcadoresHoteis,
   updateMap
 
 }
