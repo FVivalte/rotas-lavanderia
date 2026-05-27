@@ -76,7 +76,15 @@ export function atualizarCamera(
   speed = 0
 
 ){
-
+  if(
+  typeof lat !== 'number' ||
+  typeof lng !== 'number' ||
+  isNaN(lat) ||
+  isNaN(lng)
+){
+  return;
+}
+  
   const agora =
     Date.now();
 
