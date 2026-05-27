@@ -12,14 +12,14 @@ let userMarker = null;
  */
 export function inicializarMapa(containerId = 'map', accessToken = '') {
   if (accessToken) {
-    mapboxgl.accessToken = accessToken;
+    maplibregl.accessToken = accessToken;
   }
 
   // Ponto inicial padrão (Lavanderia LAVILAGOS) caso o GPS demore a responder
   const defaultLng = -41.8964253;
   const defaultLat = -22.7625969;
 
-  mapInstance = new mapboxgl.Map({
+  mapInstance = new maplibregl.Map({
     container: containerId,
     style: 'mapbox://styles/mapbox/streets-v11', // Ou outro estilo de sua preferência
     center: [defaultLng, defaultLat], // IMPORTANTE: Longitude primeiro, depois Latitude
@@ -28,7 +28,7 @@ export function inicializarMapa(containerId = 'map', accessToken = '') {
   });
 
   // Cria o marcador do usuário, mas deixa escondido até o GPS rodar
-  userMarker = new mapboxgl.Marker({ color: '#007AFF' })
+  userMarker = new maplibregl.Marker({ color: '#007AFF' })
     .setLngLat([defaultLng, defaultLat])
     .addTo(mapInstance);
 
