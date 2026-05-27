@@ -68,10 +68,21 @@ export function startGpsTracking(){
 
         };
 
+        // DEBUG
+        console.log({
+
+          lat,
+          lng,
+          heading,
+          speed
+
+        });
+
+        // ORDEM CORRETA
         updateMap(
 
-          lng,
           lat,
+          lng,
           heading,
           speed
 
@@ -83,7 +94,10 @@ export function startGpsTracking(){
 
       err => {
 
-        console.log(err);
+        console.log(
+          'Erro GPS:',
+          err
+        );
 
       },
 
