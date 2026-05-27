@@ -21,7 +21,7 @@ export function inicializarMapa(containerId = 'mapa', accessToken = '') {
 
   mapInstance = new maplibregl.Map({
   container: containerId,
-  style: 'https://demotiles.maplibre.org/style.json',
+  style: 'https://tiles.openfreemap.org/styles/liberty',
   center: [defaultLng, defaultLat],
   zoom: 15,
   pitch: 0
