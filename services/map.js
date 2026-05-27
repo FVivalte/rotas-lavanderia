@@ -1,270 +1,57 @@
 // services/map.js
+import { atualizarCamera } from './map-camera.js';
 
-import { HOTELS }
-from '../data/dados.js';
+// Variável escopo global do módulo para guardar a instância do mapa
+let mapInstance = null;
+let userMarker = null;
 
-import { state }
-from '../core/state.js';
+/**
+ * Inicializa o mapa na tela. Chamado geralmente no início da sua aplicação (ex: main.js ou index.js)
+ * @param {string} containerId - O ID da div HTML (ex: 'map')
+ * @param {string} accessToken - Seu token do Mapbox (se aplicável)
+ */
+export function inicializarMapa(containerId = 'map', accessToken = '') {
+  if (accessToken) {
+    mapboxgl.accessToken = accessToken;
+  }
 
-import {
+  // Ponto inicial padrão (Lavanderia LAVILAGOS) caso o GPS demore a responder
+  const defaultLng = -41.8964253;
+  const defaultLat = -22.7625969;
 
-  atualizarCamera,
-  configurarListenersCamera
-
-}
-from './map-camera.js';
-
-
-// =========================
-// MAPA PRINCIPAL
-// =========================
-
-let marcadorUsuario;
-
-
-// =========================
-// INIT MAP
-// =========================
-
-export function initMap(){
-
-  state.map = new maplibregl.Map({
-
-    container:'mapa',
-
-    style:'https://demotiles.maplibre.org/style.json',
-
-    center:[-41.882, -22.757],
-
-    zoom:12,
-
-    pitch:45,
-
-    bearing:0,
-
-    antialias:true
-
+  mapInstance = new mapboxgl.Map({
+    container: containerId,
+    style: 'mapbox://styles/mapbox/streets-v11', // Ou outro estilo de sua preferência
+    center: [defaultLng, defaultLat], // IMPORTANTE: Longitude primeiro, depois Latitude
+    zoom: 15,
+    pitch: 0
   });
 
-  state.map.addControl(
+  // Cria o marcador do usuário, mas deixa escondido até o GPS rodar
+  userMarker = new mapboxgl.Marker({ color: '#007AFF' })
+    .setLngLat([defaultLng, defaultLat])
+    .addTo(mapInstance);
 
-    new maplibregl.NavigationControl(),
-
-    'top-right'
-
-  );
-
-  state.map.on(
-    'load',
-    ()=>{
-
-      adicionarHoteis();
-
-    }
-  );
-
-  configurarListenersCamera(
-    state.map
-  );
-
-  state.mapInitialized = true;
-
+  return mapInstance;
 }
 
-
-// =========================
-// HOTÉIS
-// =========================
-
-function adicionarHoteis(){
-
-  HOTELS.forEach(hotel=>{
-
-    if(!hotel.coords){
-      return;
-    }
-
-    const partes =
-      hotel.coords.split(',');
-
-    if(partes.length < 2){
-      return;
-    }
-
-    const lat =
-      Number(partes[0]);
-
-    const lng =
-      Number(partes[1]);
-
-    if(
-      isNaN(lat) ||
-      isNaN(lng)
-    ){
-      return;
-    }
-
-    const el =
-      document.createElement('div');
-
-    el.className =
-      'hotel-marker';
-
-    el.innerHTML = '🏨';
-
-    new maplibregl.Marker(el)
-
-      .setLngLat([
-        lng,
-        lat
-      ])
-
-      .setPopup(
-
-        new maplibregl.Popup({
-          offset:25
-        })
-
-        .setHTML(`
-
-          <strong>
-            ${hotel.name}
-          </strong>
-
-          <br>
-
-          ${hotel.region}
-
-        `)
-
-      )
-
-      .addTo(state.map);
-
-  });
-
-}
-
-
-// =========================
-// MARCADOR USUÁRIO
-// =========================
-
-function atualizarMarcadorUsuario(
-  lat,
-  lng
-){
-
-  if(
-
-    typeof lat !== 'number' ||
-    typeof lng !== 'number' ||
-
-    isNaN(lat) ||
-    isNaN(lng)
-
-  ){
-
-    console.error(
-      'Coordenadas inválidas:',
-      { lat, lng }
-    );
-
-    return;
-
-  }
-
-  if(!marcadorUsuario){
-
-    const el =
-      document.createElement('div');
-
-    el.className =
-      'user-marker';
-
-    el.innerHTML = '📍';
-
-    marcadorUsuario =
-      new maplibregl.Marker(el)
-
-        .setLngLat([
-          lng,
-          lat
-        ])
-
-        .addTo(state.map);
-
-    return;
-
-  }
-
-  marcadorUsuario.setLngLat([
-    lng,
-    lat
-  ]);
-
-}
-
-
-// =========================
-// UPDATE MAP
-// =========================
-
-export function updateMap(
-
-  lat,
-  lng,
-  heading = 0,
-  speed = 0
-
-){
-
-  if(
-
-    typeof lat !== 'number' ||
-    typeof lng !== 'number' ||
-
-    isNaN(lat) ||
-    isNaN(lng)
-
-  ){
-
-    console.error(
-      'updateMap coordenadas inválidas',
-      { lat, lng }
-    );
-
-    return;
-
-  }
-
-  if(!state.map){
+/**
+ * Atualiza a posição do marcador do usuário e move a câmera
+ */
+export function updateMap(lat, lng, heading = 0, speed = 0) {
+  if (!mapInstance) {
+    console.warn('O mapa ainda não foi inicializado. Chame inicializarMapa() primeiro.');
     return;
   }
 
-  atualizarMarcadorUsuario(
-    lat,
-    lng
-  );
+  // 1. Atualiza a posição do marcador azul do usuário no mapa
+  if (userMarker) {
+    userMarker.setLngLat([lng, lat]);
+  }
 
-  atualizarCamera(
-
-    state.map,
-
-    lat,
-    lng,
-
-    heading,
-    speed
-
-  );
-
+  // 2. Passa o comando para o arquivo de câmera ajustar a visão do motorista
+  atualizarCamera(mapInstance, lat, lng, heading, speed);
 }
 
-
-// =========================
-// EXPORT MAP
-// =========================
-
-export const map =
-  ()=> state.map;
+// Exporta a instância caso outros arquivos precisem interagir com o mapa diretamente
+export { mapInstance };
