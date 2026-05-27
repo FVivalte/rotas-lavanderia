@@ -1,61 +1,38 @@
 // services/map-camera.js
 
-// ======================
-// CONFIG CAMERA
-// ======================
-
-let seguirUsuario = true;
-
-let ultimaInteracao = 0;
-
-const TEMPO_RETORNO_CAMERA = 5000;
+import { state }
+from '../core/state.js';
 
 
-// ======================
-// BOTÃO SEGUIR
-// ======================
+// =========================
+// CONFIG
+// =========================
 
-export function alternarModoSeguir(){
+const CAMERA_CONFIG = {
 
-  seguirUsuario = !seguirUsuario;
+  zoom:17,
 
-  atualizarBotaoSeguir();
+  pitch:60,
 
-}
+  animationDuration:1000
+
+};
 
 
-// ======================
-// LISTENERS MAPA
-// ======================
+// =========================
+// LISTENERS
+// =========================
 
 export function configurarListenersCamera(
-  mapa
+  map
 ){
 
-  mapa.on(
+  map.on(
     'dragstart',
     ()=>{
 
-      seguirUsuario = false;
-
-      ultimaInteracao =
-        Date.now();
-
-      atualizarBotaoSeguir();
-
-    }
-  );
-
-  mapa.on(
-    'zoomstart',
-    ()=>{
-
-      seguirUsuario = false;
-
-      ultimaInteracao =
-        Date.now();
-
-      atualizarBotaoSeguir();
+      state.cameraFollowing =
+        false;
 
     }
   );
@@ -63,127 +40,64 @@ export function configurarListenersCamera(
 }
 
 
-// ======================
-// UPDATE CAMERA
-// ======================
+// =========================
+// ATUALIZAR CAMERA
+// =========================
 
 export function atualizarCamera(
 
-  mapa,
-  lng,
+  map,
+
   lat,
+  lng,
+
   heading = 0,
   speed = 0
 
 ){
+
   if(
-  typeof lat !== 'number' ||
-  typeof lng !== 'number' ||
-  isNaN(lat) ||
-  isNaN(lng)
-){
-  return;
-}
-  
-  const agora =
-    Date.now();
 
-  if(!seguirUsuario){
+    typeof lat !== 'number' ||
+    typeof lng !== 'number' ||
 
-    if(
-      agora - ultimaInteracao >
-      TEMPO_RETORNO_CAMERA
-    ){
+    isNaN(lat) ||
+    isNaN(lng)
 
-      seguirUsuario = true;
+  ){
 
-      atualizarBotaoSeguir();
+    console.error(
+      'Camera coordenadas inválidas',
+      { lat, lng }
+    );
 
-    }else{
-
-      return;
-
-    }
+    return;
 
   }
 
-  const zoom =
-    obterZoomPorVelocidade(
-      speed
-    );
+  if(!state.cameraFollowing){
+    return;
+  }
 
-  mapa.easeTo({
+  map.easeTo({
 
-    center:[lng,lat],
+    center:[
+      lng,
+      lat
+    ],
 
-    zoom,
+    zoom:
+      CAMERA_CONFIG.zoom,
 
-    bearing:heading,
+    pitch:
+      CAMERA_CONFIG.pitch,
 
-    pitch:55,
+    bearing:
+      heading || 0,
 
-    duration:1000,
-
-    essential:true
+    duration:
+      CAMERA_CONFIG.animationDuration
 
   });
-
-}
-
-
-// ======================
-// ZOOM DINÂMICO
-// ======================
-
-function obterZoomPorVelocidade(
-  speed
-){
-
-  const kmh =
-    speed * 3.6;
-
-  if(kmh < 5)
-    return 17.5;
-
-  if(kmh < 20)
-    return 16.5;
-
-  if(kmh < 40)
-    return 15.5;
-
-  if(kmh < 70)
-    return 14.5;
-
-  return 13.5;
-
-}
-
-
-// ======================
-// BOTÃO FOLLOW
-// ======================
-
-function atualizarBotaoSeguir(){
-
-  const btn =
-    document.getElementById(
-      'follow-btn'
-    );
-
-  if(!btn) return;
-
-  if(seguirUsuario){
-
-    btn.classList.add(
-      'active'
-    );
-
-  }else{
-
-    btn.classList.remove(
-      'active'
-    );
-
-  }
 
 }
