@@ -1,6 +1,11 @@
 // ui/mode.js
 
 import {
+  inicializarMapa,
+  adicionarMarcadoresHoteis
+} from './services/map.js';
+
+import {
   HOTELS
 }
 from '../data/dados.js';
@@ -102,6 +107,7 @@ export function iniciarModoRota(){
     false;
 
   inicializarMapa();
+  adicionarMarcadoresHoteis(hoteisAtivos);
 
   if(
 
