@@ -196,28 +196,48 @@ function atualizarMarcadorUsuario(
 // =========================
 
 export function updateMap(
+
   lat,
   lng,
   heading = 0,
   speed = 0
+
 ){
+
+  if(
+    typeof lat !== 'number' ||
+    typeof lng !== 'number' ||
+    isNaN(lat) ||
+    isNaN(lng)
+  ){
+    console.error(
+      'updateMap recebeu coordenadas inválidas',
+      { lat, lng }
+    );
+    return;
+  }
 
   if(!state.map){
     return;
   }
 
   atualizarMarcadorUsuario(
-  lat,
-  lng
-);
+    lat,
+    lng
+  );
 
- atualizarCamera(
-  state.map,
-  lat,
-  lng,
-  heading,
-  speed
-);
+  atualizarCamera(
+
+    state.map,
+
+    lat,
+    lng,
+
+    heading,
+    speed
+
+  );
+
 }
 
 
