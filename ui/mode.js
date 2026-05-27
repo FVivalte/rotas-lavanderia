@@ -101,7 +101,7 @@ export function iniciarModoRota(){
   state.mapInitialized =
     false;
 
-  initMap();
+  inicializarMapa();
 
   if(
 
