@@ -196,12 +196,10 @@ function atualizarMarcadorUsuario(
 // =========================
 
 export function updateMap(
-
   lat,
   lng,
   heading = 0,
   speed = 0
-
 ){
 
   if(
@@ -211,7 +209,7 @@ export function updateMap(
     isNaN(lng)
   ){
     console.error(
-      'updateMap recebeu coordenadas inválidas',
+      'updateMap coordenadas inválidas',
       { lat, lng }
     );
     return;
@@ -227,20 +225,14 @@ export function updateMap(
   );
 
   atualizarCamera(
-
     state.map,
-
     lat,
     lng,
-
     heading,
     speed
-
   );
 
 }
-
-
 // =========================
 // EXPORT MAP
 // =========================
