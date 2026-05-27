@@ -16,7 +16,7 @@ from './map-camera.js';
 
 
 // =========================
-// A PRINCIPAL
+// MAPA PRINCIPAL
 // =========================
 
 let marcadorUsuario;
@@ -71,6 +71,7 @@ export function initMap(){
 
 }
 
+
 // =========================
 // HOTÉIS
 // =========================
@@ -95,6 +96,13 @@ function adicionarHoteis(){
 
     const lng =
       Number(partes[1]);
+
+    if(
+      isNaN(lat) ||
+      isNaN(lng)
+    ){
+      return;
+    }
 
     const el =
       document.createElement('div');
@@ -148,16 +156,22 @@ function atualizarMarcadorUsuario(
 ){
 
   if(
+
     typeof lat !== 'number' ||
     typeof lng !== 'number' ||
+
     isNaN(lat) ||
     isNaN(lng)
+
   ){
+
     console.error(
       'Coordenadas inválidas:',
       { lat, lng }
     );
+
     return;
+
   }
 
   if(!marcadorUsuario){
@@ -191,28 +205,37 @@ function atualizarMarcadorUsuario(
 
 }
 
+
 // =========================
 // UPDATE MAP
 // =========================
 
 export function updateMap(
+
   lat,
   lng,
   heading = 0,
   speed = 0
+
 ){
 
   if(
+
     typeof lat !== 'number' ||
     typeof lng !== 'number' ||
+
     isNaN(lat) ||
     isNaN(lng)
+
   ){
+
     console.error(
       'updateMap coordenadas inválidas',
       { lat, lng }
     );
+
     return;
+
   }
 
   if(!state.map){
@@ -225,14 +248,20 @@ export function updateMap(
   );
 
   atualizarCamera(
+
     state.map,
+
     lat,
     lng,
+
     heading,
     speed
+
   );
 
 }
+
+
 // =========================
 // EXPORT MAP
 // =========================
