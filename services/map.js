@@ -54,3 +54,49 @@ export function updateMap(lat, lng, heading = 0, speed = 0) {
 
 // Exporta a instância caso outros arquivos precisem interagir com o mapa diretamente
 export { mapInstance };
+
+export function adicionarMarcadoresHoteis(hoteis = []) {
+
+  if (!mapInstance) return;
+
+  hoteis.forEach(hotel => {
+
+    if (!hotel.coords) return;
+
+    let lat;
+    let lng;
+
+    // Caso coords venha como string: "-22.76,-41.89"
+    if (typeof hotel.coords === 'string') {
+
+      [lat, lng] = hotel.coords
+        .split(',')
+        .map(Number);
+
+    }
+
+    // Caso venha como array
+    else if (Array.isArray(hotel.coords)) {
+
+      [lat, lng] = hotel.coords;
+
+    }
+
+    // Validação
+    if (
+      isNaN(lat) ||
+      isNaN(lng)
+    ) {
+      console.warn('Coordenadas inválidas:', hotel);
+      return;
+    }
+
+    new maplibregl.Marker({
+      color: '#e53935'
+    })
+      .setLngLat([lng, lat])
+      .addTo(mapInstance);
+
+  });
+
+}
