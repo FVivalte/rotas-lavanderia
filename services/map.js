@@ -10,7 +10,7 @@ let userMarker = null;
  * @param {string} containerId - O ID da div HTML (ex: 'map')
  * @param {string} accessToken - Seu token do Mapbox (se aplicável)
  */
-export function inicializarMapa(containerId = 'map', accessToken = '') {
+export function inicializarMapa(containerId = 'mapa', accessToken = '') {
   if (accessToken) {
     maplibregl.accessToken = accessToken;
   }
