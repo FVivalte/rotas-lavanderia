@@ -1,107 +1,46 @@
-#screen-select{
-  position:fixed;
-  inset:0;
-}
-
-#homeScreen{
-
-  position:fixed;
-
-  left:0;
-  right:0;
-  bottom:0;
-
-  z-index:20;
-
+#tela-selecao{
   display:flex;
   flex-direction:column;
-
-  gap:8px;
-
-  padding:12px;
-
-  max-height:55vh;
-  min-height:260px;
-
-  background:
-    linear-gradient(
-      to top,
-      rgba(255,255,255,.98),
-      rgba(255,255,255,.88)
-    );
-
-  backdrop-filter:blur(10px);
-
-  border-top-left-radius:20px;
-  border-top-right-radius:20px;
-
+  height:100vh;
   overflow:hidden;
-
 }
 
-.topbar{
+.tela1-header{
+  position:sticky;
+  top:0;
+  z-index:20;
+
+  background:var(--bg);
+
+  padding:16px;
 
   display:flex;
-
   justify-content:space-between;
-
   align-items:center;
-
 }
 
-.bottom-actions{
+.tela1-actions{
+  position:sticky;
+  top:72px;
+  z-index:19;
 
-  position:fixed;
-
-  left:0;
-  right:0;
-
-  top:88px;
-
-  z-index:50;
+  background:var(--bg);
 
   display:flex;
-
   gap:10px;
 
   padding:12px 16px;
-
 }
 
-.bottom-actions button{
+.tela1-actions button{
   flex:1;
 }
 
-#lista-hoteis{
-
+.tela1-lista{
   flex:1;
 
-  overflow:auto;
+  overflow-y:auto;
 
-  display:flex;
-
-  flex-direction:column;
-
-  gap:10px;
-
-  padding-top:90px;
-
-  padding-bottom:24px;
-
-}
-
-.delete-hotel{
-
-  border:none;
-
-  background:#ffebeb;
-
-  color:#c62828;
-
-  border-radius:8px;
-
-  padding:6px 10px;
-
-  cursor:pointer;
-
+  padding:16px;
+  padding-bottom:120px;
 }
