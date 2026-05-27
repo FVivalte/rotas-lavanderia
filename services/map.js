@@ -20,13 +20,12 @@ export function inicializarMapa(containerId = 'mapa', accessToken = '') {
   const defaultLat = -22.7625969;
 
   mapInstance = new maplibregl.Map({
-    container: containerId,
-    style: 'mapbox://styles/mapbox/streets-v11', // Ou outro estilo de sua preferência
-    center: [defaultLng, defaultLat], // IMPORTANTE: Longitude primeiro, depois Latitude
-    zoom: 15,
-    pitch: 0
-  });
-
+  container: containerId,
+  style: 'https://demotiles.maplibre.org/style.json',
+  center: [defaultLng, defaultLat],
+  zoom: 15,
+  pitch: 0
+});
   // Cria o marcador do usuário, mas deixa escondido até o GPS rodar
   userMarker = new maplibregl.Marker({ color: '#007AFF' })
     .setLngLat([defaultLng, defaultLat])
