@@ -59,6 +59,25 @@ export function startGpsTracking(){
         const speed =
           pos.coords.speed || 0;
 
+        if(
+
+          typeof lat !== 'number' ||
+          typeof lng !== 'number' ||
+
+          isNaN(lat) ||
+          isNaN(lng)
+
+        ){
+
+          console.error(
+            'GPS inválido',
+            { lat, lng }
+          );
+
+          return;
+
+        }
+
         state.userPosition = {
 
           lat,
@@ -68,7 +87,6 @@ export function startGpsTracking(){
 
         };
 
-        // DEBUG
         console.log({
 
           lat,
@@ -78,7 +96,6 @@ export function startGpsTracking(){
 
         });
 
-        // ORDEM CORRETA
         updateMap(
 
           lat,
