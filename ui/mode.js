@@ -103,8 +103,18 @@ export function iniciarModoRota(){
 
   initMap();
 
-  updateMap();
+  if(state.userPosition){
 
+  updateMap(
+
+    state.userPosition.lat,
+    state.userPosition.lng,
+    state.userPosition.heading || 0,
+    state.userPosition.speed || 0
+
+  );
+
+}
   startGpsTracking();
 
   atualizarModoUI();
