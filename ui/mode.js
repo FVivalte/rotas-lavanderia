@@ -103,55 +103,34 @@ export function iniciarModoRota(){
     h.id === state.routeOrder[0]
   );
 
-if (
-  primeiroHotel &&
-  primeiroHotel.coords
-)
-console.log(primeiroHotel);
-{
+if (primeiroHotel) {
 
-  let lat;
-  let lng;
+  const lat =
+    Number(primeiroHotel.lat);
+
+  const lng =
+    Number(primeiroHotel.lng);
 
   if (
-    typeof primeiroHotel.coords === 'string'
+    isNaN(lat) ||
+    isNaN(lng)
   ) {
 
-    const partes =
-  primeiroHotel.coords
-    .split(',');
-
-lat = Number(partes[0]);
-lng = Number(partes[1]);
+    console.error(
+      'Hotel sem coordenadas válidas',
+      primeiroHotel
+    );
 
   } else {
 
-   lat = Number(primeiroHotel.coords[0]);
-lng = Number(primeiroHotel.coords[1]);
-  }
+    const iframe =
+      document.getElementById(
+        'mapa-rota'
+      );
 
-if (
-  isNaN(lat) ||
-  isNaN(lng)
-) {
+    if (iframe) {
 
-  console.error(
-    'Coords inválidas',
-    primeiroHotel
-  );
-
-  return;
-
-}
-  
-  const iframe =
-    document.getElementById(
-      'mapa-rota'
-    );
-
-  if (iframe) {
-
-    iframe.src =
+      iframe.src =
 
 `https://www.openstreetmap.org/export/embed.html?bbox=${
 lng - 0.01
@@ -162,6 +141,8 @@ lng + 0.01
 }%2C${
 lat + 0.01
 }&layer=mapnik&marker=${lat}%2C${lng}`;
+
+    }
 
   }
 
