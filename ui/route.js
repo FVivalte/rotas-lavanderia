@@ -157,7 +157,7 @@ export function renderizarRota(){
               x => x !== id
             );
 
-          renderSelection();
+          renderizarSelecao();
 
           renderizarRota();
 
