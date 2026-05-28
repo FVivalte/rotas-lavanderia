@@ -31,6 +31,8 @@ import {
 }
 from '../storage/database.js';
 
+import { getFormattedDateTitle }
+from '../utils/utils.js';
 
 // ======================
 // RELATÓRIO TELA ROTA
@@ -190,51 +192,6 @@ export function renderizarRelatorioModo(){
       .appendChild(div);
 
   });
-
-}
-
-
-// ======================
-// DATA FORMATADA
-// ======================
-
-export function obterTituloData(){
-
-  const agora = new Date();
-
-  const diasSemana = [
-
-    'Domingo',
-    'Segunda-feira',
-    'Terça-feira',
-    'Quarta-feira',
-    'Quinta-feira',
-    'Sexta-feira',
-    'Sábado'
-
-  ];
-
-  const diaSemana =
-    diasSemana[agora.getDay()];
-
-  const dia =
-    String(
-      agora.getDate()
-    ).padStart(2,'0');
-
-  const mes =
-    String(
-      agora.getMonth() + 1
-    ).padStart(2,'0');
-
-  const ano =
-    agora.getFullYear();
-
-  return `
-ROTA do dia
-${diaSemana},
-${dia}/${mes}/${ano}
-  `;
 
 }
 
