@@ -36,33 +36,48 @@ mapas[containerId] = map;
     .setLngLat([defaultLng, defaultLat])
     .addTo(mapInstance);
 
-  return mapInstance;
+  return map;
 }
 
 /**
  * Atualiza a posição do marcador do usuário e move a câmera
  */
-export function updateMap(lat, lng, heading = 0, speed = 0) {
-  if (!mapInstance) {
-    console.warn('O mapa ainda não foi inicializado. Chame inicializarMapa() primeiro.');
+export function updateMap(
+  lat,
+  lng,
+  heading = 0,
+  speed = 0,
+  mapId = 'mapa'
+) {
+
+  const map = mapas[mapId];
+
+  if (!map) {
     return;
   }
 
-  // 1. Atualiza a posição do marcador azul do usuário no mapa
   if (userMarker) {
     userMarker.setLngLat([lng, lat]);
   }
 
-  // 2. Passa o comando para o arquivo de câmera ajustar a visão do motorista
-  atualizarCamera(mapInstance, lat, lng, heading, speed);
+  atualizarCamera(
+    map,
+    lat,
+    lng,
+    heading,
+    speed
+  );
+
 }
 
 // Exporta a instância caso outros arquivos precisem interagir com o mapa diretamente
-export { mapInstance };
+export { map };
 
 export function adicionarMarcadoresHoteis(hoteis = []) {
 
-  if (!mapInstance) return;
+  const map = mapas['mapa-rota'];
+
+if (!map) return;
 
   hoteis.forEach(hotel => {
 
