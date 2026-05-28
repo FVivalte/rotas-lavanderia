@@ -122,6 +122,21 @@ if (!map) return;
 }
 export function inicializarMapaRota(hoteis = []) {
 
+  const container =
+    document.getElementById('mapa-rota');
+
+  if (!container) {
+
+    console.error(
+      'Container mapa-rota não encontrado'
+    );
+
+    return;
+
+  }
+
+  container.innerHTML = '';
+
   const defaultLng = -41.8964253;
   const defaultLat = -22.7625969;
 
@@ -129,7 +144,8 @@ export function inicializarMapaRota(hoteis = []) {
 
     container: 'mapa-rota',
 
-    style: 'https://tiles.openfreemap.org/styles/liberty',
+    style:
+      'https://tiles.openfreemap.org/styles/liberty',
 
     center: [defaultLng, defaultLat],
 
@@ -139,38 +155,60 @@ export function inicializarMapaRota(hoteis = []) {
 
   mapas['mapa-rota'] = map;
 
-  hoteis.forEach(hotel => {
+  map.on('load', () => {
 
-    if (!hotel.coords) return;
+    map.resize();
 
-    let lat;
-    let lng;
+    const bounds =
+      new maplibregl.LngLatBounds();
 
-    if (typeof hotel.coords === 'string') {
+    hoteis.forEach(hotel => {
 
-      [lat, lng] =
-        hotel.coords
-          .split(',')
-          .map(Number);
+      if (!hotel.coords) return;
 
-    } else {
+      let lat;
+      let lng;
 
-      [lat, lng] = hotel.coords;
+      if (
+        typeof hotel.coords === 'string'
+      ) {
+
+        [lat, lng] =
+          hotel.coords
+            .split(',')
+            .map(Number);
+
+      } else {
+
+        [lat, lng] = hotel.coords;
+
+      }
+
+      if (
+        isNaN(lat) ||
+        isNaN(lng)
+      ) {
+        return;
+      }
+
+      new maplibregl.Marker({
+        color: '#e53935'
+      })
+        .setLngLat([lng, lat])
+        .addTo(map);
+
+      bounds.extend([lng, lat]);
+
+    });
+
+    if (hoteis.length > 0) {
+
+      map.fitBounds(bounds, {
+        padding: 60,
+        maxZoom: 15
+      });
 
     }
-
-    if (
-      isNaN(lat) ||
-      isNaN(lng)
-    ) {
-      return;
-    }
-
-    new maplibregl.Marker({
-      color: '#e53935'
-    })
-      .setLngLat([lng, lat])
-      .addTo(map);
 
   });
 
