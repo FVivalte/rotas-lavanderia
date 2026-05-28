@@ -34,7 +34,7 @@ mapas[containerId] = map;
   // Cria o marcador do usuário, mas deixa escondido até o GPS rodar
   userMarker = new maplibregl.Marker({ color: '#007AFF' })
     .setLngLat([defaultLng, defaultLat])
-    .addTo(mapInstance);
+    .addTo(map);
 
   return map;
 }
