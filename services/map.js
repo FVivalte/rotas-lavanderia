@@ -1,8 +1,10 @@
 // services/map.js
+
 import { atualizarCamera } from './map-camera.js';
 
 // Variável escopo global do módulo para guardar a instância do mapa
-let mapInstance = null;
+
+let mapas = {};
 let userMarker = null;
 
 /**
@@ -10,6 +12,7 @@ let userMarker = null;
  * @param {string} containerId - O ID da div HTML (ex: 'map')
  * @param {string} accessToken - Seu token do Mapbox (se aplicável)
  */
+
 export function inicializarMapa(containerId = 'mapa', accessToken = '') {
   if (accessToken) {
     maplibregl.accessToken = accessToken;
@@ -19,13 +22,15 @@ export function inicializarMapa(containerId = 'mapa', accessToken = '') {
   const defaultLng = -41.8964253;
   const defaultLat = -22.7625969;
 
-  mapInstance = new maplibregl.Map({
+  const map = new maplibregl.Map({
   container: containerId,
   style: 'https://tiles.openfreemap.org/styles/liberty',
   center: [defaultLng, defaultLat],
   zoom: 15,
   pitch: 0
 });
+mapas[containerId] = map;
+
   // Cria o marcador do usuário, mas deixa escondido até o GPS rodar
   userMarker = new maplibregl.Marker({ color: '#007AFF' })
     .setLngLat([defaultLng, defaultLat])
@@ -95,7 +100,7 @@ export function adicionarMarcadoresHoteis(hoteis = []) {
       color: '#e53935'
     })
       .setLngLat([lng, lat])
-      .addTo(mapInstance);
+      .addTo(map);
 
   });
 
