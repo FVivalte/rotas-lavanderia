@@ -102,8 +102,17 @@ export function iniciarModoRota(){
   state.mapInitialized =
     false;
 
-  inicializarMapa();
-  adicionarMarcadoresHoteis(hoteisAtivos);
+  setTimeout(() => {
+
+  inicializarMapa('mapa-rota');
+
+  adicionarMarcadoresHoteis(
+    HOTELS.filter(h =>
+      state.routeOrder.includes(h.id)
+    )
+  );
+
+}, 200);
 
   if(
 
