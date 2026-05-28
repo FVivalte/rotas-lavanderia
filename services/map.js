@@ -71,7 +71,7 @@ export function updateMap(
 }
 
 // Exporta a instância caso outros arquivos precisem interagir com o mapa diretamente
-export { map };
+export { mapas };
 
 export function adicionarMarcadoresHoteis(hoteis = []) {
 
