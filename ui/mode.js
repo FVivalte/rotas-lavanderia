@@ -44,15 +44,6 @@ from './report.js';
 
 import {
 
-  inicializarMapa,
-  adicionarMarcadoresHoteis,
-  updateMap
-
-}
-from '../services/map.js';
-
-import {
-
   startGpsTracking,
   stopGpsTracking
 
