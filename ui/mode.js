@@ -2,7 +2,6 @@
 
 import {
   inicializarMapa,
-  inicializarMapaRota,
   updateMap
 }
 from '../services/map.js';
