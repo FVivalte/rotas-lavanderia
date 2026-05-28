@@ -110,7 +110,7 @@ export function iniciarModoRota(){
     )
   );
 
-}, 300);
+}, 800);
 
   if(
 
