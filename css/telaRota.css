@@ -20,6 +20,11 @@
   z-index:30;
 }
 
+#mapa {
+  width: 100%;
+  height: 100vh; /* Ou um valor fixo como 400px */
+}
+
 #mapa-rota{
   width:100%;
   height:220px;
