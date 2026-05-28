@@ -215,71 +215,34 @@ export function renderizarSelecao(){
 
 
 // ======================
-// TOGGLES
+// DELEGAÇÃO DE EVENTOS (Performance Máxima)
 // ======================
 
-  listaHoteis
-  .querySelectorAll(
-    'input[type=checkbox]'
-  )
-  .forEach(cb=>{
+listaHoteis.addEventListener('click', (e) => {
+  // Caso 1: Clique no botão de deletar (ou no emoji dentro dele)
+  const btnDelete = e.target.closest('[data-delete]');
+  if (btnDelete) {
+    const id = Number(btnDelete.dataset.delete);
+    removerHotelCustomizado(id);
+    return;
+  }
+});
 
-    cb.addEventListener(
-      'change',
-      e=>{
-
-        const id =
-          Number(
-            e.target.dataset.id
-          );
-
-        if(e.target.checked){
-
-          state.activeSet.add(id);
-
-        }else{
-
-          state.activeSet.delete(id);
-
-        }
-
-        atualizarContadores();
-
-        salvarEstadoApp();
-
-      }
-    );
-
-  });
-
-
-// ======================
-// BOTÃO DELETE
-// ======================
-
-  listaHoteis
-  .querySelectorAll(
-    '[data-delete]'
-  )
-  .forEach(btn=>{
-
-    btn.addEventListener(
-      'click',
-      ()=>{
-
-        const id =
-          Number(
-            btn.dataset.delete
-          );
-
-        removerHotelCustomizado(id);
-
-      }
-    );
-
-  });
-
-
+listaHoteis.addEventListener('change', (e) => {
+  // Caso 2: Clique no checkbox
+  if (e.target.matches('input[type=checkbox]')) {
+    const id = Number(e.target.dataset.id);
+    
+    if (e.target.checked) {
+      state.activeSet.add(id);
+    } else {
+      state.activeSet.delete(id);
+    }
+    
+    atualizarContadores();
+    salvarEstadoApp();
+  }
+});
 // ======================
 // FINAL
 // ======================
