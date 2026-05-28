@@ -83,14 +83,16 @@ export function gerarRota(){
 
 export function atualizarContadores(){
 
-  const texto =
-    `${state.activeSet.size} hotéis ativos`;
+  const texto = `${state.activeSet.size} hotéis ativos`;
 
-  contadorSelecao.textContent =
-    texto;
+  // Só injeta o texto se o contador existir
+  if (contadorSelecao) {
+    contadorSelecao.textContent = texto;
+  }
 
-  contadorRota.textContent =
-    texto;
+  if (contadorRota) {
+    contadorRota.textContent = texto;
+  }
 
 }
 
