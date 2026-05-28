@@ -21,14 +21,17 @@ const telas = [
 
 export function mostrarTela(tela){
 
-  telas.forEach(el=>{
+  // 1. Garante que a tela de destino realmente existe no HTML
+  if (!tela) return;
 
-    el.classList.add('hidden');
-
+  telas.forEach(el => {
+    // 2. Garante que o elemento da lista existe antes de tentar esconder
+    if (el) {
+      el.classList.add('hidden');
+    }
   });
 
   tela.classList.remove('hidden');
-
   window.scrollTo(0,0);
 
 }
