@@ -81,26 +81,16 @@ if (!map) return;
 
   hoteis.forEach(hotel => {
 
-    if (!hotel.coords) return;
+    if (
+  hotel.lat == null ||
+  hotel.lng == null
+) return;
 
     let lat;
     let lng;
 
-    // Caso coords venha como string: "-22.76,-41.89"
-    if (typeof hotel.coords === 'string') {
-
-      [lat, lng] = hotel.coords
-        .split(',')
-        .map(Number);
-
-    }
-
-    // Caso venha como array
-    else if (Array.isArray(hotel.coords)) {
-
-      [lat, lng] = hotel.coords;
-
-    }
+lat = Number(hotel.lat);
+lng = Number(hotel.lng);
 
     // Validação
     if (
