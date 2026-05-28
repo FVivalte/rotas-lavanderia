@@ -287,10 +287,20 @@ export function renderizarRota(){
             }
           );
 
+          // --- PROTEÇÃO DO "ESCORREGAMENTO" ---
+          // Se o dedo foi solto abaixo do último elemento, o índice de destino
+          // será nulo. Forçamos para o último índice disponível.
+          if (indiceDestino === null) {
+            indiceDestino = state.routeOrder.length - 1;
+          }
+          // ------------------------------------
+
           const indiceOrigem =
             state.routeOrder.indexOf(id);
 
-          if(indiceDestino !== null){
+          // A lógica de mover no array permanece a mesma, 
+          // agora com o indiceDestino garantido
+          if(indiceDestino !== null && indiceDestino !== indiceOrigem){
 
             state.routeOrder.splice(
               indiceDestino,
@@ -316,7 +326,6 @@ export function renderizarRota(){
         },
         { passive:true }
       );
-
       listaRota.appendChild(item);
 
     }
