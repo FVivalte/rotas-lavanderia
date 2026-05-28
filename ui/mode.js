@@ -103,13 +103,6 @@ export function iniciarModoRota(){
   setTimeout(() => {
 
   inicializarMapa('mapa-rota');
-
-  adicionarMarcadoresHoteis(
-    HOTELS.filter(h =>
-      state.routeOrder.includes(h.id)
-    )
-  );
-
 }, 800);
 
   if(
