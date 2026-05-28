@@ -131,9 +131,7 @@ if(btnCriarRota){
 
       renderizarRota();
 
-      mostrarTela(
-        telaRota
-      );
+      mostrarTela(telaRota);
 
     }
   );
@@ -218,6 +216,11 @@ if(btnIniciarRota){
       mostrarTela(
         telaNavegacao
       );
+      if (mapas['mapa']) {
+    setTimeout(() => {
+        mapas['mapa'].resize();
+    }, 150); // O tempo garante que o CSS terminou de processar
+}
 
     }
   );
