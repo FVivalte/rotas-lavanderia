@@ -120,3 +120,58 @@ if (!map) return;
   });
 
 }
+export function inicializarMapaRota(hoteis = []) {
+
+  const defaultLng = -41.8964253;
+  const defaultLat = -22.7625969;
+
+  const map = new maplibregl.Map({
+
+    container: 'mapa-rota',
+
+    style: 'https://tiles.openfreemap.org/styles/liberty',
+
+    center: [defaultLng, defaultLat],
+
+    zoom: 12
+
+  });
+
+  mapas['mapa-rota'] = map;
+
+  hoteis.forEach(hotel => {
+
+    if (!hotel.coords) return;
+
+    let lat;
+    let lng;
+
+    if (typeof hotel.coords === 'string') {
+
+      [lat, lng] =
+        hotel.coords
+          .split(',')
+          .map(Number);
+
+    } else {
+
+      [lat, lng] = hotel.coords;
+
+    }
+
+    if (
+      isNaN(lat) ||
+      isNaN(lng)
+    ) {
+      return;
+    }
+
+    new maplibregl.Marker({
+      color: '#e53935'
+    })
+      .setLngLat([lng, lat])
+      .addTo(map);
+
+  });
+
+}
