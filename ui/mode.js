@@ -96,8 +96,59 @@ export function iniciarModoRota(){
 
     }));
 
-  state.mapInitialized =
-    false;
+  state.mapInitialized = false;
+
+  const primeiroHotel =
+  HOTELS.find(h =>
+    h.id === state.routeOrder[0]
+  );
+
+if (
+  primeiroHotel &&
+  primeiroHotel.coords
+) {
+
+  let lat;
+  let lng;
+
+  if (
+    typeof primeiroHotel.coords === 'string'
+  ) {
+
+    [lat, lng] =
+      primeiroHotel.coords
+        .split(',')
+        .map(Number);
+
+  } else {
+
+    [lat, lng] =
+      primeiroHotel.coords;
+
+  }
+
+  const iframe =
+    document.getElementById(
+      'mapa-rota'
+    );
+
+  if (iframe) {
+
+    iframe.src =
+
+`https://www.openstreetmap.org/export/embed.html?bbox=${
+lng - 0.01
+}%2C${
+lat - 0.01
+}%2C${
+lng + 0.01
+}%2C${
+lat + 0.01
+}&layer=mapnik&marker=${lat}%2C${lng}`;
+
+  }
+
+}
 
   setTimeout(() => {
 
