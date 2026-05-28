@@ -19,19 +19,22 @@ const telas = [
 
 ];
 
-export function mostrarTela(tela){
+import { state } from '../core/state.js';
+import { salvarEstadoApp } from '../storage/storage.js';
 
-  // 1. Garante que a tela de destino realmente existe no HTML
+export function mostrarTela(tela){
   if (!tela) return;
 
   telas.forEach(el => {
-    // 2. Garante que o elemento da lista existe antes de tentar esconder
-    if (el) {
-      el.classList.add('hidden');
-    }
+    if (el) el.classList.add('hidden');
   });
 
   tela.classList.remove('hidden');
   window.scrollTo(0,0);
 
+  // Atualiza a memória com a tela atual (usando o id da div) e salva
+  if (tela.id) {
+    state.currentScreen = tela.id;
+    salvarEstadoApp();
+  }
 }
