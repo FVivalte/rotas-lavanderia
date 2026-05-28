@@ -98,11 +98,11 @@ self.addEventListener(
         )
         .then(networkResponse => {
 
-          // salva novos arquivos
+          // salva apenas os arquivos do próprio aplicativo (evita entupir a memória com o mapa)
           if(
-  event.request.method === 'GET' &&
-  event.request.url.startsWith('http')
-){
+            event.request.method === 'GET' &&
+            event.request.url.startsWith(self.location.origin)
+          ){
 
             const clone =
               networkResponse.clone();
