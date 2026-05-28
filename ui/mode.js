@@ -106,7 +106,9 @@ export function iniciarModoRota(){
 if (
   primeiroHotel &&
   primeiroHotel.coords
-) {
+)
+console.log(primeiroHotel);
+{
 
   let lat;
   let lng;
@@ -115,18 +117,33 @@ if (
     typeof primeiroHotel.coords === 'string'
   ) {
 
-    [lat, lng] =
-      primeiroHotel.coords
-        .split(',')
-        .map(Number);
+    const partes =
+  primeiroHotel.coords
+    .split(',');
+
+lat = Number(partes[0]);
+lng = Number(partes[1]);
 
   } else {
 
-    [lat, lng] =
-      primeiroHotel.coords;
-
+   lat = Number(primeiroHotel.coords[0]);
+lng = Number(primeiroHotel.coords[1]);
   }
 
+if (
+  isNaN(lat) ||
+  isNaN(lng)
+) {
+
+  console.error(
+    'Coords inválidas',
+    primeiroHotel
+  );
+
+  return;
+
+}
+  
   const iframe =
     document.getElementById(
       'mapa-rota'
