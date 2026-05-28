@@ -2,7 +2,8 @@
 
 import {
   inicializarMapa,
-  updateMap
+  updateMap,
+  mapas
 }
 from '../services/map.js';
 
@@ -103,55 +104,34 @@ export function iniciarModoRota(){
     h.id === state.routeOrder[0]
   );
 
-if (primeiroHotel) {
+  if (primeiroHotel) {
 
-  const lat =
-    Number(primeiroHotel.lat);
+    const lat =
+      Number(primeiroHotel.lat);
 
-  const lng =
-    Number(primeiroHotel.lng);
+    const lng =
+      Number(primeiroHotel.lng);
 
-  if (
-    isNaN(lat) ||
-    isNaN(lng)
-  ) {
+    if (
+      isNaN(lat) ||
+      isNaN(lng)
+    ) {
 
-    console.error(
-      'Hotel sem coordenadas válidas',
-      primeiroHotel
-    );
-
-  } else {
-
-    const iframe =
-      document.getElementById(
-        'mapa-rota'
+      console.error(
+        'Hotel sem coordenadas válidas',
+        primeiroHotel
       );
-
-    if (iframe) {
-
-      iframe.src =
-
-`https://www.openstreetmap.org/export/embed.html?bbox=${
-lng - 0.01
-}%2C${
-lat - 0.01
-}%2C${
-lng + 0.01
-}%2C${
-lat + 0.01
-}&layer=mapnik&marker=${lat}%2C${lng}`;
 
     }
 
   }
 
-}
-
   setTimeout(() => {
-
-  inicializarMapa('mapa-rota');
-}, 800);
+    const mapaRota = inicializarMapa('mapa-rota');
+    if (mapaRota) {
+      mapaRota.resize();
+    }
+  }, 300);
 
   if(
 
@@ -435,6 +415,10 @@ export function proximoHotel(){
   atualizarModoUI();
 
   renderizarRelatorioModo();
+
+  if (mapas['mapa']) {
+    mapas['mapa'].resize();
+  }
 
   updateMap();
 
