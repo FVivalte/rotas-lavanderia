@@ -323,31 +323,32 @@ export function renderizarRota(){
   );
 
 
-  // ======================
-  // CRIAR RELATÓRIO VAZIO
-  // ======================
+// ======================
+// SINCRONIZAR RELATÓRIO
+// ======================
 
-  if(
-    state.routeReport.length === 0
-  ){
+  state.routeReport = state.routeOrder.map(id => {
+    
+    // Procura se este hotel já tem um relatório salvo na memória
+    const relatorioExistente = state.routeReport.find(r => r.id === id);
 
-    state.routeReport =
-      state.routeOrder.map(id=>({
-
+    if (relatorioExistente) {
+      // Se existir, devolve exatamente como estava (preserva fotos e horários!)
+      return relatorioExistente; 
+    } else {
+      // Se for um hotel novo, cria a ficha zerada
+      return {
         id,
-
-        arrival:null,
-        departure:null,
-
-        entrega:false,
-        coleta:false,
-
-        deliveryPhotos:[],
-        pickupPhotos:[]
-
-      }));
-
-  }
+        arrival: null,
+        departure: null,
+        entrega: false,
+        coleta: false,
+        deliveryPhotos: [],
+        pickupPhotos: []
+      };
+    }
+    
+  });
 
 
   atualizarContadores();
