@@ -88,25 +88,5 @@ export function adicionarMarcadoresHoteis(
   });
 
 } 
-
-  if (!map) {
-    console.warn('Mapa não encontrado para adicionar marcadores!');
-    return;
-  }
-
-  hoteis.forEach(hotel => {
-    if (hotel.lat == null || hotel.lng == null) return;
-
-    const lat = Number(hotel.lat);
-    const lng = Number(hotel.lng);
-
-    if (isNaN(lat) || isNaN(lng)) return;
-
-    new maplibregl.Marker({ color: '#e53935' })
-      .setLngLat([lng, lat])
-      .addTo(map);
-  });
-}
-
 // Exporta a instância
 export { mapas };
