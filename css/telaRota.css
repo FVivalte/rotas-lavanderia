@@ -1,8 +1,7 @@
 #tela-rota{
+  display:flex;
   flex-direction:column;
-
   height:100vh;
-
   overflow:hidden;
 }
 
@@ -26,25 +25,18 @@
 }
 
 #mapa-rota{
-  width:calc(100% - 32px);
   height:300px;
-
   margin:0 16px;
-
   border-radius:18px;
-
   overflow:hidden;
-
   flex-shrink:0;
 }
 
 .tela2-actions{
+  flex-shrink:0;
   display:flex;
   gap:10px;
-
   padding:16px;
-
-  background:var(--bg);
 }
 
 .tela2-actions button{
@@ -53,11 +45,9 @@
 
 .tela2-lista{
   flex:1;
-
   overflow-y:auto;
-
   padding:16px;
-  padding-bottom:120px;
+  min-height:0;
 }
 
 .tela2-relatorio{
