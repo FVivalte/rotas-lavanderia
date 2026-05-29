@@ -53,9 +53,41 @@ export function updateMap(lat, lng, heading = 0, speed = 0, mapId = 'mapa') {
 /**
  * Adiciona marcadores de hotéis usando a mesma chave da inicialização
  */
-export function adicionarMarcadoresHoteis(hoteis = []) {
-  // CORREÇÃO: Usando 'mapa' para bater com a inicialização
-  const map = mapas['mapa']; 
+export function adicionarMarcadoresHoteis(
+  hoteis = [],
+  mapId = 'mapa-rota'
+) {
+
+  const map = mapas[mapId];
+
+  if (!map) {
+    console.warn(
+      `Mapa ${mapId} não encontrado`
+    );
+    return;
+  }
+
+  hoteis.forEach(hotel => {
+
+    const lat = Number(hotel.lat);
+    const lng = Number(hotel.lng);
+
+    if (
+      isNaN(lat) ||
+      isNaN(lng)
+    ) {
+      return;
+    }
+
+    new maplibregl.Marker({
+      color: '#e53935'
+    })
+      .setLngLat([lng, lat])
+      .addTo(map);
+
+  });
+
+} 
 
   if (!map) {
     console.warn('Mapa não encontrado para adicionar marcadores!');
