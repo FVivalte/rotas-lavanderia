@@ -91,7 +91,7 @@ export const proximosHoteis =
 
 export const mapa =
   document.getElementById(
-    'mapa'
+    'mapa-rota'
   );
 
 
