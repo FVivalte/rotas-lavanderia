@@ -9,6 +9,12 @@ import {
   state
 }
 from '../core/state.js';
+import {
+  inicializarMapa,
+  adicionarMarcadoresHoteis,
+  mapas
+}
+from '../services/map.js';
 
 import {
 
@@ -60,7 +66,6 @@ export function gerarRota(){
     );
 
     return;
-
   }
 
   state.routeOrder =
@@ -71,6 +76,57 @@ export function gerarRota(){
   mostrarTela(
     telaRota
   );
+
+  setTimeout(()=>{
+
+    if(!mapas['mapa-rota']){
+
+      inicializarMapa(
+        'mapa-rota'
+      );
+
+    }
+
+    adicionarMarcadoresHoteis(
+      ativos,
+      'mapa-rota'
+    );
+
+    const bounds =
+      new maplibregl.LngLatBounds();
+
+    ativos.forEach(h=>{
+
+      if(
+        h.lat != null &&
+        h.lng != null
+      ){
+
+        bounds.extend([
+          Number(h.lng),
+          Number(h.lat)
+        ]);
+
+      }
+
+    });
+
+    if(
+      !bounds.isEmpty()
+    ){
+
+      mapas['mapa-rota']
+        .fitBounds(
+          bounds,
+          {
+            padding:50,
+            maxZoom:16
+          }
+        );
+
+    }
+
+  },200);
 
   salvarEstadoApp();
 
