@@ -9,6 +9,25 @@
 
 }
 
+#route-info{
+
+  display:flex;
+
+  justify-content:center;
+
+  gap:20px;
+
+  padding:10px;
+
+  background:white;
+
+  border-bottom:
+    1px solid var(--border);
+
+  font-weight:600;
+
+}
+
 #follow-btn{
 position:absolute;
 top:16px;
