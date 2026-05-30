@@ -95,49 +95,74 @@ let rotaSource = null;
 
 export function desenharRotaOSRM(
   coordenadas,
-  mapId='mapa'
-){
+  mapId = 'mapa'
+) {
 
   const map =
     mapas[mapId];
 
-  if(!map) return;
+  if (!map) return;
 
   const geojson = {
-    type:'Feature',
-    geometry:{
-      type:'LineString',
-      coordinates:coordenadas
+
+    type: 'Feature',
+
+    geometry: {
+
+      type: 'LineString',
+
+      coordinates:
+        coordenadas
+
     }
+
   };
 
-  if(
-    map.getSource('osrm-route')
-  ){
+  if (
+    map.getSource(
+      'osrm-route'
+    )
+  ) {
 
     map
-      .getSource('osrm-route')
-      .setData(geojson);
+      .getSource(
+        'osrm-route'
+      )
+      .setData(
+        geojson
+      );
 
     return;
+
   }
 
   map.addSource(
     'osrm-route',
     {
-      type:'geojson',
-      data:geojson
+      type: 'geojson',
+      data: geojson
     }
   );
 
   map.addLayer({
-    id:'osrm-route',
-    type:'line',
-    source:'osrm-route',
-    paint:{
-      'line-color':'#007AFF',
-      'line-width':6
+
+    id: 'osrm-route',
+
+    type: 'line',
+
+    source:
+      'osrm-route',
+
+    paint: {
+
+      'line-color':
+        '#007AFF',
+
+      'line-width':
+        6
+
     }
+
   });
 
 }
