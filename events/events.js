@@ -236,12 +236,13 @@ if(btnProximo){
           state.currentIndex
         ];
 
-      entry.entrega =
-        checkEntrega.checked;
+  entry.entrega =
+  checkEntrega?.checked ?? false;
 
-      entry.coleta =
-        checkColeta.checked;
+  entry.coleta =
+  checkColeta?.checked ?? false;
 
+    
       entry.departure =
         new Date().toISOString();
 
