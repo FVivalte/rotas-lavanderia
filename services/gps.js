@@ -6,6 +6,7 @@ import { getDistanceMeters } from '../utils/utils.js'; // Removido o parseCoords
 import { atualizarModoUI } from '../ui/mode.js';
 import { renderizarRelatorioModo } from '../ui/report.js';
 import { HOTELS } from '../data/dados.js';
+import { falar } from './voice.js';
 
 // ======================
 // START GPS
@@ -142,17 +143,41 @@ export function verificarChegada() {
 
   // Se estiver a menos de 90 metros do local
   if (distance <= 90) {
-    state.arrivalConfirmed = true;
 
-    const ok = confirm(`Você chegou em: ${hotel.name}?`);
+  state.arrivalConfirmed = true;
 
-    if (ok) {
-      state.routeReport[state.currentIndex].arrival = new Date().toISOString();
-      renderizarRelatorioModo();
-      atualizarModoUI();
-    } else {
-      // Se o usuário clicar em "Cancelar", liberamos para perguntar de novo na próxima atualização de posição
-      state.arrivalConfirmed = false;
-    }
+  // Fala somente se o switch estiver ligado
+  if (state.voiceNavigation) {
+
+    falar(
+      `Você chegou ao hotel ${hotel.name}`
+    );
+
   }
+
+  const ok = confirm(
+    `Você chegou em: ${hotel.name}?`
+  );
+
+  if (ok) {
+
+    state.routeReport[
+      state.currentIndex
+    ].arrival =
+      new Date().toISOString();
+
+    renderizarRelatorioModo();
+
+    atualizarModoUI();
+
+  }
+
+  else {
+
+    // Se clicar cancelar
+    state.arrivalConfirmed = false;
+
+  }
+
+}
 }
