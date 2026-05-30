@@ -540,27 +540,30 @@ if(btnSalvarHotel){
 
       }
 
-      HOTELS.push({
+ HOTELS.push({
 
-        id: Date.now(),
+  id: Date.now(),
 
-        name:
-          inputNomeHotel.value,
+  name:
+    inputNomeHotel.value,
 
-        region:
-          inputRegiaoHotel.value,
+  region:
+    inputRegiaoHotel.value,
 
-        address:
-          inputEnderecoHotel.value,
+  address:
+    inputEnderecoHotel.value,
 
-        coords:
-          inputCoordsHotel.value,
+  lat:
+    Number(coords.lat),
 
-        custom:true
+  lng:
+    Number(coords.lng),
 
-      });
+  custom:true
 
-      salvarHoteisCustomizados();
+});
+      
+salvarHoteisCustomizados();
 
       renderizarSelecao();
 
