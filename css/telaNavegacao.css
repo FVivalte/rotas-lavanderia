@@ -1,46 +1,96 @@
-#tela-navegacao{
-  position:relative;
+/* ======================
+   VOZ
+====================== */
 
-  width:100%;
-  height:100vh;
-
-  overflow:hidden;
-
-  background:black;
-}
-
-#follow-btn{
-  position:absolute;
-
-  top:16px;
-  right:16px;
-
-  z-index:50;
-}
-
-#mapa{
-  width:100%;
-  height:calc(100vh - 90px);
-}
-
-.nav-bottom-actions{
-  position:absolute;
-
-  bottom:0;
-  left:0;
-
-  width:100%;
+.voice-bar{
 
   display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  padding:12px 16px;
+
+  background:white;
+
+  border-bottom:
+    1px solid var(--border);
+
+}
+
+/* ======================
+   ENTREGA / COLETA
+====================== */
+
+.delivery-bar{
+
+  display:flex;
+  justify-content:space-around;
+  align-items:center;
+
+  gap:20px;
+
+  padding:12px 16px;
+
+  background:white;
+
+  border-bottom:
+    1px solid var(--border);
+
+}
+
+.delivery-item{
+
+  display:flex;
+  align-items:center;
+
+  gap:8px;
+
+  font-weight:600;
+
+}
+
+.delivery-item input{
+
+  width:18px;
+  height:18px;
+
+}
+
+/* ======================
+   MAPA
+====================== */
+
+#mapa{
+
+  flex:1;
+
+  width:100%;
+
+  min-height:300px;
+
+}
+
+/* ======================
+   BOTÕES
+====================== */
+
+.nav-bottom-actions{
+
+  display:flex;
+
   gap:10px;
 
   padding:16px;
 
   background:white;
 
-  z-index:40;
+  border-top:
+    1px solid var(--border);
+
 }
 
 .nav-bottom-actions button{
+
   flex:1;
+
 }
