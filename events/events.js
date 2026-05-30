@@ -574,7 +574,7 @@ if(btnSalvarHotel){
 
       });
 
-      saveCustomHotels();
+      salvarHoteisCustomizados();
 
       renderizarSelecao();
 
