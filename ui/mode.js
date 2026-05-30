@@ -24,6 +24,7 @@ import {
 
   hotelAtual,
   proximosHoteis,
+  toggleVoz,
 
   checkEntrega,
   checkColeta,
@@ -64,7 +65,24 @@ from '../storage/storage.js';
 // ======================
 
 export function iniciarModoRota(){
+  
+  if(toggleVoz){
 
+  toggleVoz.checked = false;
+
+  toggleVoz.addEventListener(
+    'change',
+    ()=>{
+
+      state.voiceNavigation =
+        toggleVoz.checked;
+
+      salvarEstadoApp();
+
+    }
+  );
+
+}
   if(
     state.routeOrder.length === 0
   ){
