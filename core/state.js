@@ -36,6 +36,8 @@ export const state = {
 
   mapInitialized: false,
 
+  voiceNavigation: false,
+ 
   lastInstruction: '',
 
   lastHeading: 0,
