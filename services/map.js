@@ -93,57 +93,6 @@ export { mapas };
 
 let rotaSource = null;
 
-export function desenharLinhaRota(
-  origemLat,
-  origemLng,
-  destinoLat,
-  destinoLng,
-  mapId = 'mapa'
-) {
-
-  const map = mapas[mapId];
-
-  if (!map) return;
-
-  const dados = {
-    type: 'Feature',
-    geometry: {
-      type: 'LineString',
-      coordinates: [
-        [origemLng, origemLat],
-        [destinoLng, destinoLat]
-      ]
-    }
-  };
-
-  if (map.getSource('rota')) {
-
-    map.getSource('rota')
-      .setData(dados);
-
-    return;
-  }
-
-  map.addSource('rota', {
-    type: 'geojson',
-    data: dados
-  });
-
-  map.addLayer({
-    id: 'rota',
-    type: 'line',
-    source: 'rota',
-    layout: {
-      'line-join': 'round',
-      'line-cap': 'round'
-    },
-    paint: {
-      'line-color': '#007AFF',
-      'line-width': 5
-    }
-  });
-
-}
 export function desenharRotaOSRM(
   coordenadas,
   mapId='mapa'
