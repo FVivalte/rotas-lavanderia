@@ -1,6 +1,6 @@
 // services/gps.js
 import { state } from '../core/state.js';
-import { updateMap } from './map.js';
+import { updateMap, desenharLinhaRota } from './map.js';
 import { getDistanceMeters } from '../utils/utils.js'; // Removido o parseCoords desnecessário
 import { atualizarModoUI } from '../ui/mode.js';
 import { renderizarRelatorioModo } from '../ui/report.js';
@@ -38,6 +38,28 @@ export function startGpsTracking() {
         heading,
         speed
       };
+
+      const hotelAtualId =
+  state.routeOrder[
+    state.currentIndex
+  ];
+
+const hotelAtual =
+  HOTELS.find(
+    h => h.id === hotelAtualId
+  );
+
+if (hotelAtual) {
+
+  desenharLinhaRota(
+    lat,
+    lng,
+    Number(hotelAtual.lat),
+    Number(hotelAtual.lng),
+    'mapa'
+  );
+
+}
 
       console.log('Posição atualizada:', { lat, lng, heading, speed });
 
