@@ -7,6 +7,7 @@ import { atualizarModoUI } from '../ui/mode.js';
 import { renderizarRelatorioModo } from '../ui/report.js';
 import { HOTELS } from '../data/dados.js';
 import { falar } from './voice.js';
+import { distanceInfo, durationInfo } from '../ui/elements.js';
 
 // ======================
 // START GPS
@@ -41,7 +42,7 @@ export function startGpsTracking() {
         speed
       };
 
-      const hotelId =
+const hotelId =
   state.routeOrder[
     state.currentIndex
   ];
@@ -51,25 +52,56 @@ const hotel =
     h => h.id === hotelId
   );
 
-if(hotel){
+if (hotel) {
 
   obterRota(
 
     lat,
     lng,
 
-    Number(hotel.lat),
-    Number(hotel.lng)
+    Number(
+      hotel.lat
+    ),
+
+    Number(
+      hotel.lng
+    )
 
   )
-  .then(rota=>{
 
-    if(!rota) return;
+  .then(rota => {
+
+    if (!rota) {
+      return;
+    }
 
     desenharRotaOSRM(
       rota.geometry.coordinates,
       'mapa'
     );
+
+    if (
+      distanceInfo
+    ) {
+
+      distanceInfo.textContent =
+        `${(
+          rota.distance / 1000
+        ).toFixed(1)} km`;
+
+    }
+
+    if (
+      durationInfo
+    ) {
+
+      durationInfo.textContent =
+
+        `${Math.round(
+          rota.duration / 60
+        )} min`;
+
+    }
 
   });
 
