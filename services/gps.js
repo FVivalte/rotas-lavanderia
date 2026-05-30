@@ -1,6 +1,7 @@
 // services/gps.js
 import { state } from '../core/state.js';
-import { updateMap, desenharLinhaRota } from './map.js';
+import { updateMap, desenharRotaOSRM } from './map.js';
+import { obterRota } from './osrm.js';
 import { getDistanceMeters } from '../utils/utils.js'; // Removido o parseCoords desnecessário
 import { atualizarModoUI } from '../ui/mode.js';
 import { renderizarRelatorioModo } from '../ui/report.js';
@@ -39,25 +40,37 @@ export function startGpsTracking() {
         speed
       };
 
-      const hotelAtualId =
+      const hotelId =
   state.routeOrder[
     state.currentIndex
   ];
 
-const hotelAtual =
+const hotel =
   HOTELS.find(
-    h => h.id === hotelAtualId
+    h => h.id === hotelId
   );
 
-if (hotelAtual) {
+if(hotel){
 
-  desenharLinhaRota(
+  obterRota(
+
     lat,
     lng,
-    Number(hotelAtual.lat),
-    Number(hotelAtual.lng),
-    'mapa'
-  );
+
+    Number(hotel.lat),
+    Number(hotel.lng)
+
+  )
+  .then(rota=>{
+
+    if(!rota) return;
+
+    desenharRotaOSRM(
+      rota.geometry.coordinates,
+      'mapa'
+    );
+
+  });
 
 }
 
