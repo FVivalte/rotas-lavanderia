@@ -540,7 +540,7 @@ if(btnSalvarHotel){
 
       }
 
- HOTELS.push({
+HOTELS.push({
 
   id: Date.now(),
 
@@ -553,13 +553,11 @@ if(btnSalvarHotel){
   address:
     inputEnderecoHotel.value,
 
-  lat:
-    Number(coords.lat),
+  lat: coords.lat,
 
-  lng:
-    Number(coords.lng),
+  lng: coords.lng,
 
-  custom:true
+  custom: true
 
 });
       
