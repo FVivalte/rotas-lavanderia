@@ -3,7 +3,8 @@
 import {
   inicializarMapa,
   updateMap,
-  mapas
+  mapas,
+  adicionarMarcadoresHoteis
 }
 from '../services/map.js';
 
@@ -127,12 +128,15 @@ export function iniciarModoRota(){
   }
 
   setTimeout(() => {
-    const mapaRota = inicializarMapa('mapa-rota');
-    if (mapaRota) {
-      mapaRota.resize();
-    }
-  }, 300);
 
+  const mapa = inicializarMapa('mapa');
+
+  if (mapa) {
+    mapa.resize();
+  }
+
+}, 300);
+  
   if(
 
   state.userPosition &&
@@ -215,10 +219,42 @@ export function atualizarModoUI(){
       h => h.id === id
     );
 
+if (
+  hotel &&
+  mapas['mapa']
+) {
+
+  const lat = Number(hotel.lat);
+  const lng = Number(hotel.lng);
+
+  if (
+    !isNaN(lat) &&
+    !isNaN(lng)
+  ) {
+
+    mapas['mapa'].flyTo({
+      center: [lng, lat],
+      zoom: 16,
+      duration: 1500
+    });
+
+  }
+
+}
+
   if(!hotel){
     return;
   }
 
+  if (hotel) {
+
+  adicionarMarcadoresHoteis(
+    [hotel],
+    'mapa'
+  );
+
+}
+  
   if(hotelAtual){
 
     hotelAtual.innerHTML = `
