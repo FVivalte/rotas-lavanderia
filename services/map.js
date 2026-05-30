@@ -144,3 +144,51 @@ export function desenharLinhaRota(
   });
 
 }
+export function desenharRotaOSRM(
+  coordenadas,
+  mapId='mapa'
+){
+
+  const map =
+    mapas[mapId];
+
+  if(!map) return;
+
+  const geojson = {
+    type:'Feature',
+    geometry:{
+      type:'LineString',
+      coordinates:coordenadas
+    }
+  };
+
+  if(
+    map.getSource('osrm-route')
+  ){
+
+    map
+      .getSource('osrm-route')
+      .setData(geojson);
+
+    return;
+  }
+
+  map.addSource(
+    'osrm-route',
+    {
+      type:'geojson',
+      data:geojson
+    }
+  );
+
+  map.addLayer({
+    id:'osrm-route',
+    type:'line',
+    source:'osrm-route',
+    paint:{
+      'line-color':'#007AFF',
+      'line-width':6
+    }
+  });
+
+}
