@@ -1,11 +1,7 @@
 // events/events.js
 
-import { HOTELS }
-from '../data/dados.js';
-
-import { state }
-from '../core/state.js';
-
+import { HOTELS } from '../data/dados.js';
+import { state } from '../core/state.js';
 import {
 
   btnVoltar,
@@ -41,23 +37,13 @@ import {
   telaSelecao,
   telaRota,
   telaNavegacao
-
 }
 from '../ui/elements.js';
 
-
-import {
-  mostrarTela
-}
-from '../ui/screens.js';
-
-
-import {
-  gerarRota,
+import { mostrarTela } from '../ui/screens.js';
+import { gerarRota,
   renderizarSelecao
-}
-from '../ui/selection.js';
-
+} from '../ui/selection.js';
 
 import {
   renderizarRota
