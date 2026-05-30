@@ -60,22 +60,37 @@ export function carregarHoteisCustomizados(){
     const hoteisCustomizados =
       JSON.parse(salvo);
 
-    hoteisCustomizados
-    .forEach(h=>{
+hoteisCustomizados.forEach(h => {
 
-      const jaExiste =
-        HOTELS.some(
-          x => x.id === h.id
-        );
+  // Compatibilidade com hotéis antigos
+  if (
+    (h.lat == null || h.lng == null) &&
+    h.coords
+  ) {
 
-      if(!jaExiste){
+    const partes = h.coords.split(',');
 
-        HOTELS.push(h);
+    if (partes.length === 2) {
 
-      }
+      h.lat = Number(partes[0].trim());
+      h.lng = Number(partes[1].trim());
 
-    });
+    }
 
+  }
+
+  const jaExiste =
+    HOTELS.some(
+      x => x.id === h.id
+    );
+
+  if (!jaExiste) {
+
+    HOTELS.push(h);
+
+  }
+
+});
   }catch(err){
 
     console.log(
