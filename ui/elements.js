@@ -59,6 +59,16 @@ export const relatorioModo =
 // CONTADORES
 // ======================
 
+export const distanceInfo =
+  document.getElementById(
+    'distance-info'
+  );
+
+export const durationInfo =
+  document.getElementById(
+    'duration-info'
+  );
+
 export const contadorSelecao =
   document.getElementById(
     'contador-selecao'
