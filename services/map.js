@@ -14,8 +14,8 @@ export function inicializarMapa(containerId = 'mapa', accessToken = '') {
   }
 
   // Ponto inicial padrão
-  const defaultLng = -41.8964253;
-  const defaultLat = -22.7625969;
+  const defaultLng = -42.0541382;
+  const defaultLat = -22.8601498;
 
   const map = new maplibregl.Map({
     container: containerId,
