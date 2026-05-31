@@ -117,7 +117,7 @@ name:"Pousada Dom Fernandez",
 region:"Cabo Frio",
 address:"Av. Ver. Antônio Ferreira dos Santos, 290 - Braga, Cabo Frio - RJ, 28908-200",
 lat:-22.8905021,
-lng:-42.0311832}
+lng:-42.0311832},
 
      {id:18,
 name:"Lavanderia Centro CABO FRIO",
