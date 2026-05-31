@@ -1,89 +1,60 @@
-.report-header{
-
+#tela-relatorio{
   padding:16px;
-
-  background:#ffffff;
-
-  border-bottom:1px solid #ddd;
-
-  position:sticky;
-
-  top:0;
-
-  z-index:10;
-
+  overflow:auto;
 }
 
-.report-route-list{
-  padding:16px;
-}
-
-.report-item{
-
+#tela-relatorio .card{
   background:#fff;
-
-  border-radius:14px;
-
-  padding:14px;
-
-  margin-bottom:16px;
-
-  box-shadow:0 2px 8px rgba(0,0,0,0.08);
-
+  border-radius:18px;
+  padding:20px;
+  box-shadow:0 4px 12px rgba(0,0,0,.08);
 }
 
-.report-top-line{
-
-  display:flex;
-
-  flex-wrap:wrap;
-
-  gap:8px;
-
-  align-items:center;
-
-  margin-bottom:12px;
-
+#tela-relatorio h2{
+  text-align:center;
+  margin-bottom:20px;
 }
 
-.report-order{
-  font-weight:700;
-  font-size:18px;
+.info{
+  margin-bottom:20px;
 }
 
-.report-hotel-name{
-  font-weight:600;
-  font-size:17px;
+.info p{
+  margin:8px 0;
 }
 
-.report-time{
-  width:100%;
-  font-size:15px;
-  color:#444;
+.resumo{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin-bottom:20px;
 }
 
-.report-photo-list{
+.stat{
+  background:#f5f8fc;
+  border-radius:12px;
+  padding:12px;
+  text-align:center;
+}
 
-  display:flex;
-
-  flex-wrap:wrap;
-
-  gap:8px;
-
+.stat strong{
+  display:block;
+  font-size:24px;
   margin-top:8px;
-
 }
 
-.report-photo-list img{
-
-  width:90px;
-  height:90px;
-
-  object-fit:cover;
-
-  border-radius:10px;
-
+#relObservacoes{
+  width:100%;
+  resize:none;
   border:1px solid #ddd;
-
+  border-radius:12px;
+  padding:12px;
+  margin-top:8px;
+  margin-bottom:16px;
 }
 
+#btnPdf,
+#btnNovaRota{
+  width:100%;
+  margin-top:10px;
+}
