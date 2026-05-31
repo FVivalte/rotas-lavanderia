@@ -39,7 +39,8 @@ from './elements.js';
 
 import {
 
-  renderizarRelatorioModo
+  renderizarRelatorioModo,
+  abrirTelaRelatorio
 
 }
 from './report.js';
@@ -419,14 +420,18 @@ function atualizarTextoBotao(){
 // PRÓXIMO HOTEL
 // ======================
 
-export function proximoHotel(){
+export async function proximoHotel(){
 
   if(
-    state.currentIndex >=
-    state.routeOrder.length
-  ){
-    return;
-  }
+  state.currentIndex >=
+  state.routeOrder.length
+){
+
+  await finalizarModoRota();
+
+  return;
+
+}
 
   const entry =
     state.routeReport[
@@ -487,7 +492,7 @@ export function proximoHotel(){
 // FINALIZAR
 // ======================
 
-export function finalizarModoRota(){
+export async function finalizarModoRota(){
 
   stopGpsTracking();
 
@@ -496,6 +501,10 @@ export function finalizarModoRota(){
   renderizarRelatorioModo();
 
   salvarEstadoApp();
+
+  await abrirTelaRelatorio(
+    state.routeReport
+  );
 
 }
 
