@@ -97,4 +97,76 @@ address:"Código Plus: 743C+MM6 – Armação dos Búzios - RJ",
 lat:-22.7458674,
 lng:-41.8783928}
 
+      {id:15,
+name:"Oásis",
+region:"Cabo Frio",
+address:"Av. Ver. Antônio Ferreira dos Santos - Braga, Cabo Frio - RJ, 28908-200",
+lat:-22.8910037,
+lng:-42.0317897}
+
+      {id:16,
+name:"Green Hotéis",
+region:"Cabo Frio",
+address:"Av. Teixeira e Souza, 1056 - Vila Nova, Cabo Frio - RJ, 28905-100",
+lat:-22.8848220,
+lng:-42.0277150}
+
+     {id:17,
+name:"Pousada Dom Fernandez",
+region:"Cabo Frio",
+address:"Av. Ver. Antônio Ferreira dos Santos, 290 - Braga, Cabo Frio - RJ, 28908-200",
+lat:-22.8905021,
+lng:-42.0311832}
+
+     {id:18,
+name:"Lavanderia Centro CABO FRIO",
+region:"Cabo Frio",
+address:"Av. Teixeira e Souza, 584 A - Vila Nova, Cabo Frio - RJ, 28905-100",
+lat:-22.8825200,
+lng:-42.0239003}
+
+    {id:19,
+name:"Hotel Solar do Arco",
+region:"Cabo Frio",
+address:"R. Constantino Menelau, 48 - Passagem, Cabo Frio - RJ, 28906-060",
+lat:-22.8763726,
+lng:-42.0078131}
+
+    {id:20,
+name:"Oftalmologia",
+region:"Cabo Frio",
+address:"R. Áustria, 150 - Jardim Caiçara, Cabo Frio - RJ, 28910-270",
+lat:-22.8890612,
+lng:-42.0345179}
+
+    {id:21,
+name:"Dermatologia",
+region:"Cabo Frio",
+address:"Av. Nossa Sra. da Assunção, 294- São Bento, Cabo Frio - RJ, 28906-200",
+lat:-22.8754045,
+lng:-42.0124332}
+
+   {id:22,
+name:"CHAMOS Hostel",
+region:"Arraial do Cabo",
+address:"Travessa Damaceno Barreto, 4 - Sítio, Arraial do Cabo - RJ, 28930-000",
+lat:-22.9680679,
+lng:-42.0213824}
+
+  {id:23,
+name:"Hotel Praia dos Anjos",
+region:"Arraial do Cabo",
+address:"Av. Roberto Silveira, 10 - Praia dos Anjos, Arraial do Cabo - RJ, 28930-000",
+lat:-22.9716080,
+lng:-42.0218307}
+
+  {id:24,
+name:"Hospedagem Sentinela",
+region:"Arraial do Cabo",
+address:"Rua de Castro Neto, R. Pontal do Atalaia, s6, Arraial do Cabo - RJ, 28930-000",
+lat:-22.9782054,
+lng:-42.0325682}
+
+
+
     ];
