@@ -222,53 +222,43 @@
     <!-- ===================== -->
 
     <section id="tela-relatorio" class="screen hidden">
-
-  <div class="card">
-
-    <h2>📋 Relatório Final</h2>
-
-    <div class="info">
-      <p><strong>Hotel:</strong> <span id="relHotel"></span></p>
-      <p><strong>Data:</strong> <span id="relData"></span></p>
-      <p><strong>Hora:</strong> <span id="relHora"></span></p>
-    </div>
-
-    <div class="resumo">
-
-      <div class="stat">
-        <span>📦 Entregas</span>
-        <strong id="relEntregas">0</strong>
-      </div>
-
-      <div class="stat">
-        <span>♻️ Coletas</span>
-        <strong id="relColetas">0</strong>
-      </div>
-
-      <div class="stat">
-        <span>📸 Fotos</span>
-        <strong id="relFotos">0</strong>
-      </div>
-
-    </div>
-
-    <label>📝 Observações</label>
-
-    <textarea
+      <div class="card">
+        <h2>📋 Relatório Final</h2>
+        <div class="info">
+          <p><strong>Hotel:</strong> <span id="relHotel"></span></p>
+          <p><strong>Data:</strong> <span id="relData"></span></p>
+          <p><strong>Hora:</strong> <span id="relHora"></span></p>
+        </div>
+        <div class="resumo">
+          <div class="stat">
+            <span>📦 Entregas</span>
+            <strong id="relEntregas">0</strong>
+          </div>
+          <div class="stat">
+            <span>♻️ Coletas</span>
+            <strong id="relColetas">0</strong>
+          </div>
+          <div class="stat">
+            <span>📸 Fotos</span>
+            <strong id="relFotos">0</strong>
+          </div>
+        </div>
+        <label>📝 Observações</label>
+        <textarea
       id="relObservacoes"
       rows="5"
-      placeholder="Digite observações da visita..."
-    ></textarea>
-
-    <button id="btnPdf" class="btn-primary">
+      placeholder="Digite observações da visita...">
+          
+        </textarea>
+        <button id="btnPdf" class="btn-primary">
       📄 Exportar PDF
-    </button>
-
-    <button id="btnNovaRota" class="btn-secondary">
+        </button>
+        <button id="btnNovaRota" class="btn-secondary">
       🔄 Nova Rota
-    </button>
-
-  </div>
+        </button>
+    <div id="lista-relatorio-final"></div>
+        
+      </div>
 
 </section>
 
