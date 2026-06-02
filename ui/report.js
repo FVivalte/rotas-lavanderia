@@ -16,7 +16,14 @@ import {
   listaRelatorioFinal,
   relatorioModo,
   telaRelatorio,
-  tituloRelatorio
+  tituloRelatorio,
+  relHotel,
+  relData,
+  relHora,
+  relEntregas,
+  relColetas,
+  relFotos
+
 
 }
 from './elements.js';
@@ -282,9 +289,23 @@ export async function renderizarRelatorioFinal(
 
         <div class="report-time">
 
-          🚥 ${hotel.arrival || '--:--'}
+          🚥 ${
+  item.arrival
+  ? new Date(item.arrival)
+      .toLocaleTimeString(
+        'pt-BR'
+      )
+  : '--:--'
+}
           -
-          🏁 ${hotel.departure || '--:--'}
+          🏁 ${
+  item.departure
+  ? new Date(item.departure)
+      .toLocaleTimeString(
+        'pt-BR'
+      )
+  : '--:--'
+}
 
         </div>
 
@@ -368,6 +389,77 @@ export async function abrirTelaRelatorio(
     telaRelatorio
   );
 
+  export async function abrirTelaRelatorio(
+  dadosRota
+){
+
+  mostrarTela(
+    telaRelatorio
+  );
+
+  const hoje =
+    new Date();
+
+  if(relData){
+
+    relData.textContent =
+      hoje.toLocaleDateString(
+        'pt-BR'
+      );
+
+  }
+
+  if(relHora){
+
+    relHora.textContent =
+      hoje.toLocaleTimeString(
+        'pt-BR'
+      );
+
+  }
+
+  if(relHotel){
+
+    relHotel.textContent =
+      `${dadosRota.length} hotéis`;
+
+  }
+
+  let entregas = 0;
+  let coletas = 0;
+  let fotos = 0;
+
+  dadosRota.forEach(item=>{
+
+    if(item.entrega)
+      entregas++;
+
+    if(item.coleta)
+      coletas++;
+
+    fotos +=
+      (item.deliveryPhotos?.length || 0) +
+      (item.pickupPhotos?.length || 0);
+
+  });
+
+  if(relEntregas)
+    relEntregas.textContent =
+      entregas;
+
+  if(relColetas)
+    relColetas.textContent =
+      coletas;
+
+  if(relFotos)
+    relFotos.textContent =
+      fotos;
+
+  await renderizarRelatorioFinal(
+    dadosRota
+  );
+
+}
   await renderizarRelatorioFinal(
     dadosRota
   );
