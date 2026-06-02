@@ -417,24 +417,49 @@ export async function abrirTelaRelatorio(
 
   }
 
-  let entregas = 0;
-  let coletas = 0;
-  let fotos = 0;
+let entregas = 0;
+let coletas = 0;
+let fotos = 0;
 
-  dadosRota.forEach(item=>{
+for(const hotel of dadosRota){
 
-    if(item.entrega)
-      entregas++;
+  // Entregas
+  if(
+    hotel.entrega === true ||
+    hotel.delivery === true
+  ){
+    entregas++;
+  }
 
-    if(item.coleta)
-      coletas++;
+  // Coletas
+  if(
+    hotel.coleta === true ||
+    hotel.pickup === true
+  ){
+    coletas++;
+  }
 
-    fotos +=
-      (item.deliveryPhotos?.length || 0) +
-      (item.pickupPhotos?.length || 0);
+  // Fotos de entrega
+  if(
+    Array.isArray(hotel.deliveryPhotos)
+  ){
+    fotos += hotel.deliveryPhotos.length;
+  }
 
-  });
+  // Fotos de coleta
+  if(
+    Array.isArray(hotel.pickupPhotos)
+  ){
+    fotos += hotel.pickupPhotos.length;
+  }
 
+}
+
+console.log('ENTREGAS:', entregas);
+console.log('COLETAS:', coletas);
+console.log('FOTOS:', fotos);
+console.log('DADOS ROTA:', dadosRota);
+  
   if(relEntregas)
     relEntregas.textContent =
       entregas;
