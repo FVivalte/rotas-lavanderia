@@ -113,7 +113,23 @@ export const tituloRelatorio =
   document.getElementById(
     'titulo-relatorio'
   );
+export const relHotel =
+  document.getElementById('relHotel');
 
+export const relData =
+  document.getElementById('relData');
+
+export const relHora =
+  document.getElementById('relHora');
+
+export const relEntregas =
+  document.getElementById('relEntregas');
+
+export const relColetas =
+  document.getElementById('relColetas');
+
+export const relFotos =
+  document.getElementById('relFotos');
 
 // ======================
 // MODAL
