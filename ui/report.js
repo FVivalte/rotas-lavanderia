@@ -210,7 +210,7 @@ export function renderizarRelatorioModo(){
 export async function renderizarRelatorioFinal(
   dadosRota
 ){
-  console.log('RENDERIZAR RELATORIO');
+console.log('RENDERIZAR RELATORIO');
 console.log(dadosRota);
 
   if(!listaRelatorioFinal){
@@ -218,8 +218,6 @@ console.log(dadosRota);
   }
 
   listaRelatorioFinal.innerHTML = '';
-  listaRelatorioFinal.innerHTML =
-  '<h3>TESTE RELATÓRIO</h3>';
 
   if(tituloRelatorio){
 
@@ -294,8 +292,8 @@ console.log(dadosRota);
         <div class="report-time">
 
           🚥 ${
-  item.arrival
-  ? new Date(item.arrival)
+  hotel.arrival
+  ? new Date(hotel.arrival)
       .toLocaleTimeString(
         'pt-BR'
       )
@@ -303,8 +301,8 @@ console.log(dadosRota);
 }
           -
           🏁 ${
-  item.departure
-  ? new Date(item.departure)
+  hotel.departure
+  ? new Date(hotel.departure)
       .toLocaleTimeString(
         'pt-BR'
       )
