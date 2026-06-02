@@ -197,7 +197,56 @@
   <!-- MAPA -->
 
   <div id="mapa"></div>
+<!-- FOTOS -->
 
+<div class="photos-section">
+
+  <div class="photo-box">
+
+    <label
+      for="input-fotos-entrega"
+      class="camera-btn"
+    >
+      📷 Entrega
+    </label>
+
+    <input
+      type="file"
+      id="input-fotos-entrega"
+      accept="image/*"
+      capture="environment"
+      multiple
+      hidden
+    >
+
+    <div id="preview-entrega"></div>
+
+  </div>
+
+  <div class="photo-box">
+
+    <label
+      for="input-fotos-coleta"
+      class="camera-btn"
+    >
+      📷 Coleta
+    </label>
+
+    <input
+      type="file"
+      id="input-fotos-coleta"
+      accept="image/*"
+      capture="environment"
+      multiple
+      hidden
+    >
+
+    <div id="preview-coleta"></div>
+
+  </div>
+
+</div>
+  
   <!-- BOTÕES -->
 
   <div class="nav-bottom-actions">
