@@ -59,7 +59,7 @@ export function updateMap(lat, lng, heading = 0, speed = 0, mapId = 'mapa') {
  */
 export function adicionarMarcadoresHoteis(
   hoteis = [],
-  mapId = 'mapa-rota'
+  mapId = 'mapa'
 ) {
 
   const map = mapas[mapId];
