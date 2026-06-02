@@ -10,6 +10,7 @@ import {
   btnFinalizar,
   btnNovaRota,
   btnGoogleMaps,
+  btnFollow,
 
   btnAdicionarHotel,
   btnSalvarHotel,
@@ -179,7 +180,42 @@ if(btnLimpar){
   );
 
 }
+// ======================
+// CENTRALIZAR MAPA
+// ======================
+if(btnFollow){
 
+  btnFollow.addEventListener(
+    'click',
+    ()=>{
+
+      const map =
+        mapas['mapa'];
+
+      if(
+        !map ||
+        !state.userPosition
+      ){
+        return;
+      }
+
+      map.flyTo({
+
+        center:[
+          state.userPosition.lng,
+          state.userPosition.lat
+        ],
+
+        zoom:18,
+
+        duration:1000
+
+      });
+
+    }
+  );
+
+}
 
 // ======================
 // VOLTAR
