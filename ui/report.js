@@ -452,8 +452,3 @@ export async function abrirTelaRelatorio(
   );
 
 }
-  await renderizarRelatorioFinal(
-    dadosRota
-  );
-
-}
