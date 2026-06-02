@@ -104,7 +104,8 @@ from '../storage/database.js';
 
 import {
   
-  getMapa
+  getMapa,
+  mapas
 }
 from '../services/map.js';
 
