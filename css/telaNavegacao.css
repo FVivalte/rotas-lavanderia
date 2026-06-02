@@ -131,3 +131,65 @@ z-index:50;
   flex:1;
 
 }
+/* ======================
+   FOTOS
+====================== */
+.photos-section{
+
+  display:flex;
+  gap:12px;
+
+  padding:10px;
+
+  background:#fff;
+
+}
+
+.photo-box{
+
+  flex:1;
+
+}
+
+.camera-btn{
+
+  display:block;
+
+  text-align:center;
+
+  padding:10px;
+
+  border-radius:10px;
+
+  background:#0b63b7;
+
+  color:white;
+
+  cursor:pointer;
+
+}
+
+#preview-entrega,
+#preview-coleta{
+
+  display:flex;
+
+  gap:6px;
+
+  margin-top:8px;
+
+  overflow-x:auto;
+
+}
+
+#preview-entrega img,
+#preview-coleta img{
+
+  width:60px;
+  height:60px;
+
+  object-fit:cover;
+
+  border-radius:8px;
+
+}
