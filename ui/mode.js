@@ -501,6 +501,10 @@ export async function finalizarModoRota(){
   renderizarRelatorioModo();
 
   salvarEstadoApp();
+  console.log(
+  'STATE ROUTE REPORT FINAL',
+  state.routeReport
+);
 
   await abrirTelaRelatorio(
     state.routeReport
