@@ -14,6 +14,9 @@ export function getMapa(id = 'mapa'){
 
 export function inicializarMapa(containerId = 'mapa', accessToken = '') {
   if (accessToken) {
+    // TESTE ABAIXO
+    console.log('CRIANDO MAPA:', containerId);
+    //TESTE ACIMA
     maplibregl.accessToken = accessToken;
   }
 
