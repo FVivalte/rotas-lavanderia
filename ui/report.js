@@ -210,6 +210,8 @@ export function renderizarRelatorioModo(){
 export async function renderizarRelatorioFinal(
   dadosRota
 ){
+  console.log('RENDERIZAR RELATORIO');
+console.log(dadosRota);
 
   if(!listaRelatorioFinal){
     return;
