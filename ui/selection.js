@@ -79,17 +79,17 @@ export function gerarRota(){
 
   setTimeout(()=>{
 
-    if(!mapas['mapa-rota']){
+    if(!mapas['mapa']){
 
       inicializarMapa(
-        'mapa-rota'
+        'mapa'
       );
 
     }
 
     adicionarMarcadoresHoteis(
       ativos,
-      'mapa-rota'
+      'mapa'
     );
 
     const bounds =
@@ -115,7 +115,7 @@ export function gerarRota(){
       !bounds.isEmpty()
     ){
 
-      mapas['mapa-rota']
+      mapas['mapa']
         .fitBounds(
           bounds,
           {
