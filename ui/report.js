@@ -389,14 +389,6 @@ export async function abrirTelaRelatorio(
     telaRelatorio
   );
 
-  export async function abrirTelaRelatorio(
-  dadosRota
-){
-
-  mostrarTela(
-    telaRelatorio
-  );
-
   const hoje =
     new Date();
 
