@@ -8,6 +8,10 @@ let userMarker = null;
 /**
  * Inicializa o mapa na tela.
  */
+export function getMapa(id = 'mapa'){
+  return mapas[id];
+}
+
 export function inicializarMapa(containerId = 'mapa', accessToken = '') {
   if (accessToken) {
     maplibregl.accessToken = accessToken;
