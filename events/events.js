@@ -102,6 +102,21 @@ import {
 }
 from '../storage/database.js';
 
+import {
+  
+  getMapa
+}
+from '../services/map.js';
+
+//CORRIGIR MAPA
+
+const map = getMapa('mapa');
+
+if (map) {
+  setTimeout(() => {
+    map.resize();
+  }, 150);
+}
 
 // ======================
 // GERAR ROTA
