@@ -209,7 +209,8 @@ export const btnFecharModal =
   document.getElementById(
     'btn-fechar-modal'
   );
-
+export const btnFollow =
+  document.getElementById('follow-btn');
 
 // ======================
 // TOGGLE / CHECKBOX
