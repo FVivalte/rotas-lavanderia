@@ -242,7 +242,12 @@ if(btnProximo){
   entry.coleta =
   checkColeta?.checked ?? false;
 
-    
+      if(!entry.arrival){
+
+  entry.arrival =
+    new Date().toISOString();
+
+}
       entry.departure =
         new Date().toISOString();
 
@@ -294,24 +299,32 @@ if(btnFinalizar){
               h => h.id === r.id
             );
 
-          return {
+return {
 
-            name:
-              hotel?.name || '',
+  id: r.id,
 
-            arrival:
-              r.arrival,
+  name:
+    hotel?.name || '',
 
-            departure:
-              r.departure,
+  arrival:
+    r.arrival,
 
-            deliveryPhotos:
-              r.deliveryPhotos || [],
+  departure:
+    r.departure,
 
-            pickupPhotos:
-              r.pickupPhotos || []
+  entrega:
+    r.entrega,
 
-          };
+  coleta:
+    r.coleta,
+
+  deliveryPhotos:
+    r.deliveryPhotos || [],
+
+  pickupPhotos:
+    r.pickupPhotos || []
+
+};
 
         });
 
