@@ -233,3 +233,16 @@ z-index:50;
   border-radius:8px;
 
 }
+
+/* TESTE ABAIXO */
+.switch{
+  position:relative;
+  display:inline-block;
+  width:52px;
+  height:28px;
+  border:2px solid red;
+}
+
+.slider{
+  background:green !important;
+}
