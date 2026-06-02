@@ -58,3 +58,122 @@
   width:100%;
   margin-top:10px;
 }
+/* ======================
+   FOTOS DO RELATÓRIO
+   ====================== */
+
+#lista-relatorio-final{
+
+  margin-top:20px;
+
+}
+
+.report-item{
+
+  border:1px solid #e5e7eb;
+
+  border-radius:12px;
+
+  padding:12px;
+
+  margin-bottom:12px;
+
+  background:#fff;
+
+}
+
+.report-top-line{
+
+  display:flex;
+
+  flex-wrap:wrap;
+
+  gap:8px;
+
+  justify-content:space-between;
+
+  align-items:center;
+
+  margin-bottom:12px;
+
+}
+
+.report-order{
+
+  font-weight:700;
+
+}
+
+.report-hotel-name{
+
+  flex:1;
+
+  font-weight:600;
+
+}
+
+.report-time{
+
+  font-size:.85rem;
+
+  color:#666;
+
+}
+
+.report-photos{
+
+  display:flex;
+
+  gap:16px;
+
+  flex-wrap:wrap;
+
+}
+
+.report-photo-group{
+
+  flex:1;
+
+  min-width:120px;
+
+}
+
+.report-photo-label{
+
+  font-weight:600;
+
+  margin-bottom:6px;
+
+}
+
+.report-photo-list{
+
+  display:flex;
+
+  gap:6px;
+
+  flex-wrap:wrap;
+
+}
+
+.report-photo-list img{
+
+  width:60px;
+
+  height:60px;
+
+  object-fit:cover;
+
+  border-radius:8px;
+
+  border:1px solid #ddd;
+
+}
+
+.empty-photo{
+
+  font-size:.85rem;
+
+  color:#888;
+
+}
