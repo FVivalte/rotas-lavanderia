@@ -130,16 +130,31 @@
     Centralizar
   </button>
 
-  <!-- VOZ -->
+<!-- VOZ -->
 
-  <div class="voice-bar">
+<div class="voice-bar">
 
-    <span>
-      🔊 Voz Navegação
-    </span>
+  <span>
+    🔊 Voz Navegação
+  </span>
 
-    <label class="switch">
-    <div id="route-info">
+  <label class="switch">
+
+    <input
+      type="checkbox"
+      id="toggle-voz"
+      checked
+    >
+
+    <span class="slider"></span>
+
+  </label>
+
+</div>
+
+<!-- INFO DA ROTA -->
+
+<div id="route-info">
 
   <span id="distance-info">
     --
@@ -150,17 +165,6 @@
   </span>
 
 </div>
-
-      <input
-        type="checkbox"
-        id="toggle-voz"
-      >
-
-      <span class="slider"></span>
-
-    </label>
-
-  </div>
 
   <!-- ENTREGA / COLETA -->
 
