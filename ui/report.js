@@ -218,6 +218,8 @@ console.log(dadosRota);
   }
 
   listaRelatorioFinal.innerHTML = '';
+  listaRelatorioFinal.innerHTML =
+  '<h3>TESTE RELATÓRIO</h3>';
 
   if(tituloRelatorio){
 
