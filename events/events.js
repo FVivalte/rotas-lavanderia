@@ -110,16 +110,6 @@ import {
 }
 from '../services/map.js';
 
-//CORRIGIR MAPA
-
-const map = getMapa('mapa');
-
-if (map) {
-  setTimeout(() => {
-    map.resize();
-  }, 150);
-}
-
 // ======================
 // GERAR ROTA
 // ======================
