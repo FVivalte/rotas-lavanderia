@@ -454,11 +454,6 @@ for(const hotel of dadosRota){
   }
 
 }
-
-console.log('ENTREGAS:', entregas);
-console.log('COLETAS:', coletas);
-console.log('FOTOS:', fotos);
-console.log('DADOS ROTA:', dadosRota);
   
   if(relEntregas)
     relEntregas.textContent =
