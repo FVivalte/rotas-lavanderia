@@ -405,76 +405,76 @@ if(hoteisRota.length){
 
     mapa.resize();
 
-    mapa.once(
-      'load',
-      async ()=>{
+const desenharMapa = async ()=>{
 
-        const rota =
-          await obterRotaCompleta(
-            hoteisRota
-          );
+  const rota =
+    await obterRotaCompleta(
+      hoteisRota
+    );
 
-if(rota){
+  if(rota){
 
-  desenharRotaPlanejada(
-    rota.coordinates
+    desenharRotaPlanejada(
+      rota.coordinates
+    );
+
+    const resumoHoteis =
+      document.getElementById(
+        'resumo-hoteis'
+      );
+
+    const resumoDistancia =
+      document.getElementById(
+        'resumo-distancia'
+      );
+
+    const resumoTempo =
+      document.getElementById(
+        'resumo-tempo'
+      );
+
+    if(resumoHoteis){
+      resumoHoteis.textContent =
+        hoteisRota.length;
+    }
+
+    if(resumoDistancia){
+      resumoDistancia.textContent =
+        `${(rota.distance / 1000).toFixed(1)} km`;
+    }
+
+    if(resumoTempo){
+      resumoTempo.textContent =
+        `${Math.round(
+          rota.duration / 60
+        )} min`;
+    }
+
+  }
+
+  atualizarMarcadoresStatus(
+    hoteisRota,
+    state.currentIndex
   );
 
-  const resumoHoteis =
-    document.getElementById(
-      'resumo-hoteis'
-    );
+  ajustarMapaRota(
+    hoteisRota
+  );
 
-  const resumoDistancia =
-    document.getElementById(
-      'resumo-distancia'
-    );
+};
 
-  const resumoTempo =
-    document.getElementById(
-      'resumo-tempo'
-    );
+if(mapa.loaded()){
 
-  if(resumoHoteis){
+  desenharMapa();
 
-    resumoHoteis.textContent =
-      hoteisRota.length;
+}else{
 
-  }
-
-  if(resumoDistancia){
-
-    resumoDistancia.textContent =
-
-      `${(
-        rota.distance / 1000
-      ).toFixed(1)} km`;
-
-  }
-
-  if(resumoTempo){
-
-    resumoTempo.textContent =
-
-      `${Math.round(
-        rota.duration / 60
-      )} min`;
-
-  }
+  mapa.once(
+    'load',
+    desenharMapa
+  );
 
 }
-        atualizarMarcadoresStatus(
-         hoteisRota,
-         state.currentIndex
-        );
-        
-        ajustarMapaRota(
-          hoteisRota
-        );
-
-      }
-    );
-
   },100);
 
 }
