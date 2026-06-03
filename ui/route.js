@@ -45,7 +45,8 @@ import {
   inicializarMapaRota,
   desenharRotaPlanejada,
   ajustarMapaRota,
-  adicionarMarcadoresSequencia
+  adicionarMarcadoresSequencia,
+  atualizarMarcadoresStatus
 
 }
 from '../services/map.js';
@@ -459,11 +460,11 @@ if(rota){
   }
 
 }
-
-        adicionarMarcadoresSequencia(
-          hoteisRota
+        atualizarMarcadoresStatus(
+         hoteisRota,
+         state.currentIndex
         );
-
+        
         ajustarMapaRota(
           hoteisRota
         );
