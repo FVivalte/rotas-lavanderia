@@ -40,6 +40,15 @@ import {
 }
 from '../storage/storage.js';
 
+import {
+
+  inicializarMapaRota,
+  desenharRotaPlanejada,
+  ajustarMapaRota
+
+}
+from '../services/map.js';
+
 
 // ======================
 // CONTADORES
@@ -365,5 +374,45 @@ export function renderizarRota(){
   renderizarRelatorio();
 
   salvarEstadoApp();
+  // ======================
+// MAPA DA TELA 2
+// ======================
+
+const hoteisRota =
+  state.routeOrder
+  .map(id =>
+    HOTELS.find(
+      h => h.id === id
+    )
+  )
+  .filter(Boolean);
+
+if(hoteisRota.length){
+
+  setTimeout(()=>{
+
+    const mapa =
+      inicializarMapaRota();
+
+    mapa.resize();
+
+    mapa.once(
+      'load',
+      ()=>{
+
+        desenharRotaPlanejada(
+          hoteisRota
+        );
+
+        ajustarMapaRota(
+          hoteisRota
+        );
+
+      }
+    );
+
+  },100);
+
+}
 
 }
