@@ -86,3 +86,28 @@
     0 2px 8px rgba(0,0,0,.25);
 
 }
+
+#resumo-rota{
+
+  display:flex;
+
+  justify-content:space-around;
+
+  align-items:center;
+
+  padding:12px;
+
+  background:#fff;
+
+  border-bottom:
+    1px solid var(--border);
+
+}
+
+.resumo-item{
+
+  font-weight:600;
+
+  color:#123;
+
+}
