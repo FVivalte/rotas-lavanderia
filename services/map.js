@@ -409,3 +409,52 @@ export function adicionarMarcadoresSequencia(
   );
 
 }
+
+export function limparMapaRota(){
+
+  const map =
+    mapas['mapa-rota'];
+
+  if(!map) return;
+
+  // Remove marcadores numerados
+  marcadoresSequencia.forEach(
+    m => m.remove()
+  );
+
+  marcadoresSequencia = [];
+
+  // Remove marcadores de status
+  marcadoresStatus.forEach(
+    m => m.remove()
+  );
+
+  marcadoresStatus = [];
+
+  // Remove camada da rota
+  if(
+    map.getLayer(
+      'rota-planejada'
+    )
+  ){
+
+    map.removeLayer(
+      'rota-planejada'
+    );
+
+  }
+
+  // Remove source da rota
+  if(
+    map.getSource(
+      'rota-planejada'
+    )
+  ){
+
+    map.removeSource(
+      'rota-planejada'
+    );
+
+  }
+
+}
