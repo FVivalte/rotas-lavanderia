@@ -264,24 +264,23 @@ export function inicializarMapaRota(){
 export function desenharRotaPlanejada(
   coordenadas = []
 ){
-  //TESTE ABAIXO
-  console.log(
-  'MAPA:',
-  map
-);
-
-console.log(
-  'SOURCE EXISTE:',
-  map.getSource(
-    'rota-planejada'
-  )
-);
-  //TESTE ACIMA
 
   const map =
     mapas['mapa-rota'];
 
   if(!map) return;
+
+  console.log(
+    'MAPA:',
+    map
+  );
+
+  console.log(
+    'SOURCE EXISTE:',
+    map.getSource(
+      'rota-planejada'
+    )
+  );
 
   const geojson = {
 
@@ -312,11 +311,11 @@ console.log(
     return;
 
   }
-//TESTE ABAIXO
+
   console.log(
-  'CRIANDO SOURCE'
-);
-  //TESTE ACIMA
+    'CRIANDO SOURCE'
+  );
+
   map.addSource(
     'rota-planejada',
     {
@@ -324,11 +323,11 @@ console.log(
       data:geojson
     }
   );
-//TESTE ABAIXO
+
   console.log(
-  'CRIANDO LAYER'
-);
-  //TESTE ACIMA
+    'CRIANDO LAYER'
+  );
+
   map.addLayer({
 
     id:'rota-planejada',
