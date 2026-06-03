@@ -410,13 +410,55 @@ if(hoteisRota.length){
             hoteisRota
           );
 
-        if(rota){
+if(rota){
 
-          desenharRotaPlanejada(
-            rota.coordinates
-          );
+  desenharRotaPlanejada(
+    rota.coordinates
+  );
 
-        }
+  const resumoHoteis =
+    document.getElementById(
+      'resumo-hoteis'
+    );
+
+  const resumoDistancia =
+    document.getElementById(
+      'resumo-distancia'
+    );
+
+  const resumoTempo =
+    document.getElementById(
+      'resumo-tempo'
+    );
+
+  if(resumoHoteis){
+
+    resumoHoteis.textContent =
+      hoteisRota.length;
+
+  }
+
+  if(resumoDistancia){
+
+    resumoDistancia.textContent =
+
+      `${(
+        rota.distance / 1000
+      ).toFixed(1)} km`;
+
+  }
+
+  if(resumoTempo){
+
+    resumoTempo.textContent =
+
+      `${Math.round(
+        rota.duration / 60
+      )} min`;
+
+  }
+
+}
 
         adicionarMarcadoresSequencia(
           hoteisRota
