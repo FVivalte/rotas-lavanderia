@@ -14,9 +14,6 @@ export function getMapa(id = 'mapa'){
 
 export function inicializarMapa(containerId = 'mapa', accessToken = '') {
   if (accessToken) {
-    // TESTE ABAIXO
-    console.log('CRIANDO MAPA:', containerId);
-    //TESTE ACIMA
     maplibregl.accessToken = accessToken;
   }
 
@@ -171,5 +168,127 @@ export function desenharRotaOSRM(
     }
 
   });
+
+}
+
+// ======================
+// MAPA DA TELA 2
+// ======================
+
+export function inicializarMapaRota(){
+
+  if(mapas['mapa-rota']){
+    return mapas['mapa-rota'];
+  }
+
+  return inicializarMapa(
+    'mapa-rota'
+  );
+
+}
+
+export function desenharRotaPlanejada(
+  hoteis = []
+){
+
+  const map =
+    mapas['mapa-rota'];
+
+  if(!map) return;
+
+  const coords =
+    hoteis.map(h => [
+
+      Number(h.lng),
+      Number(h.lat)
+
+    ]);
+
+  const geojson = {
+
+    type:'Feature',
+
+    geometry:{
+      type:'LineString',
+      coordinates:coords
+    }
+
+  };
+
+  if(
+    map.getSource(
+      'rota-planejada'
+    )
+  ){
+
+    map
+      .getSource(
+        'rota-planejada'
+      )
+      .setData(
+        geojson
+      );
+
+    return;
+
+  }
+
+  map.addSource(
+    'rota-planejada',
+    {
+      type:'geojson',
+      data:geojson
+    }
+  );
+
+  map.addLayer({
+
+    id:'rota-planejada',
+
+    type:'line',
+
+    source:'rota-planejada',
+
+    paint:{
+
+      'line-color':'#0b63b7',
+
+      'line-width':5
+
+    }
+
+  });
+
+}
+
+export function ajustarMapaRota(
+  hoteis = []
+){
+
+  const map =
+    mapas['mapa-rota'];
+
+  if(!map) return;
+
+  const bounds =
+    new maplibregl.LngLatBounds();
+
+  hoteis.forEach(h=>{
+
+    bounds.extend([
+
+      Number(h.lng),
+      Number(h.lat)
+
+    ]);
+
+  });
+
+  map.fitBounds(
+    bounds,
+    {
+      padding:50
+    }
+  );
 
 }
