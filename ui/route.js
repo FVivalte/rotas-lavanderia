@@ -432,3 +432,4 @@ if(hoteisRota.length){
   },100);
 
 }
+}
