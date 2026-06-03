@@ -106,7 +106,8 @@ from '../storage/database.js';
 import {
   
   getMapa,
-  mapas
+  mapas,
+  limparMapaRota
 }
 from '../services/map.js';
 
