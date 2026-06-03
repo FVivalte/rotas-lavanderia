@@ -125,6 +125,18 @@ if(btnCriarRota){
       renderizarRota();
 
       mostrarTela(telaRota);
+      setTimeout(()=>{
+
+  const mapa =
+    getMapa('mapa-rota');
+
+  if(mapa){
+
+    mapa.resize();
+
+  }
+
+},200);
 
     }
   );
