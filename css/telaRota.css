@@ -87,6 +87,48 @@
 
 }
 
+.marker-status{
+
+  width:34px;
+  height:34px;
+
+  border-radius:50%;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:#fff;
+
+  font-weight:700;
+
+  border:3px solid #fff;
+
+  box-shadow:
+    0 2px 8px rgba(0,0,0,.25);
+
+}
+
+.marker-status.concluido{
+
+  background:#9aa0a6;
+
+}
+
+.marker-status.atual{
+
+  background:#2ea44f;
+
+  transform:scale(1.15);
+
+}
+
+.marker-status.pendente{
+
+  background:#0b63b7;
+
+}
+
 #resumo-rota{
 
   display:flex;
