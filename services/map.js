@@ -316,12 +316,12 @@ export function adicionarMarcadoresSequencia(
       el.className =
         'marker-sequencia';
 
-      el.textContent =
+      el.innerHTML =
         index + 1;
 
-      new maplibregl.Marker(
-        el
-      )
+      new maplibregl.Marker({
+        element: el
+      })
       .setLngLat([
 
         Number(hotel.lng),
