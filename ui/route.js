@@ -83,7 +83,7 @@ function atualizarContadores(){
 
 
 // ======================
-// RENDER ROTA
+// RENDERIZAR ROTA
 // ======================
 
 export function renderizarRota(){
@@ -384,6 +384,8 @@ export function renderizarRota(){
 // MAPA DA TELA 2
 // ======================
 
+limparMapaRota();
+  
 const hoteisRota =
   state.routeOrder
   .map(id =>
