@@ -50,6 +50,10 @@ import {
 }
 from '../services/map.js';
 
+import {
+  obterRotaCompleta
+}
+from '../services/osrm.js';
 
 // ======================
 // CONTADORES
@@ -397,27 +401,34 @@ if(hoteisRota.length){
 
     mapa.resize();
 
-mapa.once(
-  'load',
-  ()=>{
+    mapa.once(
+      'load',
+      async ()=>{
 
-    desenharRotaPlanejada(
-      hoteisRota
+        const rota =
+          await obterRotaCompleta(
+            hoteisRota
+          );
+
+        if(rota){
+
+          desenharRotaPlanejada(
+            rota.coordinates
+          );
+
+        }
+
+        adicionarMarcadoresSequencia(
+          hoteisRota
+        );
+
+        ajustarMapaRota(
+          hoteisRota
+        );
+
+      }
     );
 
-    adicionarMarcadoresSequencia(
-      hoteisRota
-    );
-
-    ajustarMapaRota(
-      hoteisRota
-    );
-
-  }
-);
-    
   },100);
-
-}
 
 }
