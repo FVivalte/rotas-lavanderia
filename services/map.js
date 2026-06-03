@@ -4,6 +4,7 @@ import { atualizarCamera } from './map-camera.js';
 // Variável escopo global do módulo
 let mapas = {};
 let userMarker = null;
+let marcadoresSequencia = [];
 
 /**
  * Inicializa o mapa na tela.
@@ -307,6 +308,12 @@ export function adicionarMarcadoresSequencia(
 
   if(!map) return;
 
+  marcadoresSequencia.forEach(
+    marker => marker.remove()
+  );
+
+  marcadoresSequencia = [];
+
   hoteis.forEach(
     (hotel,index)=>{
 
@@ -316,19 +323,24 @@ export function adicionarMarcadoresSequencia(
       el.className =
         'marker-sequencia';
 
-      el.innerHTML =
+      el.textContent =
         index + 1;
 
-      new maplibregl.Marker({
-        element: el
-      })
-      .setLngLat([
+      const marker =
+        new maplibregl.Marker({
+          element: el
+        })
+        .setLngLat([
 
-        Number(hotel.lng),
-        Number(hotel.lat)
+          Number(hotel.lng),
+          Number(hotel.lat)
 
-      ])
-      .addTo(map);
+        ])
+        .addTo(map);
+
+      marcadoresSequencia.push(
+        marker
+      );
 
     }
   );
