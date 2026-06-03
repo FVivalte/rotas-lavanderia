@@ -191,7 +191,7 @@ export function inicializarMapaRota(){
 }
 
 export function desenharRotaPlanejada(
-  hoteis = []
+  coordenadas = []
 ){
 
   const map =
@@ -199,21 +199,14 @@ export function desenharRotaPlanejada(
 
   if(!map) return;
 
-  const coords =
-    hoteis.map(h => [
-
-      Number(h.lng),
-      Number(h.lat)
-
-    ]);
-
   const geojson = {
 
     type:'Feature',
 
     geometry:{
       type:'LineString',
-      coordinates:coords
+      coordinates:
+        coordenadas
     }
 
   };
@@ -263,7 +256,6 @@ export function desenharRotaPlanejada(
   });
 
 }
-
 export function ajustarMapaRota(
   hoteis = []
 ){
