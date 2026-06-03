@@ -77,57 +77,6 @@ export function gerarRota(){
     telaRota
   );
 
-  setTimeout(()=>{
-
-    if(!mapas['mapa']){
-
-      inicializarMapa(
-        'mapa'
-      );
-
-    }
-
-    adicionarMarcadoresHoteis(
-      ativos,
-      'mapa'
-    );
-
-    const bounds =
-      new maplibregl.LngLatBounds();
-
-    ativos.forEach(h=>{
-
-      if(
-        h.lat != null &&
-        h.lng != null
-      ){
-
-        bounds.extend([
-          Number(h.lng),
-          Number(h.lat)
-        ]);
-
-      }
-
-    });
-
-    if(
-      !bounds.isEmpty()
-    ){
-
-      mapas['mapa']
-        .fitBounds(
-          bounds,
-          {
-            padding:50,
-            maxZoom:16
-          }
-        );
-
-    }
-
-  },200);
-
   salvarEstadoApp();
 
 }
