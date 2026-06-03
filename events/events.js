@@ -394,36 +394,31 @@ return {
 
 
 // ======================
-// NOVA ROTA
+// NOVA ROTA (CORRIGIDO)
 // ======================
 
 if(btnNovaRota){
-
   btnNovaRota.addEventListener(
     'click',
     ()=>{
-
       stopGpsTracking();
 
+      // 1. Limpa o estado
       state.activeSet.clear();
-
       state.routeOrder = [];
-
       state.routeReport = [];
-
       state.currentIndex = 0;
 
+      // 2. ADICIONE ISSO: Limpa os desenhos do mapa
+      // Certifique-se de que esta função remove as layers e sources do MapLibre
+      limparMapaRota(); 
+
+      // 3. Atualiza a UI
       renderizarSelecao();
-
       salvarEstadoApp();
-
-      mostrarTela(
-        telaSelecao
-      );
-
+      mostrarTela(telaSelecao);
     }
   );
-
 }
 
 
