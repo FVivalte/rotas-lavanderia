@@ -60,26 +60,25 @@
 
   border-top:1px solid var(--border);
 }
+
+
 .marker-sequencia{
 
-  width:32px;
-  height:32px;
+  width:40px;
+  height:40px;
 
   border-radius:50%;
 
-  background:#0b63b7;
+  background:red;
 
-  color:#fff;
+  color:white;
 
   display:flex;
   align-items:center;
   justify-content:center;
 
-  font-weight:700;
+  font-size:20px;
+  font-weight:bold;
 
-  border:3px solid #fff;
-
-  box-shadow:
-    0 2px 8px rgba(0,0,0,.25);
-
+  z-index:9999;
 }
