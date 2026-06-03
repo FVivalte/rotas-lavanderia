@@ -397,21 +397,25 @@ if(hoteisRota.length){
 
     mapa.resize();
 
-    mapa.once(
-      'load',
-      ()=>{
+mapa.once(
+  'load',
+  ()=>{
 
-        desenharRotaPlanejada(
-          hoteisRota
-        );
-
-        ajustarMapaRota(
-          hoteisRota
-        );
-
-      }
+    desenharRotaPlanejada(
+      hoteisRota
     );
 
+    adicionarMarcadoresSequencia(
+      hoteisRota
+    );
+
+    ajustarMapaRota(
+      hoteisRota
+    );
+
+  }
+);
+    
   },100);
 
 }
