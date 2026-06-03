@@ -178,7 +178,9 @@ export function desenharRotaOSRM(
 export function inicializarMapaRota(){
 
   if(mapas['mapa-rota']){
+
     return mapas['mapa-rota'];
+
   }
 
   return inicializarMapa(
