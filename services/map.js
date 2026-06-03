@@ -294,3 +294,43 @@ export function ajustarMapaRota(
   );
 
 }
+// ======================
+// MARCADORES NUMERADOS
+// ======================
+
+export function adicionarMarcadoresSequencia(
+  hoteis = []
+){
+
+  const map =
+    mapas['mapa-rota'];
+
+  if(!map) return;
+
+  hoteis.forEach(
+    (hotel,index)=>{
+
+      const el =
+        document.createElement('div');
+
+      el.className =
+        'marker-sequencia';
+
+      el.textContent =
+        index + 1;
+
+      new maplibregl.Marker(
+        el
+      )
+      .setLngLat([
+
+        Number(hotel.lng),
+        Number(hotel.lat)
+
+      ])
+      .addTo(map);
+
+    }
+  );
+
+}
