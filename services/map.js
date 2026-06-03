@@ -261,92 +261,44 @@ export function inicializarMapaRota(){
 
 }
 
-export function desenharRotaPlanejada(
-  coordenadas = []
-){
-
-  const map =
-    mapas['mapa-rota'];
-
-  if(!map) return;
-
-  console.log(
-    'MAPA:',
-    map
-  );
-
-  console.log(
-    'SOURCE EXISTE:',
-    map.getSource(
-      'rota-planejada'
-    )
-  );
+export function desenharRotaPlanejada(coordenadas = []) {
+  const map = mapas['mapa-rota'];
+  if (!map) return;
 
   const geojson = {
-
-    type:'Feature',
-
-    geometry:{
-      type:'LineString',
-      coordinates:
-        coordenadas
+    type: 'Feature',
+    geometry: {
+      type: 'LineString',
+      coordinates: coordenadas
     }
-
   };
 
-  if(
-    map.getSource(
-      'rota-planejada'
-    )
-  ){
-
-    map
-      .getSource(
-        'rota-planejada'
-      )
-      .setData(
-        geojson
-      );
-
-    return;
-
+  // Se a source existe, apenas atualiza
+  if (map.getSource('rota-planejada')) {
+    map.getSource('rota-planejada').setData(geojson);
+  } else {
+    // Se não existe, cria a source
+    map.addSource('rota-planejada', {
+      type: 'geojson',
+      data: geojson
+    });
   }
 
-  console.log(
-    'CRIANDO SOURCE'
-  );
-
-  map.addSource(
-    'rota-planejada',
-    {
-      type:'geojson',
-      data:geojson
-    }
-  );
-
-  console.log(
-    'CRIANDO LAYER'
-  );
-
-  map.addLayer({
-
-    id:'rota-planejada',
-
-    type:'line',
-
-    source:'rota-planejada',
-
-    paint:{
-
-      'line-color':'#0b63b7',
-
-      'line-width':5
-
-    }
-
-  });
-
+  // CRÍTICO: Sempre verifique se a layer existe. Se não existir, crie-a.
+  // Isso resolve o problema de quando você deleta a layer no limparMapaRota
+  if (!map.getLayer('rota-planejada')) {
+    map.addLayer({
+      id: 'rota-planejada',
+      type: 'line',
+      source: 'rota-planejada',
+      paint: {
+        'line-color': '#0b63b7',
+        'line-width': 5
+      }
+    });
+  }
 }
+
 export function ajustarMapaRota(
   hoteis = []
 ){
