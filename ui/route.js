@@ -44,7 +44,8 @@ import {
 
   inicializarMapaRota,
   desenharRotaPlanejada,
-  ajustarMapaRota
+  ajustarMapaRota,
+  adicionarMarcadoresSequencia
 
 }
 from '../services/map.js';
