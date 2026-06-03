@@ -5,6 +5,7 @@ import { atualizarCamera } from './map-camera.js';
 let mapas = {};
 let userMarker = null;
 let marcadoresSequencia = [];
+let marcadoresStatus = [];
 
 /**
  * Inicializa o mapa na tela.
@@ -92,7 +93,77 @@ export function adicionarMarcadoresHoteis(
 
   });
 
-} 
+}
+
+export function atualizarMarcadoresStatus(
+  hoteis = [],
+  indiceAtual = 0
+){
+
+  const map =
+    mapas['mapa-rota'];
+
+  if(!map) return;
+
+  marcadoresStatus.forEach(
+    m => m.remove()
+  );
+
+  marcadoresStatus = [];
+
+  hoteis.forEach(
+    (hotel,index)=>{
+
+      const el =
+        document.createElement('div');
+
+      el.className =
+        'marker-status';
+
+      el.textContent =
+        index + 1;
+
+      if(index < indiceAtual){
+
+        el.classList.add(
+          'concluido'
+        );
+
+      }
+      else if(index === indiceAtual){
+
+        el.classList.add(
+          'atual'
+        );
+
+      }
+      else{
+
+        el.classList.add(
+          'pendente'
+        );
+
+      }
+
+      const marker =
+        new maplibregl.Marker({
+          element: el
+        })
+        .setLngLat([
+          Number(hotel.lng),
+          Number(hotel.lat)
+        ])
+        .addTo(map);
+
+      marcadoresStatus.push(
+        marker
+      );
+
+    }
+  );
+
+}
+
 // Exporta a instância
 export { mapas };
 
