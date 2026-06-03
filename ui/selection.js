@@ -70,6 +70,17 @@ export function gerarRota(){
 
   state.routeOrder =
     ativos.map(h => h.id);
+  //teste abaixo
+  console.log(
+  'ATIVOS:',
+  ativos.length
+);
+
+console.log(
+  'ROUTE ORDER:',
+  state.routeOrder
+);
+  //teste acima
 
   renderizarRota();
 
