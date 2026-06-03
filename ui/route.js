@@ -406,11 +406,16 @@ if(hoteisRota.length){
     mapa.resize();
 
 const desenharMapa = async ()=>{
-
+  //TESTE ABAIXO
+  console.log('HOTÉIS ROTA:', hoteisRota);
+  //TESTE ACIMA
   const rota =
     await obterRotaCompleta(
       hoteisRota
     );
+  //TESTE ABAIXO
+  console.log('ROTA OSRM:', rota);
+  //TESTE ACIMA
 
   if(rota){
 
@@ -451,7 +456,9 @@ const desenharMapa = async ()=>{
     }
 
   }
-
+  //TESTE ABAIXO
+  console.log('DESENHANDO MARCADORES');
+  //TESTE ACIMA
   atualizarMarcadoresStatus(
     hoteisRota,
     state.currentIndex
