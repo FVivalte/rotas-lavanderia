@@ -382,51 +382,21 @@ export function adicionarMarcadoresSequencia(
 
 }
 
-export function limparMapaRota(){
-
-  const map =
-    mapas['mapa-rota'];
-
-  if(!map) return;
-
-  // Remove marcadores numerados
-  marcadoresSequencia.forEach(
-    m => m.remove()
-  );
-
-  marcadoresSequencia = [];
-
-  // Remove marcadores de status
-  marcadoresStatus.forEach(
-    m => m.remove()
-  );
-
-  marcadoresStatus = [];
-
-  // Remove camada da rota
-  if(
-    map.getLayer(
-      'rota-planejada'
-    )
-  ){
-
-    map.removeLayer(
-      'rota-planejada'
-    );
-
+// services/map.js
+export function limparMapaRota() {
+  const mapa = inicializarMapaRota(); // ou getMapa('mapa-rota')
+  if (mapa) {
+    // Remove marcadores antigos
+    if (window.markers) {
+      window.markers.forEach(marker => marker.remove());
+      window.markers = [];
+    }
+    // Remove rota antiga (se for Layer)
+    if (mapa.getLayer('route')) {
+      mapa.removeLayer('route');
+    }
+    if (mapa.getSource('route')) {
+      mapa.removeSource('route');
+    }
   }
-
-  // Remove source da rota
-  if(
-    map.getSource(
-      'rota-planejada'
-    )
-  ){
-
-    map.removeSource(
-      'rota-planejada'
-    );
-
-  }
-
 }
