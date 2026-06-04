@@ -110,54 +110,17 @@ import {
   ajustarMapaRota,
   atualizarMarcadoresStatus,
   limparMapaRota,
-  inicializarMapaRota,
-  obterRotaCompleta
+  inicializarMapaRota
 } from '../services/map.js';
 
 // ======================
-// BOTÃO CRIAR ROTA - VERSÃO CORRIGIDA
+// BOTÃO CRIAR ROTA - VERSÃO ESTÁVEL
 // ======================
 if (btnCriarRota) {
   btnCriarRota.addEventListener('click', () => {
 
     gerarRota();
-    renderizarRota();   // ← Esta função já cuida da maior parte do mapa
-
-    const hoteisDaRota = HOTELS.filter(h => state.routeOrder.includes(h.id));
-
-    if (hoteisDaRota.length > 0) {
-      setTimeout(() => {
-        const mapa = inicializarMapaRota();
-        if (!mapa) return;
-
-        mapa.resize();
-
-        const desenharMapa = async () => {
-          const rota = await obterRotaCompleta(hoteisDaRota);
-
-          if (rota) {
-            desenharRotaPlanejada(rota.coordinates);
-
-            const resumoHoteis = document.getElementById('resumo-hoteis');
-            const resumoDistancia = document.getElementById('resumo-distancia');
-            const resumoTempo = document.getElementById('resumo-tempo');
-
-            if (resumoHoteis) resumoHoteis.textContent = hoteisDaRota.length;
-            if (resumoDistancia) resumoDistancia.textContent = `${(rota.distance / 1000).toFixed(1)} km`;
-            if (resumoTempo) resumoTempo.textContent = `${Math.round(rota.duration / 60)} min`;
-          }
-
-          atualizarMarcadoresStatus(hoteisDaRota, state.currentIndex || 0);
-          ajustarMapaRota(hoteisDaRota);
-        };
-
-        if (mapa.loaded()) {
-          desenharMapa();
-        } else {
-          mapa.once('load', desenharMapa);
-        }
-      }, 250);
-    }
+    renderizarRota();        // ← Esta função já tem a lógica completa do mapa
 
     mostrarTela(telaRota);
   });
