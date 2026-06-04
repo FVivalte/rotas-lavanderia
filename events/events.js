@@ -112,36 +112,40 @@ import {
 from '../services/map.js';
 
 // ======================
-// GERAR ROTA
+// CRIAR ROTA (events/events.js)
 // ======================
 
-if(btnCriarRota){
+if (btnCriarRota) {
+  btnCriarRota.addEventListener('click', () => {
 
-  btnCriarRota.addEventListener(
-    'click',
-    ()=>{
+    gerarRota();           // Gera a ordem da rota
+    renderizarRota();      // Atualiza a lista lateral
 
-      gerarRota();
+    // === CORREÇÃO PRINCIPAL ===
+    const hoteisDaRota = HOTELS.filter(h => state.routeOrder.includes(h.id));
 
-      renderizarRota();
-
-      mostrarTela(telaRota);
-      setTimeout(()=>{
-
-  const mapa =
-    getMapa('mapa-rota');
-
-  if(mapa){
-
-    mapa.resize();
-
-  }
-
-},200);
-
+    if (hoteisDaRota.length > 0) {
+      // Desenha os marcadores numerados no mapa
+      adicionarMarcadoresSequencia(hoteisDaRota);
+      
+      // Desenha a linha da rota (se você já tiver a função)
+      desenharRotaPlanejada(hoteisDaRota);
+      
+      // Ajusta o zoom e centraliza o mapa
+      ajustarMapaRota(hoteisDaRota);
     }
-  );
 
+    mostrarTela(telaRota);
+
+    // Timeout importante: dá tempo do mapa ficar visível antes de ajustar
+    setTimeout(() => {
+      const mapa = getMapa('mapa-rota');
+      if (mapa) {
+        mapa.resize();
+        ajustarMapaRota(hoteisDaRota);
+      }
+    }, 400);
+  });
 }
 
 
