@@ -104,12 +104,11 @@ import {
 from '../storage/database.js';
 
 import {
-  
-  getMapa,
-  mapas,
-  limparMapaRota
-}
-from '../services/map.js';
+  adicionarMarcadoresSequencia,
+  desenharRotaPlanejada,
+  ajustarMapaRota,
+  getMapa
+} from '../services/map.js';
 
 // ======================
 // CRIAR ROTA (events/events.js)
