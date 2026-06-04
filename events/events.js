@@ -115,22 +115,19 @@ import {
 } from '../services/map.js';
 
 // ======================
-// BOTÃO CRIAR ROTA
+// BOTÃO CRIAR ROTA - VERSÃO CORRIGIDA
 // ======================
 if (btnCriarRota) {
   btnCriarRota.addEventListener('click', () => {
 
     gerarRota();
-    renderizarRota();        // Já vai cuidar do mapa também
+    renderizarRota();   // ← Esta função já cuida da maior parte do mapa
 
     const hoteisDaRota = HOTELS.filter(h => state.routeOrder.includes(h.id));
 
     if (hoteisDaRota.length > 0) {
-      // Garante que o mapa seja redesenhado
-      limparMapaRota();
-
       setTimeout(() => {
-        const mapa = inicializarMapaRota();   // Sua função atual
+        const mapa = inicializarMapaRota();
         if (!mapa) return;
 
         mapa.resize();
@@ -141,7 +138,6 @@ if (btnCriarRota) {
           if (rota) {
             desenharRotaPlanejada(rota.coordinates);
 
-            // Atualiza resumos
             const resumoHoteis = document.getElementById('resumo-hoteis');
             const resumoDistancia = document.getElementById('resumo-distancia');
             const resumoTempo = document.getElementById('resumo-tempo');
@@ -160,7 +156,7 @@ if (btnCriarRota) {
         } else {
           mapa.once('load', desenharMapa);
         }
-      }, 200);
+      }, 250);
     }
 
     mostrarTela(telaRota);
