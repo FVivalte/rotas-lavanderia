@@ -103,11 +103,15 @@ import {
 }
 from '../storage/database.js';
 
+// No topo do events.js, junto com os outros imports
 import {
   adicionarMarcadoresSequencia,
   desenharRotaPlanejada,
   ajustarMapaRota,
-  getMapa
+  atualizarMarcadoresStatus,
+  limparMapaRota,
+  inicializarMapaRota,
+  obterRotaCompleta
 } from '../services/map.js';
 
 // ======================
