@@ -87,281 +87,122 @@ function atualizarContadores(){
 // RENDERIZAR ROTA
 // ======================
 
-export function renderizarRota(){
+// ui/route.js
 
-  if(!listaRota){
+export function renderizarRota() {
+  if (!listaRota) {
     return;
   }
 
   listaRota.innerHTML = '';
 
-  state.routeOrder.forEach(
-    (id, idx)=>{
+  const hoteisDaRota = HOTELS.filter(h => state.routeOrder.includes(h.id));
 
-      const hotel =
-        HOTELS.find(
-          h => h.id === id
-        );
+  state.routeOrder.forEach((id, idx) => {
+    const hotel = HOTELS.find(h => h.id === id);
+    if (!hotel) return;
 
-      if(!hotel){
-        return;
+    const item = document.createElement('div');
+    item.className = 'route-item';
+    item.dataset.id = id;
+    item.innerHTML = `
+      <div>
+        <strong>${idx + 1}. ${hotel.name}</strong>
+        <div class="muted" style="font-size:0.85rem">
+          ${hotel.address}
+        </div>
+      </div>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <span class="drag">⋮⋮</span>
+        <button class="ghost" data-id="${id}">Remover</button>
+      </div>
+    `;
+
+    // ======================
+    // REMOVER HOTEL
+    // ======================
+    item.querySelector('button').addEventListener('click', () => {
+      state.activeSet.delete(id);
+      state.routeOrder = state.routeOrder.filter(x => x !== id);
+      renderizarSelecao();
+      renderizarRota();           // recursivo (atualiza a tela)
+      salvarEstadoApp();
+    });
+
+    // ======================
+    // DRAG AND DROP (mobile)
+    // ======================
+    const dragHandle = item.querySelector('.drag');
+    let itemArrastando = null;
+
+    dragHandle.addEventListener('touchstart', () => {
+      itemArrastando = item;
+      item.classList.add('dragging-mobile');
+    }, { passive: true });
+
+    dragHandle.addEventListener('touchmove', e => {
+      if (!itemArrastando) return;
+      // ... (seu código de touchmove continua igual)
+      const posicaoY = e.touches[0].clientY;
+      const items = [...listaRota.querySelectorAll('.route-item')];
+      items.forEach(other => {
+        other.classList.remove('over');
+        if (other === itemArrastando) return;
+        const rect = other.getBoundingClientRect();
+        const meio = rect.top + rect.height / 2;
+        if (posicaoY < meio) {
+          other.classList.add('over');
+        }
+      });
+    }, { passive: true });
+
+    dragHandle.addEventListener('touchend', e => {
+      if (!itemArrastando) return;
+      // ... (seu código de touchend continua igual - mantive a proteção que você já tem)
+      const posicaoY = e.changedTouches[0].clientY;
+      const items = [...listaRota.querySelectorAll('.route-item')];
+      let indiceDestino = null;
+
+      items.forEach((other, index) => {
+        other.classList.remove('over');
+        if (other === itemArrastando) return;
+        const rect = other.getBoundingClientRect();
+        const meio = rect.top + rect.height / 2;
+        if (posicaoY < meio && indiceDestino === null) {
+          indiceDestino = index;
+        }
+      });
+
+      if (indiceDestino === null) {
+        indiceDestino = state.routeOrder.length - 1;
       }
 
-      const item =
-        document.createElement('div');
-
-      item.className =
-        'route-item';
-
-      item.dataset.id = id;
-
-      item.innerHTML = `
-
-        <div>
-
-          <strong>
-            ${idx + 1}. ${hotel.name}
-          </strong>
-
-          <div
-            class="muted"
-            style="font-size:0.85rem"
-          >
-            ${hotel.address}
-          </div>
-
-        </div>
-
-        <div
-          style="
-            display:flex;
-            gap:8px;
-            align-items:center;
-          "
-        >
-
-          <span class="drag">
-            ⋮⋮
-          </span>
-
-          <button
-            class="ghost"
-            data-id="${id}"
-          >
-            Remover
-          </button>
-
-        </div>
-
-      `;
-
-
-      // ======================
-      // REMOVER HOTEL
-      // ======================
-
-      item
-      .querySelector('button')
-      .addEventListener(
-        'click',
-        ()=>{
-
-          state.activeSet.delete(id);
-
-          state.routeOrder =
-            state.routeOrder.filter(
-              x => x !== id
-            );
-
-          renderizarSelecao();
-
-          renderizarRota();
-
-          salvarEstadoApp();
-
-        }
-      );
-
-
-      // ======================
-      // DRAG MOBILE
-      // ======================
-
-      const dragHandle =
-        item.querySelector('.drag');
-
-      let itemArrastando = null;
-
-      dragHandle.addEventListener(
-        'touchstart',
-        ()=>{
-
-          itemArrastando = item;
-
-          item.classList.add(
-            'dragging-mobile'
-          );
-
-        },
-        { passive:true }
-      );
-
-      dragHandle.addEventListener(
-        'touchmove',
-        e=>{
-
-          if(!itemArrastando){
-            return;
-          }
-
-          const posicaoY =
-            e.touches[0].clientY;
-
-          const items = [
-            ...listaRota.querySelectorAll(
-              '.route-item'
-            )
-          ];
-
-          items.forEach(other=>{
-
-            other.classList.remove(
-              'over'
-            );
-
-            if(other === itemArrastando){
-              return;
-            }
-
-            const rect =
-              other.getBoundingClientRect();
-
-            const meio =
-              rect.top +
-              rect.height / 2;
-
-            if(posicaoY < meio){
-
-              other.classList.add(
-                'over'
-              );
-
-            }
-
-          });
-
-        },
-        { passive:true }
-      );
-
-      dragHandle.addEventListener(
-        'touchend',
-        e=>{
-
-          if(!itemArrastando){
-            return;
-          }
-
-          const posicaoY =
-            e.changedTouches[0].clientY;
-
-          const items = [
-            ...listaRota.querySelectorAll(
-              '.route-item'
-            )
-          ];
-
-          let indiceDestino = null;
-
-          items.forEach(
-            (other,index)=>{
-
-              other.classList.remove(
-                'over'
-              );
-
-              if(other === itemArrastando){
-                return;
-              }
-
-              const rect =
-                other.getBoundingClientRect();
-
-              const meio =
-                rect.top +
-                rect.height / 2;
-
-              if(
-                posicaoY < meio &&
-                indiceDestino === null
-              ){
-
-                indiceDestino = index;
-
-              }
-
-            }
-          );
-
-          // --- PROTEÇÃO DO "ESCORREGAMENTO" ---
-          // Se o dedo foi solto abaixo do último elemento, o índice de destino
-          // será nulo. Forçamos para o último índice disponível.
-          if (indiceDestino === null) {
-            indiceDestino = state.routeOrder.length - 1;
-          }
-          // ------------------------------------
-
-          const indiceOrigem =
-            state.routeOrder.indexOf(id);
-
-          // A lógica de mover no array permanece a mesma, 
-          // agora com o indiceDestino garantido
-          if(indiceDestino !== null && indiceDestino !== indiceOrigem){
-
-            state.routeOrder.splice(
-              indiceDestino,
-              0,
-              state.routeOrder.splice(
-                indiceOrigem,
-                1
-              )[0]
-            );
-
-          }
-
-          itemArrastando.classList.remove(
-            'dragging-mobile'
-          );
-
-          itemArrastando = null;
-
-          renderizarRota();
-
-          salvarEstadoApp();
-
-        },
-        { passive:true }
-      );
-      listaRota.appendChild(item);
-
-    }
-  );
-
-
-// ======================
-// SINCRONIZAR RELATÓRIO
-// ======================
-
+      const indiceOrigem = state.routeOrder.indexOf(id);
+      if (indiceDestino !== null && indiceDestino !== indiceOrigem) {
+        state.routeOrder.splice(
+          indiceDestino,
+          0,
+          state.routeOrder.splice(indiceOrigem, 1)[0]
+        );
+      }
+
+      itemArrastando.classList.remove('dragging-mobile');
+      itemArrastando = null;
+      renderizarRota();
+      salvarEstadoApp();
+    }, { passive: true });
+
+    listaRota.appendChild(item);
+  });
+
+  // ======================
+  // SINCRONIZAR RELATÓRIO
+  // ======================
   state.routeReport = state.routeOrder.map(id => {
-    
-    // Procura se este hotel já tem um relatório salvo na memória
     const relatorioExistente = state.routeReport.find(r => r.id === id);
-
     if (relatorioExistente) {
-      // Se existir, devolve exatamente como estava (preserva fotos e horários!)
-      return relatorioExistente; 
+      return relatorioExistente;
     } else {
-      // Se for um hotel novo, cria a ficha zerada
       return {
         id,
         arrival: null,
@@ -372,117 +213,52 @@ export function renderizarRota(){
         pickupPhotos: []
       };
     }
-    
   });
 
-
   atualizarContadores();
-
   renderizarRelatorio();
-
   salvarEstadoApp();
+
   // ======================
-// MAPA DA TELA 2
-// ======================
+  // ATUALIZAÇÃO DO MAPA (CORREÇÃO PRINCIPAL)
+  // ======================
+  limparMapaRota();
 
-limparMapaRota();
-  
-const hoteisRota =
-  state.routeOrder
-  .map(id =>
-    HOTELS.find(
-      h => h.id === id
-    )
-  )
-  .filter(Boolean);
+  const hoteisRota = state.routeOrder
+    .map(id => HOTELS.find(h => h.id === id))
+    .filter(Boolean);
 
-if(hoteisRota.length){
+  if (hoteisRota.length > 0) {
+    setTimeout(() => {
+      const mapa = inicializarMapaRota();
+      if (!mapa) return;
 
-  setTimeout(()=>{
+      mapa.resize();
 
-    const mapa =
-      inicializarMapaRota();
+      const desenharMapa = async () => {
+        console.log('HOTÉIS ROTA:', hoteisRota);
 
-    mapa.resize();
+        const rota = await obterRotaCompleta(hoteisRota);
 
-const desenharMapa = async ()=>{
-  //TESTE ABAIXO
-  console.log('HOTÉIS ROTA:', hoteisRota);
-  //TESTE ACIMA
-  const rota =
-    await obterRotaCompleta(
-      hoteisRota
-    );
-  //TESTE ABAIXO
-  console.log('ROTA OSRM:', rota);
-  //TESTE ACIMA
+        if (rota) {
+          desenharRotaPlanejada(rota.coordinates);
 
-  if(rota){
+          // Atualiza resumos
+          document.getElementById('resumo-hoteis').textContent = hoteisRota.length;
+          document.getElementById('resumo-distancia').textContent = `${(rota.distance / 1000).toFixed(1)} km`;
+          document.getElementById('resumo-tempo').textContent = `${Math.round(rota.duration / 60)} min`;
+        }
 
-    desenharRotaPlanejada(
-      rota.coordinates
-    );
+        console.log('DESENHANDO MARCADORES');
+        atualizarMarcadoresStatus(hoteisRota, state.currentIndex);
+        ajustarMapaRota(hoteisRota);
+      };
 
-    const resumoHoteis =
-      document.getElementById(
-        'resumo-hoteis'
-      );
-
-    const resumoDistancia =
-      document.getElementById(
-        'resumo-distancia'
-      );
-
-    const resumoTempo =
-      document.getElementById(
-        'resumo-tempo'
-      );
-
-    if(resumoHoteis){
-      resumoHoteis.textContent =
-        hoteisRota.length;
-    }
-
-    if(resumoDistancia){
-      resumoDistancia.textContent =
-        `${(rota.distance / 1000).toFixed(1)} km`;
-    }
-
-    if(resumoTempo){
-      resumoTempo.textContent =
-        `${Math.round(
-          rota.duration / 60
-        )} min`;
-    }
-
+      if (mapa.loaded()) {
+        desenharMapa();
+      } else {
+        mapa.once('load', desenharMapa);
+      }
+    }, 150);
   }
-  //TESTE ABAIXO
-  console.log('DESENHANDO MARCADORES');
-  //TESTE ACIMA
-  atualizarMarcadoresStatus(
-    hoteisRota,
-    state.currentIndex
-  );
-
-  ajustarMapaRota(
-    hoteisRota
-  );
-
-};
-
-if(mapa.loaded()){
-
-  desenharMapa();
-
-}else{
-
-  mapa.once(
-    'load',
-    desenharMapa
-  );
-
-}
-  },100);
-
-}
 }
