@@ -55,7 +55,8 @@ from '../storage/storage.js';
 
 
 
-// ======================export function initRouteUI() {
+// ======================
+export function initRouteUI() {
   listaRota = document.getElementById('lista-rota');
 }
 
