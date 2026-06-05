@@ -3,61 +3,38 @@
 // ======================
 // IMPORTS NECESSÁRIOS
 // ======================
-import {
-  HOTELS
-}
-from '../data/dados.js';
-import {
-  state
-}
-from '../core/state.js';
+import { HOTELS } from '../data/dados.js';
+import { state } from '../core/state.js';
 
+// ❌ CORREÇÃO 1: Removido o 'listaRota' daqui
 import {
-
-  listaRota,
   contadorSelecao,
   contadorRota
-
-}
-from './elements.js';
+} from './elements.js';
 
 import {
-
   inicializarMapaRota,
   desenharRotaPlanejada,
   ajustarMapaRota,
   adicionarMarcadoresSequencia,
   atualizarMarcadoresStatus,
   limparMapaRota
-
 } from '../services/map.js';
 
-import {  
-  obterRotaCompleta 
-} from '../services/osrm.js';
+import { obterRotaCompleta } from '../services/osrm.js';
 
-// Se atualizarContadores e renderizarRelatorio estiverem em outro arquivo:
-import {  
-  renderizarRelatorio 
-} from './report.js'; 
+import { renderizarRelatorio } from './report.js'; 
 import { 
   atualizarContadores, 
   renderizarSelecao
 } from './selection.js'; 
 
-import {
-
-  salvarEstadoApp
-
-}
-from '../storage/storage.js';
-
-
-
+import { salvarEstadoApp } from '../storage/storage.js';
 
 // ======================
 // VARIÁVEIS LOCAIS
 // ======================
+// ✅ CORREÇÃO 1: Agora esta é a única declaração de listaRota
 let listaRota = null;
 
 export function initRouteUI() {
@@ -126,6 +103,7 @@ export function renderizarRota() {
       if (!itemArrastando) return;
       const posicaoY = e.touches[0].clientY;
       const items = [...listaRota.querySelectorAll('.route-item')];
+      
       items.forEach(other => {
         other.classList.remove('over');
         if (other === itemArrastando) return;
@@ -158,9 +136,15 @@ export function renderizarRota() {
 
       const indiceOrigem = state.routeOrder.indexOf(id);
 
-      // ✅ CORREÇÃO FINAL - Lógica segura
+      // ✅ CORREÇÃO 2: Lógica segura de índices para o splice
       if (indiceDestino !== indiceOrigem && indiceDestino !== null) {
         const hotelMovido = state.routeOrder.splice(indiceOrigem, 1)[0];
+        
+        // Se o item foi movido de cima para baixo, o array encolheu. Precisamos ajustar o destino.
+        if (indiceDestino > indiceOrigem) {
+          indiceDestino--; 
+        }
+        
         state.routeOrder.splice(indiceDestino, 0, hotelMovido);
       }
 
