@@ -57,36 +57,6 @@ import {
 }
 from '../services/osrm.js';
 
-// ======================
-// CONTADORES
-// ======================
-
-function atualizarContadores(){
-
-  const texto =
-    `${state.activeSet.size} hotéis ativos`;
-
-  if(contadorSelecao){
-
-    contadorSelecao.textContent =
-      texto;
-
-  }
-
-  if(contadorRota){
-
-    contadorRota.textContent =
-      texto;
-
-  }
-
-}
-
-
-// ======================
-// RENDERIZAR ROTA
-// ======================
-
 // ui/route.js
 
 export function renderizarRota() {
@@ -125,12 +95,12 @@ export function renderizarRota() {
       state.activeSet.delete(id);
       state.routeOrder = state.routeOrder.filter(x => x !== id);
       renderizarSelecao();
-      renderizarRota();           // recursivo (atualiza a tela)
+      renderizarRota();
       salvarEstadoApp();
     });
 
     // ======================
-    // DRAG AND DROP (mobile)
+    // DRAG AND DROP MOBILE
     // ======================
     const dragHandle = item.querySelector('.drag');
     let itemArrastando = null;
@@ -142,7 +112,6 @@ export function renderizarRota() {
 
     dragHandle.addEventListener('touchmove', e => {
       if (!itemArrastando) return;
-      // ... (seu código de touchmove continua igual)
       const posicaoY = e.touches[0].clientY;
       const items = [...listaRota.querySelectorAll('.route-item')];
       items.forEach(other => {
@@ -158,7 +127,7 @@ export function renderizarRota() {
 
     dragHandle.addEventListener('touchend', e => {
       if (!itemArrastando) return;
-      // ... (seu código de touchend continua igual - mantive a proteção que você já tem)
+
       const posicaoY = e.changedTouches[0].clientY;
       const items = [...listaRota.querySelectorAll('.route-item')];
       let indiceDestino = null;
@@ -173,6 +142,7 @@ export function renderizarRota() {
         }
       });
 
+      // Proteção para não perder o último item
       if (indiceDestino === null) {
         indiceDestino = state.routeOrder.length - 1;
       }
@@ -220,7 +190,7 @@ export function renderizarRota() {
   salvarEstadoApp();
 
   // ======================
-  // ATUALIZAÇÃO DO MAPA (CORREÇÃO PRINCIPAL)
+  // ATUALIZAÇÃO DO MAPA (Correção do bug principal)
   // ======================
   limparMapaRota();
 
@@ -236,7 +206,7 @@ export function renderizarRota() {
       mapa.resize();
 
       const desenharMapa = async () => {
-        console.log('HOTÉIS ROTA:', hoteisRota);
+        console.log('🎯 HOTÉIS NA ROTA:', hoteisRota);
 
         const rota = await obterRotaCompleta(hoteisRota);
 
@@ -244,13 +214,17 @@ export function renderizarRota() {
           desenharRotaPlanejada(rota.coordinates);
 
           // Atualiza resumos
-          document.getElementById('resumo-hoteis').textContent = hoteisRota.length;
-          document.getElementById('resumo-distancia').textContent = `${(rota.distance / 1000).toFixed(1)} km`;
-          document.getElementById('resumo-tempo').textContent = `${Math.round(rota.duration / 60)} min`;
+          const resumoHoteis = document.getElementById('resumo-hoteis');
+          const resumoDistancia = document.getElementById('resumo-distancia');
+          const resumoTempo = document.getElementById('resumo-tempo');
+
+          if (resumoHoteis) resumoHoteis.textContent = hoteisRota.length;
+          if (resumoDistancia) resumoDistancia.textContent = `${(rota.distance / 1000).toFixed(1)} km`;
+          if (resumoTempo) resumoTempo.textContent = `${Math.round(rota.duration / 60)} min`;
         }
 
-        console.log('DESENHANDO MARCADORES');
-        atualizarMarcadoresStatus(hoteisRota, state.currentIndex);
+        console.log('📍 Desenhando marcadores sequenciados');
+        adicionarMarcadoresSequencia(hoteisRota);     // ou atualizarMarcadoresStatus
         ajustarMapaRota(hoteisRota);
       };
 
@@ -259,6 +233,6 @@ export function renderizarRota() {
       } else {
         mapa.once('load', desenharMapa);
       }
-    }, 150);
+    }, 200);
   }
 }
