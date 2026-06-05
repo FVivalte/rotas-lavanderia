@@ -24,6 +24,12 @@ import {
 } from './selection.js'; // ← Ajuste o caminho se necessário
 // import { renderizarSelecao } from './selection.js'; // se precisar
 
+let listaRota = null;   // Variável local para evitar erro
+
+// Função para inicializar a referência (chamada uma vez no init)
+export function initRouteUI() {
+  listaRota = document.getElementById('lista-rota');
+}
 export function renderizarRota() {
   if (!listaRota) {
     return;
