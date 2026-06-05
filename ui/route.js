@@ -198,13 +198,18 @@ export function renderizarRota() {
           ? await obterRotaCompleta(hoteisRota) 
           : null;
 
-        if (rota && typeof desenharRotaPlanejada === 'function') {
-          desenharRotaPlanejada(rota.coordinates);
+if (rota && typeof desenharRotaPlanejada === 'function') {
+  desenharRotaPlanejada(rota.coordinates);
 
-          document.getElementById('resumo-hoteis')?.textContent = hoteisRota.length;
-          document.getElementById('resumo-distancia')?.textContent = `${(rota.distance / 1000).toFixed(1)} km`;
-          document.getElementById('resumo-tempo')?.textContent = `${Math.round(rota.duration / 60)} min`;
-        }
+  // ✅ CORREÇÃO: Buscando os elementos primeiro e atribuindo apenas se existirem
+  const elResumoHoteis = document.getElementById('resumo-hoteis');
+  const elResumoDistancia = document.getElementById('resumo-distancia');
+  const elResumoTempo = document.getElementById('resumo-tempo');
+
+  if (elResumoHoteis) elResumoHoteis.textContent = hoteisRota.length;
+  if (elResumoDistancia) elResumoDistancia.textContent = `${(rota.distance / 1000).toFixed(1)} km`;
+  if (elResumoTempo) elResumoTempo.textContent = `${Math.round(rota.duration / 60)} min`;
+}
 
         if (typeof adicionarMarcadoresSequencia === 'function') adicionarMarcadoresSequencia(hoteisRota);
         if (typeof ajustarMapaRota === 'function') ajustarMapaRota(hoteisRota);
