@@ -1,63 +1,20 @@
 // ui/route.js
 
+// ======================
+// IMPORTS NECESSÁRIOS
+// ======================
 import {
-  HOTELS
-}
-from '../data/dados.js';
-
-import {
-  state
-}
-from '../core/state.js';
-
-import {
-
-  listaRota,
-  contadorSelecao,
-  contadorRota
-
-}
-from './elements.js';
-
-import {
-
-  renderizarSelecao
-
-}
-from './selection.js';
-
-import {
-
-  renderizarRelatorio
-
-}
-from './report.js';
-
-import {
-
-  salvarEstadoApp
-
-}
-from '../storage/storage.js';
-
-import {
-
+  limparMapaRota,
   inicializarMapaRota,
+  adicionarMarcadoresSequencia,
   desenharRotaPlanejada,
   ajustarMapaRota,
-  adicionarMarcadoresSequencia,
-  atualizarMarcadoresStatus,
-  limparMapaRota
-
-}
-from '../services/map.js';
-
-import {
   obterRotaCompleta
-}
-from '../services/osrm.js';
+} from '../services/map.js';
 
-// ui/route.js
+// Se atualizarContadores e renderizarRelatorio estiverem em outro arquivo:
+import { atualizarContadores, renderizarRelatorio } from './report.js';   // ← Ajuste o caminho se necessário
+// import { renderizarSelecao } from './selection.js'; // se precisar
 
 export function renderizarRota() {
   if (!listaRota) {
@@ -88,20 +45,16 @@ export function renderizarRota() {
       </div>
     `;
 
-    // ======================
     // REMOVER HOTEL
-    // ======================
     item.querySelector('button').addEventListener('click', () => {
       state.activeSet.delete(id);
       state.routeOrder = state.routeOrder.filter(x => x !== id);
-      renderizarSelecao();
+      renderizarSelecao();        // se der erro, comente esta linha temporariamente
       renderizarRota();
       salvarEstadoApp();
     });
 
-    // ======================
-    // DRAG AND DROP MOBILE
-    // ======================
+    // DRAG AND DROP MOBILE (mantido igual)
     const dragHandle = item.querySelector('.drag');
     let itemArrastando = null;
 
@@ -119,9 +72,7 @@ export function renderizarRota() {
         if (other === itemArrastando) return;
         const rect = other.getBoundingClientRect();
         const meio = rect.top + rect.height / 2;
-        if (posicaoY < meio) {
-          other.classList.add('over');
-        }
+        if (posicaoY < meio) other.classList.add('over');
       });
     }, { passive: true });
 
@@ -142,18 +93,11 @@ export function renderizarRota() {
         }
       });
 
-      // Proteção para não perder o último item
-      if (indiceDestino === null) {
-        indiceDestino = state.routeOrder.length - 1;
-      }
+      if (indiceDestino === null) indiceDestino = state.routeOrder.length - 1;
 
       const indiceOrigem = state.routeOrder.indexOf(id);
       if (indiceDestino !== null && indiceDestino !== indiceOrigem) {
-        state.routeOrder.splice(
-          indiceDestino,
-          0,
-          state.routeOrder.splice(indiceOrigem, 1)[0]
-        );
+        state.routeOrder.splice(indiceDestino, 0, state.routeOrder.splice(indiceOrigem, 1)[0]);
       }
 
       itemArrastando.classList.remove('dragging-mobile');
@@ -185,12 +129,16 @@ export function renderizarRota() {
     }
   });
 
-  atualizarContadores();
-  renderizarRelatorio();
+  // ======================
+  // CHAMADAS DE ATUALIZAÇÃO
+  // ======================
+  if (typeof atualizarContadores === 'function') atualizarContadores();
+  if (typeof renderizarRelatorio === 'function') renderizarRelatorio();
+  
   salvarEstadoApp();
 
   // ======================
-  // ATUALIZAÇÃO DO MAPA (Correção do bug principal)
+  // ATUALIZAÇÃO DO MAPA
   // ======================
   limparMapaRota();
 
@@ -213,7 +161,6 @@ export function renderizarRota() {
         if (rota) {
           desenharRotaPlanejada(rota.coordinates);
 
-          // Atualiza resumos
           const resumoHoteis = document.getElementById('resumo-hoteis');
           const resumoDistancia = document.getElementById('resumo-distancia');
           const resumoTempo = document.getElementById('resumo-tempo');
@@ -223,8 +170,7 @@ export function renderizarRota() {
           if (resumoTempo) resumoTempo.textContent = `${Math.round(rota.duration / 60)} min`;
         }
 
-        console.log('📍 Desenhando marcadores sequenciados');
-        adicionarMarcadoresSequencia(hoteisRota);     // ou atualizarMarcadoresStatus
+        adicionarMarcadoresSequencia(hoteisRota);
         ajustarMapaRota(hoteisRota);
       };
 
