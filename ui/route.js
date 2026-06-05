@@ -57,8 +57,7 @@ from '../storage/storage.js';
 
 // ======================
 // VARIÁVEIS
-// ======================
-let listaRota = null;
+// ======================let listaRota = null;
 
 // Inicializa a referência do elemento (chame isso no init.js)
 export function initRouteUI() {
