@@ -55,12 +55,7 @@ from '../storage/storage.js';
 
 
 
-// ======================
-// VARIÁVEIS
-// ======================let listaRota = null;
-
-// Inicializa a referência do elemento (chame isso no init.js)
-export function initRouteUI() {
+// ======================export function initRouteUI() {
   listaRota = document.getElementById('lista-rota');
 }
 
@@ -73,7 +68,6 @@ export function renderizarRota() {
     }
   }
 
-  // Proteções de segurança
   if (typeof HOTELS === 'undefined' || typeof state === 'undefined') {
     console.error('❌ HOTELS ou state não estão definidos!');
     return;
@@ -112,7 +106,9 @@ export function renderizarRota() {
       salvarEstadoApp?.();
     });
 
-    // DRAG AND DROP MOBILE
+    // ======================
+    // DRAG AND DROP
+    // ======================
     const dragHandle = item.querySelector('.drag');
     let itemArrastando = null;
 
@@ -151,11 +147,16 @@ export function renderizarRota() {
         }
       });
 
-      if (indiceDestino === null) indiceDestino = state.routeOrder.length - 1;
+      if (indiceDestino === null) {
+        indiceDestino = state.routeOrder.length - 1;
+      }
 
       const indiceOrigem = state.routeOrder.indexOf(id);
-      if (indiceDestino !== indiceOrigem) {
-        state.routeOrder.splice(indiceDestino, 0, state.routeOrder.splice(indiceOrigem, 1)[0]);
+
+      // CORREÇÃO: Lógica de reordenação mais segura
+      if (indiceDestino !== indiceOrigem && indiceDestino !== null) {
+        const [hotelMovido] = state.routeOrder.splice(indiceOrigem, 1);
+        state.routeOrder.splice(indiceDestino, 0, hotelMovido);
       }
 
       itemArrastando.classList.remove('dragging-mobile');
