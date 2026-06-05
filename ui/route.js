@@ -56,6 +56,10 @@ from '../storage/storage.js';
 
 
 // ======================
+// VARIÁVEIS LOCAIS
+// ======================
+let listaRota = null;
+
 export function initRouteUI() {
   listaRota = document.getElementById('lista-rota');
 }
@@ -154,9 +158,9 @@ export function renderizarRota() {
 
       const indiceOrigem = state.routeOrder.indexOf(id);
 
-      // CORREÇÃO: Lógica de reordenação mais segura
+      // ✅ CORREÇÃO FINAL - Lógica segura
       if (indiceDestino !== indiceOrigem && indiceDestino !== null) {
-        const [hotelMovido] = state.routeOrder.splice(indiceOrigem, 1);
+        const hotelMovido = state.routeOrder.splice(indiceOrigem, 1)[0];
         state.routeOrder.splice(indiceDestino, 0, hotelMovido);
       }
 
@@ -169,9 +173,7 @@ export function renderizarRota() {
     listaRota.appendChild(item);
   });
 
-  // ======================
   // SINCRONIZAR RELATÓRIO
-  // ======================
   if (state.routeReport) {
     state.routeReport = state.routeOrder.map(id => {
       const relatorioExistente = state.routeReport.find(r => r.id === id);
@@ -189,7 +191,6 @@ export function renderizarRota() {
 
   if (typeof atualizarContadores === 'function') atualizarContadores();
   if (typeof renderizarRelatorio === 'function') renderizarRelatorio();
-
   salvarEstadoApp?.();
 
   // ======================
