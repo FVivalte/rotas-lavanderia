@@ -4,11 +4,32 @@
 // IMPORTS NECESSÁRIOS
 // ======================
 import {
-  limparMapaRota,
+  HOTELS
+}
+from '../data/dados.js';
+import {
+  state
+}
+from '../core/state.js';
+
+import {
+
+  listaRota,
+  contadorSelecao,
+  contadorRota
+
+}
+from './elements.js';
+
+import {
+
   inicializarMapaRota,
-  adicionarMarcadoresSequencia,
   desenharRotaPlanejada,
-  ajustarMapaRota
+  ajustarMapaRota,
+  adicionarMarcadoresSequencia,
+  atualizarMarcadoresStatus,
+  limparMapaRota
+
 } from '../services/map.js';
 
 import {  
@@ -20,9 +41,19 @@ import {
   renderizarRelatorio 
 } from './report.js'; 
 import { 
-  atualizarContadores
-} from './selection.js'; // ← Ajuste o caminho se necessário
-// import { renderizarSelecao } from './selection.js'; // se precisar
+  atualizarContadores, 
+  renderizarSelecao
+} from './selection.js'; 
+
+import {
+
+  salvarEstadoApp
+
+}
+from '../storage/storage.js';
+
+
+
 
 let listaRota = null;   // Variável local para evitar erro
 
