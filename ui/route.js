@@ -13,7 +13,12 @@ import {
 } from '../services/map.js';
 
 // Se atualizarContadores e renderizarRelatorio estiverem em outro arquivo:
-import { atualizarContadores, renderizarRelatorio } from './report.js';   // ← Ajuste o caminho se necessário
+import {  
+  renderizarRelatorio 
+} from './report.js'; 
+import { 
+  atualizarContadores
+} from './selection.js'; // ← Ajuste o caminho se necessário
 // import { renderizarSelecao } from './selection.js'; // se precisar
 
 export function renderizarRota() {
