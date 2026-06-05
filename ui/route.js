@@ -13,7 +13,7 @@ import {
 
 import {  
   obterRotaCompleta 
-} from './osrm.js';
+} from '../services/osrm.js';
 
 // Se atualizarContadores e renderizarRelatorio estiverem em outro arquivo:
 import {  
