@@ -55,14 +55,28 @@ from '../storage/storage.js';
 
 
 
-let listaRota = null;   // Variável local para evitar erro
+// ======================
+// VARIÁVEIS
+// ======================
+let listaRota = null;
 
-// Função para inicializar a referência (chamada uma vez no init)
+// Inicializa a referência do elemento (chame isso no init.js)
 export function initRouteUI() {
   listaRota = document.getElementById('lista-rota');
 }
+
 export function renderizarRota() {
   if (!listaRota) {
+    listaRota = document.getElementById('lista-rota');
+    if (!listaRota) {
+      console.error('❌ Elemento #lista-rota não encontrado!');
+      return;
+    }
+  }
+
+  // Proteções de segurança
+  if (typeof HOTELS === 'undefined' || typeof state === 'undefined') {
+    console.error('❌ HOTELS ou state não estão definidos!');
     return;
   }
 
@@ -92,14 +106,14 @@ export function renderizarRota() {
 
     // REMOVER HOTEL
     item.querySelector('button').addEventListener('click', () => {
-      state.activeSet.delete(id);
+      state.activeSet?.delete(id);
       state.routeOrder = state.routeOrder.filter(x => x !== id);
-      renderizarSelecao();        // se der erro, comente esta linha temporariamente
+      if (typeof renderizarSelecao === 'function') renderizarSelecao();
       renderizarRota();
-      salvarEstadoApp();
+      salvarEstadoApp?.();
     });
 
-    // DRAG AND DROP MOBILE (mantido igual)
+    // DRAG AND DROP MOBILE
     const dragHandle = item.querySelector('.drag');
     let itemArrastando = null;
 
@@ -141,14 +155,14 @@ export function renderizarRota() {
       if (indiceDestino === null) indiceDestino = state.routeOrder.length - 1;
 
       const indiceOrigem = state.routeOrder.indexOf(id);
-      if (indiceDestino !== null && indiceDestino !== indiceOrigem) {
+      if (indiceDestino !== indiceOrigem) {
         state.routeOrder.splice(indiceDestino, 0, state.routeOrder.splice(indiceOrigem, 1)[0]);
       }
 
       itemArrastando.classList.remove('dragging-mobile');
       itemArrastando = null;
       renderizarRota();
-      salvarEstadoApp();
+      salvarEstadoApp?.();
     }, { passive: true });
 
     listaRota.appendChild(item);
@@ -157,12 +171,10 @@ export function renderizarRota() {
   // ======================
   // SINCRONIZAR RELATÓRIO
   // ======================
-  state.routeReport = state.routeOrder.map(id => {
-    const relatorioExistente = state.routeReport.find(r => r.id === id);
-    if (relatorioExistente) {
-      return relatorioExistente;
-    } else {
-      return {
+  if (state.routeReport) {
+    state.routeReport = state.routeOrder.map(id => {
+      const relatorioExistente = state.routeReport.find(r => r.id === id);
+      return relatorioExistente || {
         id,
         arrival: null,
         departure: null,
@@ -171,21 +183,18 @@ export function renderizarRota() {
         deliveryPhotos: [],
         pickupPhotos: []
       };
-    }
-  });
+    });
+  }
 
-  // ======================
-  // CHAMADAS DE ATUALIZAÇÃO
-  // ======================
   if (typeof atualizarContadores === 'function') atualizarContadores();
   if (typeof renderizarRelatorio === 'function') renderizarRelatorio();
-  
-  salvarEstadoApp();
+
+  salvarEstadoApp?.();
 
   // ======================
-  // ATUALIZAÇÃO DO MAPA
+  // MAPA
   // ======================
-  limparMapaRota();
+  if (typeof limparMapaRota === 'function') limparMapaRota();
 
   const hoteisRota = state.routeOrder
     .map(id => HOTELS.find(h => h.id === id))
@@ -193,30 +202,26 @@ export function renderizarRota() {
 
   if (hoteisRota.length > 0) {
     setTimeout(() => {
-      const mapa = inicializarMapaRota();
+      const mapa = typeof inicializarMapaRota === 'function' ? inicializarMapaRota() : null;
       if (!mapa) return;
 
       mapa.resize();
 
       const desenharMapa = async () => {
-        console.log('🎯 HOTÉIS NA ROTA:', hoteisRota);
+        const rota = typeof obterRotaCompleta === 'function' 
+          ? await obterRotaCompleta(hoteisRota) 
+          : null;
 
-        const rota = await obterRotaCompleta(hoteisRota);
-
-        if (rota) {
+        if (rota && typeof desenharRotaPlanejada === 'function') {
           desenharRotaPlanejada(rota.coordinates);
 
-          const resumoHoteis = document.getElementById('resumo-hoteis');
-          const resumoDistancia = document.getElementById('resumo-distancia');
-          const resumoTempo = document.getElementById('resumo-tempo');
-
-          if (resumoHoteis) resumoHoteis.textContent = hoteisRota.length;
-          if (resumoDistancia) resumoDistancia.textContent = `${(rota.distance / 1000).toFixed(1)} km`;
-          if (resumoTempo) resumoTempo.textContent = `${Math.round(rota.duration / 60)} min`;
+          document.getElementById('resumo-hoteis')?.textContent = hoteisRota.length;
+          document.getElementById('resumo-distancia')?.textContent = `${(rota.distance / 1000).toFixed(1)} km`;
+          document.getElementById('resumo-tempo')?.textContent = `${Math.round(rota.duration / 60)} min`;
         }
 
-        adicionarMarcadoresSequencia(hoteisRota);
-        ajustarMapaRota(hoteisRota);
+        if (typeof adicionarMarcadoresSequencia === 'function') adicionarMarcadoresSequencia(hoteisRota);
+        if (typeof ajustarMapaRota === 'function') ajustarMapaRota(hoteisRota);
       };
 
       if (mapa.loaded()) {
@@ -224,6 +229,6 @@ export function renderizarRota() {
       } else {
         mapa.once('load', desenharMapa);
       }
-    }, 200);
+    }, 250);
   }
 }
