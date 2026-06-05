@@ -8,9 +8,12 @@ import {
   inicializarMapaRota,
   adicionarMarcadoresSequencia,
   desenharRotaPlanejada,
-  ajustarMapaRota,
-  obterRotaCompleta
+  ajustarMapaRota
 } from '../services/map.js';
+
+import {  
+  obterRotaCompleta 
+} from './osrm.js';
 
 // Se atualizarContadores e renderizarRelatorio estiverem em outro arquivo:
 import {  
