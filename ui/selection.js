@@ -82,11 +82,11 @@ console.log(
 );
   //teste acima
 
-  renderizarRota();
-
   mostrarTela(
     telaRota
   );
+
+  renderizarRota();
 
   salvarEstadoApp();
 
