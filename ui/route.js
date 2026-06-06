@@ -6,7 +6,6 @@
 import { HOTELS } from '../data/dados.js';
 import { state } from '../core/state.js';
 
-// ❌ CORREÇÃO 1: Removido o 'listaRota' daqui
 import {
   contadorSelecao,
   contadorRota
@@ -23,41 +22,110 @@ import {
 
 import { obterRotaCompleta } from '../services/osrm.js';
 
-import { renderizarRelatorio } from './report.js'; 
-import { 
-  atualizarContadores, 
+import { renderizarRelatorio } from './report.js';
+import {
+  atualizarContadores,
   renderizarSelecao
-} from './selection.js'; 
+} from './selection.js';
 
 import { salvarEstadoApp } from '../storage/storage.js';
 
 // ======================
 // VARIÁVEIS LOCAIS
 // ======================
-// ✅ CORREÇÃO 1: Agora esta é a única declaração de listaRota
 let listaRota = null;
+let _rafId    = null;   // controle de rAF — escopo do módulo, não da função
 
 export function initRouteUI() {
   listaRota = document.getElementById('lista-rota');
 }
 
-export function renderizarRota() {
-  if (!listaRota) {
-    listaRota = document.getElementById('lista-rota');
-    if (!listaRota) {
-      console.error('❌ Elemento #lista-rota não encontrado!');
-      return;
-    }
+// ======================
+// ATUALIZAR APENAS O MAPA
+// Chamado após remover/reordenar sem re-renderizar a lista
+// ======================
+export function atualizarMapaRota() {
+
+  const hoteisRota = state.routeOrder
+    .map(id => HOTELS.find(h => h.id === id))
+    .filter(Boolean);
+
+  const elResumoHoteis    = document.getElementById('resumo-hoteis');
+  const elResumoDistancia = document.getElementById('resumo-distancia');
+  const elResumoTempo     = document.getElementById('resumo-tempo');
+  if (elResumoHoteis)    elResumoHoteis.textContent    = hoteisRota.length;
+  if (elResumoDistancia) elResumoDistancia.textContent = '--';
+  if (elResumoTempo)     elResumoTempo.textContent     = '--';
+
+  // Cancela rAF anterior pendente
+  if (_rafId) {
+    cancelAnimationFrame(_rafId);
+    _rafId = null;
   }
 
-  if (typeof HOTELS === 'undefined' || typeof state === 'undefined') {
-    console.error('❌ HOTELS ou state não estão definidos!');
+  if (hoteisRota.length === 0) {
+    if (typeof limparMapaRota === 'function') limparMapaRota();
     return;
   }
 
-  listaRota.innerHTML = '';
+  // Snapshot imutável para este ciclo de render
+  const snapshot = [...hoteisRota];
 
-  const hoteisDaRota = HOTELS.filter(h => state.routeOrder.includes(h.id));
+  _rafId = requestAnimationFrame(() => {
+    _rafId = null;
+
+    const mapa = typeof inicializarMapaRota === 'function' ? inicializarMapaRota() : null;
+    if (!mapa) return;
+
+    mapa.resize();
+
+    const desenharNoMapa = async () => {
+
+      // Limpa e redesenha no mesmo contexto síncrono — sem janela vazia
+      if (typeof limparMapaRota === 'function') limparMapaRota();
+
+      // 1. Marcadores: síncronos, visíveis imediatamente
+      if (typeof adicionarMarcadoresSequencia === 'function') {
+        adicionarMarcadoresSequencia(snapshot);
+      }
+      if (typeof ajustarMapaRota === 'function') {
+        ajustarMapaRota(snapshot);
+      }
+
+      // 2. Linha de rota OSRM: async — marcadores já estão no mapa se falhar
+      try {
+        const rota = typeof obterRotaCompleta === 'function'
+          ? await obterRotaCompleta(snapshot)
+          : null;
+
+        if (rota && typeof desenharRotaPlanejada === 'function') {
+          desenharRotaPlanejada(rota.coordinates);
+          if (elResumoDistancia) elResumoDistancia.textContent = `${(rota.distance / 1000).toFixed(1)} km`;
+          if (elResumoTempo)     elResumoTempo.textContent     = `${Math.round(rota.duration / 60)} min`;
+        }
+      } catch (err) {
+        console.error('Erro ao obter rota OSRM:', err);
+      }
+    };
+
+    if (mapa.loaded()) {
+      desenharNoMapa();
+    } else {
+      mapa.once('load', () => desenharNoMapa());
+    }
+  });
+}
+
+// ======================
+// RENDERIZAR LISTA + MAPA
+// ======================
+export function renderizarRota() {
+  if (!listaRota) {
+    listaRota = document.getElementById('lista-rota');
+    if (!listaRota) return;
+  }
+
+  listaRota.innerHTML = '';
 
   state.routeOrder.forEach((id, idx) => {
     const hotel = HOTELS.find(h => h.id === id);
@@ -69,9 +137,7 @@ export function renderizarRota() {
     item.innerHTML = `
       <div>
         <strong>${idx + 1}. ${hotel.name}</strong>
-        <div class="muted" style="font-size:0.85rem">
-          ${hotel.address}
-        </div>
+        <div class="muted" style="font-size:0.85rem">${hotel.address}</div>
       </div>
       <div style="display:flex; gap:8px; align-items:center;">
         <span class="drag">⋮⋮</span>
@@ -79,12 +145,13 @@ export function renderizarRota() {
       </div>
     `;
 
-    // REMOVER HOTEL
+    // REMOVER — atualiza state, re-renderiza lista e mapa separadamente
     item.querySelector('button').addEventListener('click', () => {
       state.activeSet?.delete(id);
       state.routeOrder = state.routeOrder.filter(x => x !== id);
       if (typeof renderizarSelecao === 'function') renderizarSelecao();
-      renderizarRota();
+      renderizarRota();        // reconstrói a lista HTML
+      atualizarMapaRota();     // atualiza o mapa com o novo estado
       salvarEstadoApp?.();
     });
 
@@ -103,13 +170,11 @@ export function renderizarRota() {
       if (!itemArrastando) return;
       const posicaoY = e.touches[0].clientY;
       const items = [...listaRota.querySelectorAll('.route-item')];
-      
       items.forEach(other => {
         other.classList.remove('over');
         if (other === itemArrastando) return;
         const rect = other.getBoundingClientRect();
-        const meio = rect.top + rect.height / 2;
-        if (posicaoY < meio) other.classList.add('over');
+        if (posicaoY < rect.top + rect.height / 2) other.classList.add('over');
       });
     }, { passive: true });
 
@@ -124,8 +189,7 @@ export function renderizarRota() {
         other.classList.remove('over');
         if (other === itemArrastando) return;
         const rect = other.getBoundingClientRect();
-        const meio = rect.top + rect.height / 2;
-        if (posicaoY < meio && indiceDestino === null) {
+        if (posicaoY < rect.top + rect.height / 2 && indiceDestino === null) {
           indiceDestino = index;
         }
       });
@@ -136,39 +200,30 @@ export function renderizarRota() {
 
       const indiceOrigem = state.routeOrder.indexOf(id);
 
-      // ✅ CORREÇÃO 2: Lógica segura de índices para o splice
-      if (indiceDestino !== indiceOrigem && indiceDestino !== null) {
+      if (indiceDestino !== indiceOrigem) {
         const hotelMovido = state.routeOrder.splice(indiceOrigem, 1)[0];
-        
-        // Se o item foi movido de cima para baixo, o array encolheu. Precisamos ajustar o destino.
-        if (indiceDestino > indiceOrigem) {
-          indiceDestino--; 
-        }
-        
+        if (indiceDestino > indiceOrigem) indiceDestino--;
         state.routeOrder.splice(indiceDestino, 0, hotelMovido);
       }
 
       itemArrastando.classList.remove('dragging-mobile');
       itemArrastando = null;
-      renderizarRota();
+      renderizarRota();        // reconstrói a lista HTML com nova ordem
+      atualizarMapaRota();     // atualiza o mapa com a nova ordem
       salvarEstadoApp?.();
     }, { passive: true });
 
     listaRota.appendChild(item);
   });
 
-  // SINCRONIZAR RELATÓRIO
+  // Sincroniza relatório
   if (state.routeReport) {
     state.routeReport = state.routeOrder.map(id => {
-      const relatorioExistente = state.routeReport.find(r => r.id === id);
-      return relatorioExistente || {
-        id,
-        arrival: null,
-        departure: null,
-        entrega: false,
-        coleta: false,
-        deliveryPhotos: [],
-        pickupPhotos: []
+      const existente = state.routeReport.find(r => r.id === id);
+      return existente || {
+        id, arrival: null, departure: null,
+        entrega: false, coleta: false,
+        deliveryPhotos: [], pickupPhotos: []
       };
     });
   }
@@ -176,80 +231,4 @@ export function renderizarRota() {
   if (typeof atualizarContadores === 'function') atualizarContadores();
   if (typeof renderizarRelatorio === 'function') renderizarRelatorio();
   salvarEstadoApp?.();
-
-  // ======================
-  // MAPA
-  // ======================
-
-  const hoteisRota = state.routeOrder
-    .map(id => HOTELS.find(h => h.id === id))
-    .filter(Boolean);
-
-  // Atualiza o resumo imediatamente com o que já sabemos
-  const elResumoHoteis    = document.getElementById('resumo-hoteis');
-  const elResumoDistancia = document.getElementById('resumo-distancia');
-  const elResumoTempo     = document.getElementById('resumo-tempo');
-  if (elResumoHoteis)    elResumoHoteis.textContent    = hoteisRota.length;
-  if (elResumoDistancia) elResumoDistancia.textContent = '--';
-  if (elResumoTempo)     elResumoTempo.textContent     = '--';
-
-  if (hoteisRota.length > 0) {
-
-    // Cancela qualquer render anterior ainda pendente
-    if (renderizarRota._rafId) {
-      cancelAnimationFrame(renderizarRota._rafId);
-    }
-
-    // Snapshot dos hotéis neste momento — evita que um render
-    // posterior sobrescreva a lista enquanto awaita o OSRM
-    const snapshot = [...hoteisRota];
-
-    renderizarRota._rafId = requestAnimationFrame(() => {
-      renderizarRota._rafId = null;
-
-      const mapa = typeof inicializarMapaRota === 'function' ? inicializarMapaRota() : null;
-      if (!mapa) return;
-
-      mapa.resize();
-
-      const desenharNoMapa = async () => {
-
-        // Limpa AQUI — dentro do rAF, após resize, antes de redesenhar
-        // Garante que não há janela entre limpar e adicionar marcadores
-        if (typeof limparMapaRota === 'function') limparMapaRota();
-
-        // 1. Marcadores: síncronos, aparecem imediatamente
-        if (typeof adicionarMarcadoresSequencia === 'function') {
-          adicionarMarcadoresSequencia(snapshot);
-        }
-        if (typeof ajustarMapaRota === 'function') {
-          ajustarMapaRota(snapshot);
-        }
-
-        // 2. Rota OSRM: async — marcadores já estão visíveis se isso falhar
-        try {
-          const rota = typeof obterRotaCompleta === 'function'
-            ? await obterRotaCompleta(snapshot)
-            : null;
-
-          if (rota && typeof desenharRotaPlanejada === 'function') {
-            desenharRotaPlanejada(rota.coordinates);
-            if (elResumoDistancia) elResumoDistancia.textContent = `${(rota.distance / 1000).toFixed(1)} km`;
-            if (elResumoTempo)     elResumoTempo.textContent     = `${Math.round(rota.duration / 60)} min`;
-          }
-        } catch (err) {
-          console.error('Erro ao obter rota OSRM:', err);
-        }
-      };
-
-      if (mapa.loaded()) {
-        desenharNoMapa();
-      } else {
-        mapa.once('load', () => desenharNoMapa());
-      }
-    });
-  } else {
-    // Lista vazia — só limpa o mapa
-    if (typeof limparMapaRota === 'function') limparMapaRota();
-  }
 }
