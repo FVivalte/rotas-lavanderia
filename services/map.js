@@ -249,10 +249,17 @@ export function desenharRotaOSRM(
 
 export function inicializarMapaRota(){
 
+  // Se já existe E o container ainda está no DOM, reutiliza
   if(mapas['mapa-rota']){
-
-    return mapas['mapa-rota'];
-
+    const container = document.getElementById('mapa-rota');
+    // Verifica se o canvas do mapa ainda está dentro do container
+    if(container && container.querySelector('canvas')){
+      return mapas['mapa-rota'];
+    }
+    // Container foi re-montado (tela ocultada/exibida via innerHTML)
+    // Destrói a instância antiga para recriar
+    try { mapas['mapa-rota'].remove(); } catch(e) {}
+    delete mapas['mapa-rota'];
   }
 
   return inicializarMapa(
@@ -263,7 +270,7 @@ export function inicializarMapaRota(){
 
 export function desenharRotaPlanejada(coordenadas = []) {
   const map = mapas['mapa-rota'];
-  if (!map) return;
+  if (!map || !map.loaded()) return;
 
   const geojson = {
     type: 'Feature',
@@ -273,19 +280,28 @@ export function desenharRotaPlanejada(coordenadas = []) {
     }
   };
 
-  // Se a source existe, apenas atualiza
+  // Se a source existe, apenas atualiza os dados
   if (map.getSource('rota-planejada')) {
     map.getSource('rota-planejada').setData(geojson);
   } else {
-    // Se não existe, cria a source
+    // Source não existe: cria source + layer juntos
     map.addSource('rota-planejada', {
       type: 'geojson',
       data: geojson
     });
+    map.addLayer({
+      id: 'rota-planejada',
+      type: 'line',
+      source: 'rota-planejada',
+      paint: {
+        'line-color': '#0b63b7',
+        'line-width': 5
+      }
+    });
+    return; // layer já criada, sai
   }
 
-  // CRÍTICO: Sempre verifique se a layer existe. Se não existir, crie-a.
-  // Isso resolve o problema de quando você deleta a layer no limparMapaRota
+  // Garante que a layer existe mesmo que a source já existisse
   if (!map.getLayer('rota-planejada')) {
     map.addLayer({
       id: 'rota-planejada',
