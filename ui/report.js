@@ -220,7 +220,7 @@ export async function renderizarRelatorioFinal(
   if(tituloRelatorio){
 
     tituloRelatorio.textContent =
-      obterTituloData();
+      getFormattedDateTitle();
 
   }
 
