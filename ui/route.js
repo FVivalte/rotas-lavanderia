@@ -74,45 +74,49 @@ export function atualizarMapaRota() {
   _rafId = requestAnimationFrame(() => {
     _rafId = null;
 
-    const mapa = typeof inicializarMapaRota === 'function' ? inicializarMapaRota() : null;
-    if (!mapa) return;
+    // Pequeno delay para garantir que display:none foi removido
+    // e o browser recalculou o layout antes do resize()
+    setTimeout(() => {
+      const mapa = typeof inicializarMapaRota === 'function' ? inicializarMapaRota() : null;
+      if (!mapa) return;
 
-    mapa.resize();
+      mapa.resize();
 
-    const desenharNoMapa = async () => {
+      const desenharNoMapa = async () => {
 
-      // Limpa e redesenha no mesmo contexto síncrono — sem janela vazia
-      if (typeof limparMapaRota === 'function') limparMapaRota();
+        // Limpa marcadores e linha da rota
+        if (typeof limparMapaRota === 'function') limparMapaRota();
 
-      // 1. Marcadores: síncronos, visíveis imediatamente
-      if (typeof adicionarMarcadoresSequencia === 'function') {
-        adicionarMarcadoresSequencia(snapshot);
-      }
-      if (typeof ajustarMapaRota === 'function') {
-        ajustarMapaRota(snapshot);
-      }
-
-      // 2. Linha de rota OSRM: async — marcadores já estão no mapa se falhar
-      try {
-        const rota = typeof obterRotaCompleta === 'function'
-          ? await obterRotaCompleta(snapshot)
-          : null;
-
-        if (rota && typeof desenharRotaPlanejada === 'function') {
-          desenharRotaPlanejada(rota.coordinates);
-          if (elResumoDistancia) elResumoDistancia.textContent = `${(rota.distance / 1000).toFixed(1)} km`;
-          if (elResumoTempo)     elResumoTempo.textContent     = `${Math.round(rota.duration / 60)} min`;
+        // 1. Marcadores: síncronos, visíveis imediatamente
+        if (typeof adicionarMarcadoresSequencia === 'function') {
+          adicionarMarcadoresSequencia(snapshot);
         }
-      } catch (err) {
-        console.error('Erro ao obter rota OSRM:', err);
-      }
-    };
+        if (typeof ajustarMapaRota === 'function') {
+          ajustarMapaRota(snapshot);
+        }
 
-    if (mapa.loaded()) {
-      desenharNoMapa();
-    } else {
-      mapa.once('load', () => desenharNoMapa());
-    }
+        // 2. Linha de rota OSRM: async — marcadores já estão no mapa se falhar
+        try {
+          const rota = typeof obterRotaCompleta === 'function'
+            ? await obterRotaCompleta(snapshot)
+            : null;
+
+          if (rota && typeof desenharRotaPlanejada === 'function') {
+            desenharRotaPlanejada(rota.coordinates);
+            if (elResumoDistancia) elResumoDistancia.textContent = `${(rota.distance / 1000).toFixed(1)} km`;
+            if (elResumoTempo)     elResumoTempo.textContent     = `${Math.round(rota.duration / 60)} min`;
+          }
+        } catch (err) {
+          console.error('Erro ao obter rota OSRM:', err);
+        }
+      };
+
+      if (mapa.loaded()) {
+        desenharNoMapa();
+      } else {
+        mapa.once('load', () => desenharNoMapa());
+      }
+    }, 50); // 50ms garante que o layout foi recalculado após remover hidden
   });
 }
 
@@ -187,7 +191,7 @@ export function renderizarRota() {
       items.forEach((other, index) => {
         other.classList.remove('over');
         if (other === itemArrastando) return;
-        const rect = other.getBoundingClientRect();
+        const rect = other.getBoundingClientRect();;
         if (posicaoY < rect.top + rect.height / 2 && indiceDestino === null) {
           indiceDestino = index;
         }
