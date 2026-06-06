@@ -110,9 +110,7 @@ hoteisCustomizados.forEach(h => {
 // ESTADO APP
 // =========================
 
-export function salvarEstadoApp(
-  telaAtual
-){
+export function salvarEstadoApp(){
 
   const data = {
 
@@ -135,7 +133,7 @@ export function salvarEstadoApp(
       state.currentIndex,
 
     currentScreen:
-      telaAtual
+      state.currentScreen
 
   };
 
