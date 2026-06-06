@@ -105,6 +105,8 @@ from '../storage/database.js';
 
 // No topo do events.js, junto com os outros imports
 import {
+  getMapa,
+  mapas,
   adicionarMarcadoresSequencia,
   desenharRotaPlanejada,
   ajustarMapaRota,
@@ -174,8 +176,7 @@ if(btnFollow){
     'click',
     ()=>{
 
-      const map =
-        mapas['mapa'];
+      const map = getMapa('mapa');
 
       if(
         !map ||
@@ -239,10 +240,10 @@ if(btnIniciarRota){
       mostrarTela(
         telaNavegacao
       );
-      if (mapas['mapa']) {
+      if (getMapa('mapa')) {
     setTimeout(() => {
-        mapas['mapa'].resize();
-    }, 150); // O tempo garante que o CSS terminou de processar
+        getMapa('mapa').resize();
+    }, 150);
 }
 
     }
