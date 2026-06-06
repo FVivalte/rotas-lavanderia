@@ -187,39 +187,43 @@ export function renderizarRota() {
     .filter(Boolean);
 
   if (hoteisRota.length > 0) {
-    setTimeout(() => {
+
+    const desenharMapa = async (mapa) => {
+      const rota = typeof obterRotaCompleta === 'function'
+        ? await obterRotaCompleta(hoteisRota)
+        : null;
+
+      if (rota && typeof desenharRotaPlanejada === 'function') {
+        desenharRotaPlanejada(rota.coordinates);
+
+        const elResumoHoteis    = document.getElementById('resumo-hoteis');
+        const elResumoDistancia = document.getElementById('resumo-distancia');
+        const elResumoTempo     = document.getElementById('resumo-tempo');
+
+        if (elResumoHoteis)    elResumoHoteis.textContent    = hoteisRota.length;
+        if (elResumoDistancia) elResumoDistancia.textContent = `${(rota.distance / 1000).toFixed(1)} km`;
+        if (elResumoTempo)     elResumoTempo.textContent     = `${Math.round(rota.duration / 60)} min`;
+      }
+
+      if (typeof adicionarMarcadoresSequencia === 'function') adicionarMarcadoresSequencia(hoteisRota);
+      if (typeof ajustarMapaRota === 'function') ajustarMapaRota(hoteisRota);
+    };
+
+    // requestAnimationFrame garante que o browser já calculou o layout
+    // e o container #mapa-rota tem dimensões reais antes do resize()
+    requestAnimationFrame(() => {
       const mapa = typeof inicializarMapaRota === 'function' ? inicializarMapaRota() : null;
       if (!mapa) return;
 
       mapa.resize();
 
-      const desenharMapa = async () => {
-        const rota = typeof obterRotaCompleta === 'function' 
-          ? await obterRotaCompleta(hoteisRota) 
-          : null;
-
-if (rota && typeof desenharRotaPlanejada === 'function') {
-  desenharRotaPlanejada(rota.coordinates);
-
-  // ✅ CORREÇÃO: Buscando os elementos primeiro e atribuindo apenas se existirem
-  const elResumoHoteis = document.getElementById('resumo-hoteis');
-  const elResumoDistancia = document.getElementById('resumo-distancia');
-  const elResumoTempo = document.getElementById('resumo-tempo');
-
-  if (elResumoHoteis) elResumoHoteis.textContent = hoteisRota.length;
-  if (elResumoDistancia) elResumoDistancia.textContent = `${(rota.distance / 1000).toFixed(1)} km`;
-  if (elResumoTempo) elResumoTempo.textContent = `${Math.round(rota.duration / 60)} min`;
-}
-
-        if (typeof adicionarMarcadoresSequencia === 'function') adicionarMarcadoresSequencia(hoteisRota);
-        if (typeof ajustarMapaRota === 'function') ajustarMapaRota(hoteisRota);
-      };
-
       if (mapa.loaded()) {
-        desenharMapa();
+        // Mapa já carregado (segunda rota em diante): desenha direto
+        desenharMapa(mapa);
       } else {
-        mapa.once('load', desenharMapa);
+        // Primeira vez: aguarda o load completo do estilo/tiles
+        mapa.once('load', () => desenharMapa(mapa));
       }
-    }, 250);
+    });
   }
 }
