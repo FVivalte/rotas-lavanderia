@@ -38,7 +38,8 @@ import {
 from '../storage/storage.js';
 
 import {
-  renderizarRota
+  renderizarRota,
+  atualizarMapaRota
 }
 from './route.js';
 
@@ -70,23 +71,14 @@ export function gerarRota(){
 
   state.routeOrder =
     ativos.map(h => h.id);
-  //teste abaixo
-  console.log(
-  'ATIVOS:',
-  ativos.length
-);
-
-console.log(
-  'ROUTE ORDER:',
-  state.routeOrder
-);
-  //teste acima
 
   mostrarTela(
     telaRota
   );
 
   renderizarRota();
+
+  atualizarMapaRota();
 
   salvarEstadoApp();
 
