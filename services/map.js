@@ -386,23 +386,27 @@ export function limparMapaRota(){
 
   const map = mapas['mapa-rota'];
 
-  // Remove marcadores numerados (adicionarMarcadoresSequencia)
-  marcadoresSequencia.forEach(m => m.remove());
+  // Remove marcadores numerados do DOM
+  marcadoresSequencia.forEach(m => {
+    try { m.remove(); } catch(e) {}
+  });
   marcadoresSequencia = [];
 
-  // Remove marcadores de status (atualizarMarcadoresStatus)
-  marcadoresStatus.forEach(m => m.remove());
+  // Remove marcadores de status do DOM
+  marcadoresStatus.forEach(m => {
+    try { m.remove(); } catch(e) {}
+  });
   marcadoresStatus = [];
 
-  if(!map) return;
+  if(!map || !map.loaded()) return;
 
-  // Remove layer antes da source (ordem obrigatória no MapLibre)
-  if(map.getLayer('rota-planejada')){
-    map.removeLayer('rota-planejada');
-  }
-
+  // Limpa a linha da rota sem remover source/layer
+  // setData com LineString vazia é mais seguro que removeLayer+removeSource
   if(map.getSource('rota-planejada')){
-    map.removeSource('rota-planejada');
+    map.getSource('rota-planejada').setData({
+      type: 'Feature',
+      geometry: { type: 'LineString', coordinates: [] }
+    });
   }
 
 }
