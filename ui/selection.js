@@ -99,15 +99,16 @@ console.log(
 
 export function atualizarContadores(){
 
-  const texto = `${state.activeSet.size} hotéis ativos`;
-
-  // Só injeta o texto se o contador existir
+  // tela de seleção: quantos estão marcados
   if (contadorSelecao) {
-    contadorSelecao.textContent = texto;
+    contadorSelecao.textContent =
+      `${state.activeSet.size} hotéis ativos`;
   }
 
+  // tela de rota: quantos estão na rota atual
   if (contadorRota) {
-    contadorRota.textContent = texto;
+    contadorRota.textContent =
+      `${state.routeOrder.length} hotéis na rota`;
   }
 
 }
