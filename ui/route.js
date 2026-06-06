@@ -33,8 +33,10 @@ import { salvarEstadoApp } from '../storage/storage.js';
 // ======================
 // VARIÁVEIS LOCAIS
 // ======================
-let listaRota = null;
-let _rafId    = null;   // controle de rAF — escopo do módulo, não da função
+let listaRota    = null;
+let _rafId       = null;  // cancela requestAnimationFrame pendente
+let _timeoutId   = null;  // cancela setTimeout pendente
+let _renderToken = 0;     // incrementa a cada render; invalida renders antigos
 
 export function initRouteUI() {
   listaRota = document.getElementById('lista-rota');
@@ -42,7 +44,6 @@ export function initRouteUI() {
 
 // ======================
 // ATUALIZAR APENAS O MAPA
-// Chamado após remover/reordenar sem re-renderizar a lista
 // ======================
 export function atualizarMapaRota() {
 
@@ -57,51 +58,55 @@ export function atualizarMapaRota() {
   if (elResumoDistancia) elResumoDistancia.textContent = '--';
   if (elResumoTempo)     elResumoTempo.textContent     = '--';
 
-  // Cancela rAF anterior pendente
-  if (_rafId) {
-    cancelAnimationFrame(_rafId);
-    _rafId = null;
-  }
+  // Cancela qualquer render anterior que ainda não executou
+  if (_rafId)     { cancelAnimationFrame(_rafId); _rafId = null; }
+  if (_timeoutId) { clearTimeout(_timeoutId);     _timeoutId = null; }
+
+  // Incrementa o token — renders iniciados antes deste ponto são inválidos
+  const meuToken = ++_renderToken;
 
   if (hoteisRota.length === 0) {
-    if (typeof limparMapaRota === 'function') limparMapaRota();
+    limparMapaRota();
     return;
   }
 
-  // Snapshot imutável para este ciclo de render
+  // Snapshot imutável para este ciclo
   const snapshot = [...hoteisRota];
 
   _rafId = requestAnimationFrame(() => {
     _rafId = null;
 
-    // Pequeno delay para garantir que display:none foi removido
-    // e o browser recalculou o layout antes do resize()
-    setTimeout(() => {
-      const mapa = typeof inicializarMapaRota === 'function' ? inicializarMapaRota() : null;
+    // 50ms: garante que o browser recalculou o layout após remover .hidden
+    _timeoutId = setTimeout(() => {
+      _timeoutId = null;
+
+      // Se uma chamada mais nova chegou enquanto esperávamos, descarta este render
+      if (meuToken !== _renderToken) return;
+
+      const mapa = inicializarMapaRota();
       if (!mapa) return;
 
       mapa.resize();
 
       const desenharNoMapa = async () => {
+        // Verifica token novamente antes de tocar no DOM do mapa
+        if (meuToken !== _renderToken) return;
 
-        // Limpa marcadores e linha da rota
-        if (typeof limparMapaRota === 'function') limparMapaRota();
+        // Limpa marcadores e linha antiga
+        limparMapaRota();
 
-        // 1. Marcadores: síncronos, visíveis imediatamente
-        if (typeof adicionarMarcadoresSequencia === 'function') {
-          adicionarMarcadoresSequencia(snapshot);
-        }
-        if (typeof ajustarMapaRota === 'function') {
-          ajustarMapaRota(snapshot);
-        }
+        // 1. Marcadores numerados — síncronos, visíveis imediatamente
+        adicionarMarcadoresSequencia(snapshot);
+        ajustarMapaRota(snapshot);
 
-        // 2. Linha de rota OSRM: async — marcadores já estão no mapa se falhar
+        // 2. Linha OSRM — assíncrona
         try {
-          const rota = typeof obterRotaCompleta === 'function'
-            ? await obterRotaCompleta(snapshot)
-            : null;
+          const rota = await obterRotaCompleta(snapshot);
 
-          if (rota && typeof desenharRotaPlanejada === 'function') {
+          // Verifica token após await — pode ter chegado nova rota durante a requisição
+          if (meuToken !== _renderToken) return;
+
+          if (rota) {
             desenharRotaPlanejada(rota.coordinates);
             if (elResumoDistancia) elResumoDistancia.textContent = `${(rota.distance / 1000).toFixed(1)} km`;
             if (elResumoTempo)     elResumoTempo.textContent     = `${Math.round(rota.duration / 60)} min`;
@@ -114,9 +119,12 @@ export function atualizarMapaRota() {
       if (mapa.loaded()) {
         desenharNoMapa();
       } else {
-        mapa.once('load', () => desenharNoMapa());
+        mapa.once('load', () => {
+          if (meuToken !== _renderToken) return;
+          desenharNoMapa();
+        });
       }
-    }, 50); // 50ms garante que o layout foi recalculado após remover hidden
+    }, 50);
   });
 }
 
@@ -149,7 +157,7 @@ export function renderizarRota() {
       </div>
     `;
 
-    // REMOVER — atualiza state, re-renderiza lista
+    // REMOVER
     item.querySelector('button').addEventListener('click', () => {
       state.activeSet?.delete(id);
       state.routeOrder = state.routeOrder.filter(x => x !== id);
@@ -191,7 +199,7 @@ export function renderizarRota() {
       items.forEach((other, index) => {
         other.classList.remove('over');
         if (other === itemArrastando) return;
-        const rect = other.getBoundingClientRect();;
+        const rect = other.getBoundingClientRect();
         if (posicaoY < rect.top + rect.height / 2 && indiceDestino === null) {
           indiceDestino = index;
         }
@@ -234,6 +242,6 @@ export function renderizarRota() {
   if (typeof renderizarRelatorio === 'function') renderizarRelatorio();
   salvarEstadoApp?.();
 
-  // Mapa sempre atualizado no fim — um único ponto de controle
+  // Mapa — único ponto de controle
   atualizarMapaRota();
 }
