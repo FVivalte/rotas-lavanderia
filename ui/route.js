@@ -180,7 +180,6 @@ export function renderizarRota() {
   // ======================
   // MAPA
   // ======================
-  if (typeof limparMapaRota === 'function') limparMapaRota();
 
   const hoteisRota = state.routeOrder
     .map(id => HOTELS.find(h => h.id === id))
@@ -196,25 +195,41 @@ export function renderizarRota() {
 
   if (hoteisRota.length > 0) {
 
-    requestAnimationFrame(() => {
+    // Cancela qualquer render anterior ainda pendente
+    if (renderizarRota._rafId) {
+      cancelAnimationFrame(renderizarRota._rafId);
+    }
+
+    // Snapshot dos hotéis neste momento — evita que um render
+    // posterior sobrescreva a lista enquanto awaita o OSRM
+    const snapshot = [...hoteisRota];
+
+    renderizarRota._rafId = requestAnimationFrame(() => {
+      renderizarRota._rafId = null;
+
       const mapa = typeof inicializarMapaRota === 'function' ? inicializarMapaRota() : null;
       if (!mapa) return;
 
       mapa.resize();
 
       const desenharNoMapa = async () => {
-        // 1. Marcadores: imediatos, independentes do OSRM
+
+        // Limpa AQUI — dentro do rAF, após resize, antes de redesenhar
+        // Garante que não há janela entre limpar e adicionar marcadores
+        if (typeof limparMapaRota === 'function') limparMapaRota();
+
+        // 1. Marcadores: síncronos, aparecem imediatamente
         if (typeof adicionarMarcadoresSequencia === 'function') {
-          adicionarMarcadoresSequencia(hoteisRota);
+          adicionarMarcadoresSequencia(snapshot);
         }
         if (typeof ajustarMapaRota === 'function') {
-          ajustarMapaRota(hoteisRota);
+          ajustarMapaRota(snapshot);
         }
 
-        // 2. Rota OSRM: async — se falhar, marcadores já estão no mapa
+        // 2. Rota OSRM: async — marcadores já estão visíveis se isso falhar
         try {
           const rota = typeof obterRotaCompleta === 'function'
-            ? await obterRotaCompleta(hoteisRota)
+            ? await obterRotaCompleta(snapshot)
             : null;
 
           if (rota && typeof desenharRotaPlanejada === 'function') {
@@ -233,5 +248,8 @@ export function renderizarRota() {
         mapa.once('load', () => desenharNoMapa());
       }
     });
+  } else {
+    // Lista vazia — só limpa o mapa
+    if (typeof limparMapaRota === 'function') limparMapaRota();
   }
 }
