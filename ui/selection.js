@@ -76,9 +76,7 @@ export function gerarRota(){
     telaRota
   );
 
-  renderizarRota();
-
-  atualizarMapaRota();
+  renderizarRota(); // ← já chama atualizarMapaRota() internamente
 
   salvarEstadoApp();
 
