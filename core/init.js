@@ -109,7 +109,7 @@ export async function iniciarApp(){
 
     switch(state.currentScreen){
 
-      case 'route':
+      case 'tela-rota':
 
         mostrarTela(
           telaRota
@@ -117,7 +117,7 @@ export async function iniciarApp(){
 
         break;
 
-      case 'mode':
+      case 'tela-navegacao':
 
         mostrarTela(
           telaNavegacao
@@ -129,7 +129,7 @@ export async function iniciarApp(){
 
         break;
 
-      case 'report':
+      case 'tela-relatorio':
 
         mostrarTela(
           telaRelatorio
