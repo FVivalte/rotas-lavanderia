@@ -68,24 +68,11 @@ from '../storage/storage.js';
 // ======================
 
 export function iniciarModoRota(){
-  
+
   if(toggleVoz){
-
-  toggleVoz.checked = false;
-
-  toggleVoz.addEventListener(
-    'change',
-    ()=>{
-
-      state.voiceNavigation =
-        toggleVoz.checked;
-
-      salvarEstadoApp();
-
-    }
-  );
-
-}
+    toggleVoz.checked = false;
+    state.voiceNavigation = false;
+  }
   if(
     state.routeOrder.length === 0
   ){
