@@ -36,6 +36,8 @@ export const state = {
 
   mapInitialized: false,
 
+  cameraFollowing: true,
+
   voiceNavigation: false,
  
   lastInstruction: '',
