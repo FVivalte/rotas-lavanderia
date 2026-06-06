@@ -8,6 +8,8 @@ import {
 }
 from '../services/map.js';
 
+import { configurarListenersCamera } from '../services/map-camera.js';
+
 import {
   HOTELS
 }
@@ -119,6 +121,8 @@ export function iniciarModoRota(){
 
   state.mapInitialized = false;
 
+  state.cameraFollowing = true;
+
   const primeiroHotel =
   HOTELS.find(h =>
     h.id === state.routeOrder[0]
@@ -152,6 +156,7 @@ export function iniciarModoRota(){
 
   if (mapa) {
     mapa.resize();
+    configurarListenersCamera(mapa);
   }
 
 }, 300);
