@@ -493,7 +493,7 @@ if(btnGoogleMaps){
       if(!hotel) return;
 
       window.open(
-        `https://www.google.com/maps?q=${hotel.coords}`,
+        `https://www.google.com/maps?q=${hotel.lat},${hotel.lng}`,
         '_blank'
       );
 
