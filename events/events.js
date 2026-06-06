@@ -513,6 +513,9 @@ if(toggleVoz){
     'change',
     ()=>{
 
+      state.voiceNavigation =
+        toggleVoz.checked;
+
       state.speechEnabled =
         toggleVoz.checked;
 
