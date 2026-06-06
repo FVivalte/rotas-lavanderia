@@ -185,6 +185,8 @@ if(btnFollow){
         return;
       }
 
+      state.cameraFollowing = true;
+
       map.flyTo({
 
         center:[
