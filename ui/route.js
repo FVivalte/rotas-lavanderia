@@ -145,13 +145,12 @@ export function renderizarRota() {
       </div>
     `;
 
-    // REMOVER — atualiza state, re-renderiza lista e mapa separadamente
+    // REMOVER — atualiza state, re-renderiza lista
     item.querySelector('button').addEventListener('click', () => {
       state.activeSet?.delete(id);
       state.routeOrder = state.routeOrder.filter(x => x !== id);
       if (typeof renderizarSelecao === 'function') renderizarSelecao();
-      renderizarRota();        // reconstrói a lista HTML
-      atualizarMapaRota();     // atualiza o mapa com o novo estado
+      renderizarRota();
       salvarEstadoApp?.();
     });
 
@@ -208,8 +207,7 @@ export function renderizarRota() {
 
       itemArrastando.classList.remove('dragging-mobile');
       itemArrastando = null;
-      renderizarRota();        // reconstrói a lista HTML com nova ordem
-      atualizarMapaRota();     // atualiza o mapa com a nova ordem
+      renderizarRota();
       salvarEstadoApp?.();
     }, { passive: true });
 
@@ -231,4 +229,7 @@ export function renderizarRota() {
   if (typeof atualizarContadores === 'function') atualizarContadores();
   if (typeof renderizarRelatorio === 'function') renderizarRelatorio();
   salvarEstadoApp?.();
+
+  // Mapa sempre atualizado no fim — um único ponto de controle
+  atualizarMapaRota();
 }
