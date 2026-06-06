@@ -2,7 +2,8 @@
 
 import {
   carregarEstadoApp,
-  restaurarEstadoApp
+  restaurarEstadoApp,
+  carregarHoteisCustomizados
 }
 from '../storage/storage.js';
 
@@ -75,6 +76,8 @@ export async function iniciarApp(){
     // ======================
     // STORAGE
     // ======================
+
+    carregarHoteisCustomizados();
 
     carregarEstadoApp();
 
