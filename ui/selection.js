@@ -37,11 +37,7 @@ import {
 }
 from '../storage/storage.js';
 
-import {
-  renderizarRota,
-  atualizarMapaRota
-}
-from './route.js';
+import { renderizarRota, atualizarMapa } from './route.js';
 
 import {
   mostrarTela
@@ -76,7 +72,8 @@ export function gerarRota(){
     telaRota
   );
 
-  renderizarRota(); // ← já chama atualizarMapaRota() internamente
+  renderizarRota();
+  atualizarMapa();
 
   salvarEstadoApp();
 
