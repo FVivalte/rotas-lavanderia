@@ -46,10 +46,7 @@ import { gerarRota,
   renderizarSelecao
 } from '../ui/selection.js';
 
-import {
-  renderizarRota
-}
-from '../ui/route.js';
+import { renderizarRota, atualizarMapa, ordenarAuto } from '../ui/route.js';
 
 
 import {
@@ -224,6 +221,18 @@ if(btnVoltar){
     }
   );
 
+}
+
+
+// ======================
+// ORDEM AUTO
+// ======================
+
+const btnOrdemAuto = document.getElementById('btn-ordem-auto');
+if(btnOrdemAuto){
+  btnOrdemAuto.addEventListener('click', () => {
+    ordenarAuto();
+  });
 }
 
 
