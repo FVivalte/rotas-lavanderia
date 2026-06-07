@@ -247,25 +247,62 @@ export function desenharRotaOSRM(
 // MAPA DA TELA 2
 // ======================
 
+// Cria o mapa-rota se ainda não existe, ou devolve o existente.
+// Responsabilidade única: instância do mapa. Não faz resize.
 export function inicializarMapaRota(){
 
-  // Se já existe E o container ainda está no DOM, reutiliza
-  if(mapas['mapa-rota']){
-    const container = document.getElementById('mapa-rota');
-    // Verifica se o canvas do mapa ainda está dentro do container
-    if(container && container.querySelector('canvas')){
-      return mapas['mapa-rota'];
-    }
-    // Container foi re-montado (tela ocultada/exibida via innerHTML)
-    // Destrói a instância antiga para recriar
+  const container = document.getElementById('mapa-rota');
+  if (!container) return null;
+
+  // Reutiliza se o canvas ainda está montado no container
+  if (mapas['mapa-rota'] && container.querySelector('canvas')) {
+    return mapas['mapa-rota'];
+  }
+
+  // Container foi recriado ou primeiro acesso — destroi instância velha
+  if (mapas['mapa-rota']) {
     try { mapas['mapa-rota'].remove(); } catch(e) {}
     delete mapas['mapa-rota'];
   }
 
-  return inicializarMapa(
-    'mapa-rota'
-  );
+  const map = new maplibregl.Map({
+    container: 'mapa-rota',
+    style: 'https://tiles.openfreemap.org/styles/liberty',
+    center: [-42.0541382, -22.8601498],
+    zoom: 12,
+    pitch: 0,
+    attributionControl: false
+  });
 
+  mapas['mapa-rota'] = map;
+  return map;
+}
+
+// Devolve uma Promise que resolve com o mapa já carregado E com
+// dimensões corretas — dois rAFs garantem que o browser processou
+// o layout antes do resize(), eliminando o bug de marcadores
+// fora do viewport após remover/reordenar hotéis.
+export function mapaRotaPronto() {
+  return new Promise((resolve, reject) => {
+
+    const mapa = inicializarMapaRota();
+    if (!mapa) { reject(new Error('container #mapa-rota não encontrado')); return; }
+
+    const continuar = () => {
+      requestAnimationFrame(() => {       // 1º rAF: CSS/visibilidade aplicados
+        requestAnimationFrame(() => {     // 2º rAF: layout calculado, dimensões reais
+          mapa.resize();
+          resolve(mapa);
+        });
+      });
+    };
+
+    if (mapa.loaded()) {
+      continuar();
+    } else {
+      mapa.once('load', continuar);
+    }
+  });
 }
 
 export function desenharRotaPlanejada(coordenadas = []) {
