@@ -237,6 +237,18 @@ if(btnOrdemAuto){
 
 
 // ======================
+// ATUALIZAR MAPA
+// ======================
+
+const btnAtualizarMapa = document.getElementById('btn-atualizar-mapa');
+if(btnAtualizarMapa){
+  btnAtualizarMapa.addEventListener('click', () => {
+    atualizarMapa();
+  });
+}
+
+
+// ======================
 // INICIAR ROTA
 // ======================
 
