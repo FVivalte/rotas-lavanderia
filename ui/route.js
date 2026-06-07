@@ -9,6 +9,7 @@ import { mostrarTela }   from './screens.js';
 import { telaNavegacao } from './elements.js';
 import {
   inicializarMapaRota,
+  mapaRotaPronto,
   adicionarMarcadoresSequencia,
   desenharRotaPlanejada,
   ajustarMapaRota,
@@ -38,49 +39,44 @@ export async function atualizarMapa() {
     .map(id => HOTELS.find(h => h.id === id))
     .filter(Boolean);
 
-  // Resumo imediato
   atualizarResumo(hoteis.length, '--', '--');
 
-  const mapa = inicializarMapaRota();
-  if (!mapa) return;
+  // mapaRotaPronto() garante: mapa criado + loaded + resize após layout real
+  let mapa;
+  try {
+    mapa = await mapaRotaPronto();
+  } catch(e) {
+    console.error('Mapa não disponível:', e);
+    return;
+  }
 
-  // Garante que o container tem dimensões (pode estar recém-visível)
-  mapa.resize();
+  // Se chegou chamada mais nova enquanto aguardávamos, descarta
+  if (meuToken !== _token) return;
 
-  const desenhar = async () => {
-    if (meuToken !== _token) return;   // chegou chamada mais nova, descarta
+  // Limpa marcadores e linha anterior
+  limparMapaRota();
 
-    // 1. limpa marcadores antigos e linha
-    limparMapaRota();
+  // Marcadores novos — síncronos, visíveis imediatamente
+  if (hoteis.length > 0) {
+    adicionarMarcadoresSequencia(hoteis);
+    ajustarMapaRota(hoteis);
+  }
 
-    // 2. marcadores novos — síncronos, aparecem imediatamente
-    if (hoteis.length > 0) {
-      adicionarMarcadoresSequencia(hoteis);
-      ajustarMapaRota(hoteis);
+  // Linha OSRM — assíncrona
+  if (hoteis.length < 2) return;
+  try {
+    const rota = await obterRotaCompleta(hoteis);
+    if (meuToken !== _token) return;
+    if (rota) {
+      desenharRotaPlanejada(rota.coordinates);
+      atualizarResumo(
+        hoteis.length,
+        `${(rota.distance / 1000).toFixed(1)} km`,
+        `${Math.round(rota.duration / 60)} min`
+      );
     }
-
-    // 3. linha OSRM — assíncrona
-    if (hoteis.length < 2) return;
-    try {
-      const rota = await obterRotaCompleta(hoteis);
-      if (meuToken !== _token) return;   // outra chamada chegou durante o await
-      if (rota) {
-        desenharRotaPlanejada(rota.coordinates);
-        atualizarResumo(
-          hoteis.length,
-          `${(rota.distance / 1000).toFixed(1)} km`,
-          `${Math.round(rota.duration / 60)} min`
-        );
-      }
-    } catch (e) {
-      console.error('OSRM:', e);
-    }
-  };
-
-  if (mapa.loaded()) {
-    desenhar();
-  } else {
-    mapa.once('load', desenhar);
+  } catch(e) {
+    console.error('OSRM:', e);
   }
 }
 
