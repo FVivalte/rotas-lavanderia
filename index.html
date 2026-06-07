@@ -82,48 +82,34 @@
 
     <section id="tela-rota" class="screen hidden">
 
-  <div class="tela2-topbar">
+  <!-- TOPBAR -->
+  <div class="r2-topbar">
+    <button id="btn-voltar" class="r2-btn-icon">←</button>
+    <span id="contador-rota" class="r2-counter">0 hotéis na rota</span>
+    <button id="btn-ordem-auto" class="ghost r2-btn-auto">Ordem Auto</button>
+  </div>
 
-    <div id="contador-rota" class="hotel-counter">
-      0 hotéis ativos
+  <!-- CARD MAPA -->
+  <div class="r2-map-card">
+
+    <!-- resumo dentro do card, acima do mapa -->
+    <div class="r2-resumo">
+      <span class="r2-resumo-item">📍 <strong id="resumo-hoteis">0</strong></span>
+      <span class="r2-resumo-item">📏 <strong id="resumo-distancia">--</strong></span>
+      <span class="r2-resumo-item">⏱️ <strong id="resumo-tempo">--</strong></span>
     </div>
 
-    <button id="btn-voltar">
-      ←
-    </button>
+    <div id="mapa-rota"></div>
 
   </div>
-  <div id="resumo-rota">
 
-  <div class="resumo-item">
-    📍 <span id="resumo-hoteis">0</span>
-  </div>
+  <!-- LISTA -->
+  <div id="lista-rota" class="r2-lista"></div>
 
-  <div class="resumo-item">
-    📏 <span id="resumo-distancia">--</span>
-  </div>
-
-  <div class="resumo-item">
-    ⏱️ <span id="resumo-tempo">--</span>
-  </div>
-
-</div>
-  <div
-  id="mapa-rota"></div>
-  <div
-  id="lista-rota"
-  class="tela2-lista"
-></div>    
-  <div class="tela2-actions">
-
-    <button id="btn-iniciar-rota">
-      Iniciar rota
-    </button>
-
-    <button id="btn-exportar">
-      Exportar
-    </button>
-
+  <!-- AÇÕES -->
+  <div class="r2-actions">
+    <button id="btn-iniciar-rota">Iniciar rota</button>
+    <button id="btn-exportar" class="ghost">Exportar</button>
   </div>
 
 </section>
