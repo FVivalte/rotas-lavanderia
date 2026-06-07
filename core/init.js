@@ -18,8 +18,7 @@ import {
 from '../ui/selection.js';
 
 import {
-  renderizarRota,
-  initRouteUI   // ← Adicione esta linha
+  renderizarRota
 }
 from '../ui/route.js';
 
@@ -98,7 +97,6 @@ export async function iniciarApp(){
     // ======================
     // RESTORE ROTA
     // ======================
-    initRouteUI();   // ← Adicione esta linha
 
     if(state.routeOrder.length){
 
