@@ -81,6 +81,28 @@
   color: var(--primary);
 }
 
+/* botão atualizar mapa */
+.r2-btn-refresh {
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  font-size: 1rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: transform .3s;
+}
+
+.r2-btn-refresh:active {
+  transform: rotate(180deg);
+}
+
 /* mapa em si */
 #mapa-rota {
   height: 240px;
