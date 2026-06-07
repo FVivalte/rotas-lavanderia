@@ -17,10 +17,7 @@ import {
 }
 from '../ui/selection.js';
 
-import {
-  renderizarRota
-}
-from '../ui/route.js';
+import { renderizarRota, atualizarMapa } from '../ui/route.js';
 
 import {
   atualizarModoUI
@@ -101,6 +98,7 @@ export async function iniciarApp(){
     if(state.routeOrder.length){
 
       renderizarRota();
+      atualizarMapa();
 
     }
 
