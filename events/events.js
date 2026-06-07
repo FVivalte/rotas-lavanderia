@@ -117,11 +117,9 @@ import {
 // ======================
 if (btnCriarRota) {
   btnCriarRota.addEventListener('click', () => {
-
     gerarRota();
-    renderizarRota();        // ← Esta função já tem a lógica completa do mapa
-
     mostrarTela(telaRota);
+    atualizarMapa();
   });
 }
 
@@ -157,6 +155,7 @@ if(btnLimpar){
       renderizarSelecao();
 
       renderizarRota();
+      atualizarMapa();
 
       salvarEstadoApp();
 
