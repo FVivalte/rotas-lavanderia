@@ -1,247 +1,229 @@
 // ui/route.js
 
-// ======================
-// IMPORTS NECESSÁRIOS
-// ======================
-import { HOTELS } from '../data/dados.js';
-import { state } from '../core/state.js';
-
-import {
-  contadorSelecao,
-  contadorRota
-} from './elements.js';
-
+import { HOTELS }        from '../data/dados.js';
+import { state }         from '../core/state.js';
+import { salvarEstadoApp }    from '../storage/storage.js';
+import { renderizarSelecao, atualizarContadores } from './selection.js';
+import { renderizarRelatorio } from './report.js';
+import { mostrarTela }   from './screens.js';
+import { telaNavegacao } from './elements.js';
 import {
   inicializarMapaRota,
+  adicionarMarcadoresSequencia,
   desenharRotaPlanejada,
   ajustarMapaRota,
-  adicionarMarcadoresSequencia,
-  atualizarMarcadoresStatus,
   limparMapaRota
 } from '../services/map.js';
-
 import { obterRotaCompleta } from '../services/osrm.js';
 
-import { renderizarRelatorio } from './report.js';
-import {
-  atualizarContadores,
-  renderizarSelecao
-} from './selection.js';
+// ─── token anti-concorrência ──────────────────────────────────────────────────
+// Cada vez que atualizarMapa() é chamada, incrementa.
+// O await do OSRM checa se ainda é o token mais recente antes de desenhar.
+let _token = 0;
 
-import { salvarEstadoApp } from '../storage/storage.js';
-
-// ======================
-// VARIÁVEIS LOCAIS
-// ======================
-let listaRota    = null;
-let _rafId       = null;  // cancela requestAnimationFrame pendente
-let _timeoutId   = null;  // cancela setTimeout pendente
-let _renderToken = 0;     // incrementa a cada render; invalida renders antigos
-
-export function initRouteUI() {
-  listaRota = document.getElementById('lista-rota');
+// ─── MAPA ─────────────────────────────────────────────────────────────────────
+function atualizarResumo(n, dist, tempo) {
+  const eh = document.getElementById('resumo-hoteis');
+  const ed = document.getElementById('resumo-distancia');
+  const et = document.getElementById('resumo-tempo');
+  if (eh) eh.textContent = n;
+  if (ed) ed.textContent = dist;
+  if (et) et.textContent = tempo;
 }
 
-// ======================
-// ATUALIZAR APENAS O MAPA
-// ======================
-export function atualizarMapaRota() {
+export async function atualizarMapa() {
+  const meuToken = ++_token;
 
-  const hoteisRota = state.routeOrder
+  const hoteis = state.routeOrder
     .map(id => HOTELS.find(h => h.id === id))
     .filter(Boolean);
 
-  const elResumoHoteis    = document.getElementById('resumo-hoteis');
-  const elResumoDistancia = document.getElementById('resumo-distancia');
-  const elResumoTempo     = document.getElementById('resumo-tempo');
-  if (elResumoHoteis)    elResumoHoteis.textContent    = hoteisRota.length;
-  if (elResumoDistancia) elResumoDistancia.textContent = '--';
-  if (elResumoTempo)     elResumoTempo.textContent     = '--';
+  // Resumo imediato
+  atualizarResumo(hoteis.length, '--', '--');
 
-  // Cancela qualquer render anterior que ainda não executou
-  if (_rafId)     { cancelAnimationFrame(_rafId); _rafId = null; }
-  if (_timeoutId) { clearTimeout(_timeoutId);     _timeoutId = null; }
+  const mapa = inicializarMapaRota();
+  if (!mapa) return;
 
-  // Incrementa o token — renders iniciados antes deste ponto são inválidos
-  const meuToken = ++_renderToken;
+  // Garante que o container tem dimensões (pode estar recém-visível)
+  mapa.resize();
 
-  if (hoteisRota.length === 0) {
+  const desenhar = async () => {
+    if (meuToken !== _token) return;   // chegou chamada mais nova, descarta
+
+    // 1. limpa marcadores antigos e linha
     limparMapaRota();
-    return;
-  }
 
-  // Snapshot imutável para este ciclo
-  const snapshot = [...hoteisRota];
+    // 2. marcadores novos — síncronos, aparecem imediatamente
+    if (hoteis.length > 0) {
+      adicionarMarcadoresSequencia(hoteis);
+      ajustarMapaRota(hoteis);
+    }
 
-  _rafId = requestAnimationFrame(() => {
-    _rafId = null;
-
-    // 50ms: garante que o browser recalculou o layout após remover .hidden
-    _timeoutId = setTimeout(() => {
-      _timeoutId = null;
-
-      // Se uma chamada mais nova chegou enquanto esperávamos, descarta este render
-      if (meuToken !== _renderToken) return;
-
-      const mapa = inicializarMapaRota();
-      if (!mapa) return;
-
-      mapa.resize();
-
-      const desenharNoMapa = async () => {
-        // Verifica token novamente antes de tocar no DOM do mapa
-        if (meuToken !== _renderToken) return;
-
-        // Limpa marcadores e linha antiga
-        limparMapaRota();
-
-        // 1. Marcadores numerados — síncronos, visíveis imediatamente
-        adicionarMarcadoresSequencia(snapshot);
-        ajustarMapaRota(snapshot);
-
-        // 2. Linha OSRM — assíncrona
-        try {
-          const rota = await obterRotaCompleta(snapshot);
-
-          // Verifica token após await — pode ter chegado nova rota durante a requisição
-          if (meuToken !== _renderToken) return;
-
-          if (rota) {
-            desenharRotaPlanejada(rota.coordinates);
-            if (elResumoDistancia) elResumoDistancia.textContent = `${(rota.distance / 1000).toFixed(1)} km`;
-            if (elResumoTempo)     elResumoTempo.textContent     = `${Math.round(rota.duration / 60)} min`;
-          }
-        } catch (err) {
-          console.error('Erro ao obter rota OSRM:', err);
-        }
-      };
-
-      if (mapa.loaded()) {
-        desenharNoMapa();
-      } else {
-        mapa.once('load', () => {
-          if (meuToken !== _renderToken) return;
-          desenharNoMapa();
-        });
+    // 3. linha OSRM — assíncrona
+    if (hoteis.length < 2) return;
+    try {
+      const rota = await obterRotaCompleta(hoteis);
+      if (meuToken !== _token) return;   // outra chamada chegou durante o await
+      if (rota) {
+        desenharRotaPlanejada(rota.coordinates);
+        atualizarResumo(
+          hoteis.length,
+          `${(rota.distance / 1000).toFixed(1)} km`,
+          `${Math.round(rota.duration / 60)} min`
+        );
       }
-    }, 50);
-  });
+    } catch (e) {
+      console.error('OSRM:', e);
+    }
+  };
+
+  if (mapa.loaded()) {
+    desenhar();
+  } else {
+    mapa.once('load', desenhar);
+  }
 }
 
-// ======================
-// RENDERIZAR LISTA + MAPA
-// ======================
-export function renderizarRota() {
-  if (!listaRota) {
-    listaRota = document.getElementById('lista-rota');
-    if (!listaRota) return;
+// ─── ORDEM AUTO (TSP nearest-neighbor) ───────────────────────────────────────
+function dist(a, b) {
+  const dx = a.lat - b.lat, dy = a.lng - b.lng;
+  return dx * dx + dy * dy;
+}
+
+export function ordenarAuto() {
+  const hoteis = state.routeOrder
+    .map(id => HOTELS.find(h => h.id === id))
+    .filter(Boolean);
+  if (hoteis.length < 3) return;
+
+  const visitado = new Array(hoteis.length).fill(false);
+  const ordem = [];
+  let atual = 0;
+  visitado[0] = true;
+  ordem.push(hoteis[0]);
+
+  for (let i = 1; i < hoteis.length; i++) {
+    let melhor = -1, menorDist = Infinity;
+    for (let j = 0; j < hoteis.length; j++) {
+      if (visitado[j]) continue;
+      const d = dist(hoteis[atual], hoteis[j]);
+      if (d < menorDist) { menorDist = d; melhor = j; }
+    }
+    visitado[melhor] = true;
+    ordem.push(hoteis[melhor]);
+    atual = melhor;
   }
 
-  listaRota.innerHTML = '';
+  state.routeOrder = ordem.map(h => h.id);
+  renderizarRota();
+  salvarEstadoApp();
+}
+
+// ─── LISTA ────────────────────────────────────────────────────────────────────
+export function renderizarRota() {
+  const lista = document.getElementById('lista-rota');
+  if (!lista) return;
+
+  lista.innerHTML = '';
 
   state.routeOrder.forEach((id, idx) => {
     const hotel = HOTELS.find(h => h.id === id);
     if (!hotel) return;
 
     const item = document.createElement('div');
-    item.className = 'route-item';
+    item.className = 'r2-item';
     item.dataset.id = id;
     item.innerHTML = `
-      <div>
-        <strong>${idx + 1}. ${hotel.name}</strong>
-        <div class="muted" style="font-size:0.85rem">${hotel.address}</div>
+      <div class="r2-item-info">
+        <div class="r2-item-nome">${idx + 1}. ${hotel.name}</div>
+        <div class="r2-item-end">${hotel.address}</div>
       </div>
-      <div style="display:flex; gap:8px; align-items:center;">
-        <span class="drag">⋮⋮</span>
-        <button class="ghost" data-id="${id}">Remover</button>
+      <div class="r2-item-acoes">
+        <span class="r2-drag" title="Mover">⋮⋮⋮</span>
+        <button class="ghost r2-btn-nav" data-nav="${id}">Navegar</button>
+        <button class="ghost r2-btn-rem" data-rem="${id}">Remover</button>
       </div>
     `;
 
-    // REMOVER
-    item.querySelector('button').addEventListener('click', () => {
+    // Navegar — abre Google Maps
+    item.querySelector('[data-nav]').addEventListener('click', () => {
+      window.open(
+        `https://www.google.com/maps?q=${hotel.lat},${hotel.lng}`,
+        '_blank'
+      );
+    });
+
+    // Remover
+    item.querySelector('[data-rem]').addEventListener('click', () => {
       state.activeSet?.delete(id);
       state.routeOrder = state.routeOrder.filter(x => x !== id);
-      if (typeof renderizarSelecao === 'function') renderizarSelecao();
-      renderizarRota();
-      salvarEstadoApp?.();
+      renderizarSelecao();
+      renderizarRota();          // reconstrói lista
+      atualizarMapa();           // atualiza mapa com novo estado
+      salvarEstadoApp();
     });
 
-    // ======================
-    // DRAG AND DROP
-    // ======================
-    const dragHandle = item.querySelector('.drag');
-    let itemArrastando = null;
+    // ── Drag & Drop touch ──────────────────────────────────────────────
+    const handle = item.querySelector('.r2-drag');
+    let arrastando = null;
 
-    dragHandle.addEventListener('touchstart', () => {
-      itemArrastando = item;
-      item.classList.add('dragging-mobile');
+    handle.addEventListener('touchstart', e => {
+      e.stopPropagation();
+      arrastando = item;
+      item.classList.add('arrastando');
     }, { passive: true });
 
-    dragHandle.addEventListener('touchmove', e => {
-      if (!itemArrastando) return;
-      const posicaoY = e.touches[0].clientY;
-      const items = [...listaRota.querySelectorAll('.route-item')];
-      items.forEach(other => {
-        other.classList.remove('over');
-        if (other === itemArrastando) return;
-        const rect = other.getBoundingClientRect();
-        if (posicaoY < rect.top + rect.height / 2) other.classList.add('over');
+    handle.addEventListener('touchmove', e => {
+      if (!arrastando) return;
+      const y = e.touches[0].clientY;
+      lista.querySelectorAll('.r2-item').forEach(el => {
+        el.classList.remove('sobre');
+        if (el === arrastando) return;
+        const r = el.getBoundingClientRect();
+        if (y > r.top && y < r.bottom) el.classList.add('sobre');
       });
     }, { passive: true });
 
-    dragHandle.addEventListener('touchend', e => {
-      if (!itemArrastando) return;
+    handle.addEventListener('touchend', e => {
+      if (!arrastando) return;
+      const y = e.changedTouches[0].clientY;
+      const itens = [...lista.querySelectorAll('.r2-item')];
+      itens.forEach(el => el.classList.remove('sobre'));
 
-      const posicaoY = e.changedTouches[0].clientY;
-      const items = [...listaRota.querySelectorAll('.route-item')];
-      let indiceDestino = null;
-
-      items.forEach((other, index) => {
-        other.classList.remove('over');
-        if (other === itemArrastando) return;
-        const rect = other.getBoundingClientRect();
-        if (posicaoY < rect.top + rect.height / 2 && indiceDestino === null) {
-          indiceDestino = index;
-        }
-      });
-
-      if (indiceDestino === null) {
-        indiceDestino = state.routeOrder.length - 1;
+      // Determina posição de destino
+      let destino = itens.length - 1;
+      for (let i = 0; i < itens.length; i++) {
+        const r = itens[i].getBoundingClientRect();
+        if (y < r.top + r.height / 2) { destino = i; break; }
       }
 
-      const indiceOrigem = state.routeOrder.indexOf(id);
-
-      if (indiceDestino !== indiceOrigem) {
-        const hotelMovido = state.routeOrder.splice(indiceOrigem, 1)[0];
-        if (indiceDestino > indiceOrigem) indiceDestino--;
-        state.routeOrder.splice(indiceDestino, 0, hotelMovido);
+      const origem = state.routeOrder.indexOf(id);
+      if (destino !== origem) {
+        const [movido] = state.routeOrder.splice(origem, 1);
+        const idx2 = destino > origem ? destino - 1 : destino;
+        state.routeOrder.splice(idx2, 0, movido);
       }
 
-      itemArrastando.classList.remove('dragging-mobile');
-      itemArrastando = null;
-      renderizarRota();
-      salvarEstadoApp?.();
+      arrastando.classList.remove('arrastando');
+      arrastando = null;
+      renderizarRota();          // reconstrói lista com nova ordem
+      atualizarMapa();           // atualiza mapa com nova ordem
+      salvarEstadoApp();
     }, { passive: true });
 
-    listaRota.appendChild(item);
+    lista.appendChild(item);
   });
 
-  // Sincroniza relatório
-  if (state.routeReport) {
-    state.routeReport = state.routeOrder.map(id => {
-      const existente = state.routeReport.find(r => r.id === id);
-      return existente || {
-        id, arrival: null, departure: null,
-        entrega: false, coleta: false,
-        deliveryPhotos: [], pickupPhotos: []
-      };
-    });
-  }
+  // Sincroniza routeReport
+  state.routeReport = state.routeOrder.map(id => {
+    const ex = (state.routeReport || []).find(r => r.id === id);
+    return ex || {
+      id, arrival: null, departure: null,
+      entrega: false, coleta: false,
+      deliveryPhotos: [], pickupPhotos: []
+    };
+  });
 
-  if (typeof atualizarContadores === 'function') atualizarContadores();
-  if (typeof renderizarRelatorio === 'function') renderizarRelatorio();
-  salvarEstadoApp?.();
-
-  // Mapa — único ponto de controle
-  atualizarMapaRota();
+  atualizarContadores();
+  renderizarRelatorio?.();
 }
