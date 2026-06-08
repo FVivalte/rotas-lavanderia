@@ -37,7 +37,8 @@ import {
 
   telaSelecao,
   telaRota,
-  telaNavegacao
+  telaNavegacao,
+  filtroRegiao
 }
 from '../ui/elements.js';
 
