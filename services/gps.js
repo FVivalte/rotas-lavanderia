@@ -8,7 +8,7 @@ import { renderizarRelatorioModo } from '../ui/report.js';
 import { HOTELS } from '../data/dados.js';
 import { falar } from './voice.js';
 import { distanceInfo, durationInfo } from '../ui/elements.js';
-import { obterPrimeiraInstrucao, traduzirInstrucao } from './navigation.js';
+import { carregarSteps, obterStepAtual, traduzirInstrucao } from './navigation.js';
 
 // ======================
 // START GPS
@@ -94,6 +94,15 @@ if (hotel) {
       rota.geometry.coordinates,
       'mapa'
     );
+if(
+  !state.currentSteps.length
+){
+
+  carregarSteps(
+    rota
+  );
+
+}
 
     if (
       distanceInfo
@@ -157,10 +166,13 @@ if(
 
 }
 
-      console.log('Posição atualizada:', { lat, lng, heading, speed });
-
       // Atualiza a posição visual no mapa
-      updateMap(lat, lng, heading, speed);
+updateMap(
+lat,
+lng,
+heading,
+speed);
+verificarInstrucao();
 
       // Verifica se o motorista chegou perto do hotel atual da rota
       verificarChegada();
@@ -262,4 +274,66 @@ export function verificarChegada() {
   }
 
 }
+}
+
+function verificarInstrucao(){
+
+  const step =
+    obterStepAtual();
+
+  if(!step){
+    return;
+  }
+
+  const ponto =
+    step.maneuver.location;
+
+  if(!ponto){
+    return;
+  }
+
+  const distancia =
+    getDistanceMeters(
+
+      state.userPosition.lat,
+      state.userPosition.lng,
+
+      ponto[1],
+      ponto[0]
+
+    );
+
+  if(
+    distancia <= 50
+  ){
+
+    const texto =
+      traduzirInstrucao(
+        step
+      );
+
+    if(
+      texto !==
+      state.lastInstruction
+    ){
+
+      state.lastInstruction =
+        texto;
+
+      if(
+        state.voiceNavigation
+      ){
+
+        falar(
+          texto
+        );
+
+      }
+
+    }
+
+    state.currentStepIndex++;
+
+  }
+
 }
