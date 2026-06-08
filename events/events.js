@@ -63,7 +63,8 @@ from '../ui/mode.js';
 import {
 
   abrirTelaRelatorio,
-  renderizarRelatorioModo
+  renderizarRelatorioModo,
+  exportarPDF
 
 }
 from '../ui/report.js';
@@ -469,6 +470,19 @@ if(btnNovaRota){
 // ======================
 // EXPORT JSON
 // ======================
+
+if(btnExportarPdf){
+
+  btnExportarPdf.addEventListener(
+    'click',
+    ()=>{
+
+      exportarPDF();
+
+    }
+  );
+
+}
 
 if(btnExportar){
 
