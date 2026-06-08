@@ -22,23 +22,24 @@ export const state = {
   arrivalConfirmed: false,
 
 
-  // ======================
-  // GPS / MAPA
-  // ======================
+// ======================
+// GPS / MAPA
+// ======================
 
-  userPosition: null,
+userPosition: null,
 
-  routingControl: null,
+routingControl: null,
 
-  watchId: null,
+watchId: null,
 
-  map: null,
+map: null,
 
-  mapInitialized: false,
+mapInitialized: false,
 
-  cameraFollowing: true,
+cameraFollowing: true,
 
-  voiceNavigation: false,
+voiceNavigation: false,
+
 currentStepIndex: 0,
 
 currentSteps: [],
@@ -46,16 +47,8 @@ currentSteps: [],
 announcedStepIndex: -1,
 
 lastInstruction: '',
- 
-  lastInstruction: '',
 
-  currentStepIndex: 0,
-
-  currentSteps: [],
-
-  lastHeading: 0,
-
-
+lastHeading: 0,
   // ======================
   // VOZ
   // ======================
