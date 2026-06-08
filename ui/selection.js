@@ -345,7 +345,7 @@ listaHoteis.addEventListener('change', (e) => {
 // ======================
 
   atualizarContadores();
-
-  salvarEstadoApp();
+  renderizarChipsRegioes();
+   salvarEstadoApp();
 
 }
