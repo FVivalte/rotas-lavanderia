@@ -55,6 +55,9 @@ import {
 }
 from '../services/gps.js';
 
+import { falar }
+from '../services/voice.js';
+
 import {
 
   salvarEstadoApp
@@ -465,6 +468,25 @@ console.log(
     false;
 
   state.currentIndex++;
+
+const proximoHotel = HOTELS.find(
+  h =>
+    h.id ===
+    state.routeOrder[
+      state.currentIndex
+    ]
+);
+
+if (
+  proximoHotel &&
+  state.voiceNavigation
+) {
+
+  falar(
+    `Próximo hotel ${proximoHotel.name}`
+  );
+
+}
 
   if(
     state.currentIndex >=
