@@ -44,6 +44,11 @@ from '../utils/utils.js';
 // ======================
 // RELATÓRIO TELA ROTA
 // ======================
+export function exportarPDF(){
+
+  window.print();
+
+}
 
 export function renderizarRelatorio(){
 
