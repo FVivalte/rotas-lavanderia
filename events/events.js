@@ -339,6 +339,27 @@ if(btnProximo){
 
 }
 
+// ======================
+// FILTRO DE REGIÃO
+// ======================
+
+
+if(filtroRegiao){
+
+  filtroRegiao.addEventListener(
+    'change',
+    e => {
+
+      state.selectedRegion =
+        e.target.value;
+
+      renderizarSelecao();
+
+    }
+  );
+
+}
+
 
 // ======================
 // FINALIZAR ROTA
