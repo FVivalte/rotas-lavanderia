@@ -39,6 +39,13 @@ export const state = {
   cameraFollowing: true,
 
   voiceNavigation: false,
+currentStepIndex: 0,
+
+currentSteps: [],
+
+announcedStepIndex: -1,
+
+lastInstruction: '',
  
   lastInstruction: '',
 
