@@ -344,23 +344,39 @@ if(btnProximo){
 // ======================
 
 
-if(filtroRegiao){
+document
+  .querySelectorAll(
+    '.chip-regiao'
+  )
+  .forEach(chip => {
 
-  filtroRegiao.addEventListener(
-    'change',
-    e => {
+    chip.addEventListener(
+      'click',
+      () => {
 
-      state.selectedRegion =
-        e.target.value;
+        document
+          .querySelectorAll(
+            '.chip-regiao'
+          )
+          .forEach(c =>
+            c.classList.remove(
+              'ativo'
+            )
+          );
 
-      renderizarSelecao();
+        chip.classList.add(
+          'ativo'
+        );
 
-    }
-  );
+        state.selectedRegion =
+          chip.dataset.region;
 
-}
+        renderizarSelecao();
 
+      }
+    );
 
+  });
 // ======================
 // FINALIZAR ROTA
 // ======================
