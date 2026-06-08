@@ -46,10 +46,65 @@ from '../utils/utils.js';
 // ======================
 export function exportarPDF(){
 
-  window.print();
+  const elemento =
+    document.getElementById(
+      'tela-relatorio'
+    );
+
+  if(!elemento){
+    return;
+  }
+
+  const data =
+    new Date()
+      .toLocaleDateString(
+        'pt-BR'
+      )
+      .replaceAll('/','-');
+
+  html2pdf()
+
+    .set({
+
+      margin: 10,
+
+      filename:
+        `rota-${data}.pdf`,
+
+      image: {
+
+        type: 'jpeg',
+
+        quality: 0.95
+
+      },
+
+      html2canvas: {
+
+        scale: 2,
+
+        useCORS: true
+
+      },
+
+      jsPDF: {
+
+        unit: 'mm',
+
+        format: 'a4',
+
+        orientation:
+          'portrait'
+
+      }
+
+    })
+
+    .from(elemento)
+
+    .save();
 
 }
-
 export function renderizarRelatorio(){
 
   if(!listaRelatorioRota){
