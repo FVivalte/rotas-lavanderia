@@ -62,6 +62,11 @@ export function updateMap(lat, lng, heading = 0, speed = 0, mapId = 'mapa') {
 
   if (userMarker) {
     userMarker.setLngLat([lng, lat]);
+const el =
+  userMarker.getElement();
+
+el.style.transform =
+  `rotate(${heading}deg)`;
   }
 
   atualizarCamera(map, lat, lng, heading, speed);
