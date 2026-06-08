@@ -120,19 +120,3 @@ export function traduzirInstrucao(
   return texto;
 
 }
-
-export function obterInstrucoes(
-  rota
-){
-
-  if(
-    !rota?.legs?.length
-  ){
-    return [];
-  }
-
-  return (
-    rota.legs[0].steps || []
-  );
-
-}
