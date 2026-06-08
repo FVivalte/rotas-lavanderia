@@ -456,6 +456,7 @@ await finalizarModoRota();
   state.currentIndex++;
   state.currentSteps = [];
   state.currentStepIndex = 0;
+  state.announcedStepIndex = -1;
   state.lastInstruction = '';
 
 const proximoHotel = HOTELS.find(
