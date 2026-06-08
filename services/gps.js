@@ -8,7 +8,7 @@ import { renderizarRelatorioModo } from '../ui/report.js';
 import { HOTELS } from '../data/dados.js';
 import { falar } from './voice.js';
 import { distanceInfo, durationInfo } from '../ui/elements.js';
-import { carregarSteps, obterStepAtual, traduzirInstrucao } from './navigation.js';
+import { obterInstrucoes, carregarSteps, obterStepAtual, traduzirInstrucao } from './navigation.js';
 
 // ======================
 // START GPS
