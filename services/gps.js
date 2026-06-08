@@ -8,10 +8,19 @@ import { renderizarRelatorioModo } from '../ui/report.js';
 import { HOTELS } from '../data/dados.js';
 import { falar } from './voice.js';
 import { distanceInfo, durationInfo } from '../ui/elements.js';
+import {
+
+  obterInstrucoes,
+
+  traduzirInstrucao
+
+}
+from './navigation.js';
 
 // ======================
 // START GPS
 // ======================
+
 export function startGpsTracking() {
   if (!navigator.geolocation) {
     alert('GPS não suportado neste navegador/dispositivo.');
@@ -115,6 +124,41 @@ if (hotel) {
         )} min`;
 
     }
+// verificar aqui possível erro
+const steps =
+  obterInstrucoes(
+    rota
+  );
+
+if(
+  steps.length
+){
+
+  const texto =
+    traduzirInstrucao(
+      steps[0]
+    );
+
+  if(
+    texto !==
+    state.lastInstruction
+  ){
+
+    state.lastInstruction =
+      texto;
+
+    if(
+      state.voiceNavigation
+    ){
+
+      falar(texto);
+
+    }
+
+  }
+
+}
+// verificar aqui possível erro ⬆️
 
   });
 
