@@ -220,18 +220,89 @@ obterHoteisFiltrados()
 
   });
   
-function obterHoteisFiltrados(){
+function renderizarChipsRegioes() {
 
-  if(
+  const container =
+    document.getElementById(
+      'filtro-regioes'
+    );
+
+  if (!container) return;
+
+  const regioes = [
+
+    'Todas',
+
+    ...new Set(
+      HOTELS.map(
+        hotel => hotel.region
+      )
+    )
+
+  ];
+
+  container.innerHTML = '';
+
+  regioes.forEach(regiao => {
+
+    const total =
+      regiao === 'Todas'
+
+        ? HOTELS.length
+
+        : HOTELS.filter(
+            h =>
+              h.region === regiao
+          ).length;
+
+    const chip =
+      document.createElement(
+        'button'
+      );
+
+    chip.className =
+      'chip-regiao';
+
+    if (
+      state.selectedRegion ===
+      regiao
+    ) {
+      chip.classList.add(
+        'ativo'
+      );
+    }
+
+    chip.textContent =
+      `${regiao} (${total})`;
+
+    chip.onclick = () => {
+
+      state.selectedRegion =
+        regiao;
+
+      renderizarChipsRegioes();
+
+      renderizarSelecao();
+
+    };
+
+    container.appendChild(
+      chip
+    );
+
+  });
+
+}
+
+function obterHoteisFiltrados() {
+
+  if (
     state.selectedRegion ===
     'Todas'
-  ){
+  ) {
     return HOTELS;
   }
-//teste console.log(
-  'REGIAO SELECIONADA:',
-  state.selectedRegion
-);//teste
+
   return HOTELS.filter(
     hotel =>
       hotel.region ===
