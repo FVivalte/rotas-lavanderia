@@ -42,6 +42,10 @@ export const state = {
  
   lastInstruction: '',
 
+  currentStepIndex: 0,
+
+  currentSteps: [],
+
   lastHeading: 0,
 
 
