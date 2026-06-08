@@ -158,7 +158,8 @@ export function renderizarSelecao(){
 
   listaHoteis.innerHTML = '';
 
-  HOTELS.forEach(h=>{
+obterHoteisFiltrados()
+  .forEach(h=>{
 
     const div =
       document.createElement('div');
@@ -219,6 +220,22 @@ export function renderizarSelecao(){
 
   });
 
+function obterHoteisFiltrados(){
+
+  if(
+    state.selectedRegion ===
+    'Todas'
+  ){
+    return HOTELS;
+  }
+
+  return HOTELS.filter(
+    hotel =>
+      hotel.region ===
+      state.selectedRegion
+  );
+
+}
 
 // ======================
 // DELEGAÇÃO DE EVENTOS (Performance Máxima)
