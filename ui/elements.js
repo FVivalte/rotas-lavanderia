@@ -104,6 +104,10 @@ export const mapa =
     'mapa'
   );
 
+export const filtroRegiao =
+  document.getElementById(
+    'filtro-regiao'
+  );
 
 // ======================
 // RELATÓRIO
