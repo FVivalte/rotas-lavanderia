@@ -7,6 +7,7 @@ import {
   btnVoltar,
   btnIniciarRota,
   btnExportar,
+  btnExportarPdf,
   btnFinalizar,
   btnNovaRota,
   btnGoogleMaps,
