@@ -219,7 +219,12 @@ obterHoteisFiltrados()
     listaHoteis.appendChild(div);
 
   });
-
+//teste aqui
+  console.log(
+  'REGIAO SELECIONADA:',
+  state.selectedRegion
+);
+  //teste
 function obterHoteisFiltrados(){
 
   if(
