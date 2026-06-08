@@ -232,7 +232,8 @@ export function atualizarModoUI(){
 
 if (
   hotel &&
-  mapas['mapa']
+  mapas['mapa'] &&
+  !state.userPosition
 ) {
 
   const lat = Number(hotel.lat);
