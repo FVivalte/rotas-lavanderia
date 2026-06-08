@@ -55,6 +55,17 @@ export function exportarPDF(){
     return;
   }
 
+  const ocultar =
+    elemento.querySelectorAll(
+      '.btn'
+    );
+
+  ocultar.forEach(
+    b => b.classList.add(
+      'pdf-hide'
+    )
+  );
+
   const data =
     new Date()
       .toLocaleDateString(
@@ -66,43 +77,41 @@ export function exportarPDF(){
 
     .set({
 
-      margin: 10,
+      margin:10,
 
       filename:
         `rota-${data}.pdf`,
 
-      image: {
-
-        type: 'jpeg',
-
-        quality: 0.95
-
+      image:{
+        type:'jpeg',
+        quality:0.95
       },
 
-      html2canvas: {
-
-        scale: 2,
-
-        useCORS: true
-
+      html2canvas:{
+        scale:2
       },
 
-      jsPDF: {
-
-        unit: 'mm',
-
-        format: 'a4',
-
-        orientation:
-          'portrait'
-
+      jsPDF:{
+        unit:'mm',
+        format:'a4',
+        orientation:'portrait'
       }
 
     })
 
     .from(elemento)
 
-    .save();
+    .save()
+
+    .then(()=>{
+
+      ocultar.forEach(
+        b => b.classList.remove(
+          'pdf-hide'
+        )
+      );
+
+    });
 
 }
 export function renderizarRelatorio(){
