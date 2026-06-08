@@ -63,6 +63,8 @@ export const state = {
   // TELA ATUAL
   // ======================
 
-  currentScreen: 'selection'
+currentScreen: 'selection',
 
+selectedRegion: 'Todas'
+  
 };
