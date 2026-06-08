@@ -303,34 +303,41 @@ function verificarInstrucao(){
 
     );
 
+  // Falar a 100m
+
   if(
-    distancia <= 50
+
+    distancia <= 100 &&
+
+    state.announcedStepIndex !==
+    state.currentStepIndex
+
   ){
 
     const texto =
       traduzirInstrucao(
-        step
+        step,
+        true
       );
 
+    state.announcedStepIndex =
+      state.currentStepIndex;
+
     if(
-      texto !==
-      state.lastInstruction
+      state.voiceNavigation
     ){
 
-      state.lastInstruction =
-        texto;
-
-      if(
-        state.voiceNavigation
-      ){
-
-        falar(
-          texto
-        );
-
-      }
+      falar(texto);
 
     }
+
+  }
+
+  // Passou da manobra
+
+  if(
+    distancia <= 20
+  ){
 
     state.currentStepIndex++;
 
