@@ -35,18 +35,46 @@
 .tela1-actions button{
   flex:1;
 }
-#filtro-regiao{
+.chips-regioes{
 
-  width:100%;
+  display:flex;
 
-  padding:12px;
+  gap:8px;
 
-  border-radius:12px;
+  overflow-x:auto;
 
-  border:1px solid #ddd;
-
-  font-size:16px;
+  padding-bottom:8px;
 
   margin-bottom:12px;
+
+}
+
+.chip-regiao{
+
+  border:none;
+
+  border-radius:999px;
+
+  padding:10px 16px;
+
+  background:#fff;
+
+  color:#0b63b7;
+
+  font-weight:600;
+
+  white-space:nowrap;
+
+  cursor:pointer;
+
+  box-shadow:0 2px 6px rgba(0,0,0,.08);
+
+}
+
+.chip-regiao.ativo{
+
+  background:#0b63b7;
+
+  color:#fff;
 
 }
