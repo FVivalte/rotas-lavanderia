@@ -5,13 +5,14 @@ export async function obterRota(
   destinoLng
 ){
 
-const url =
-`https://router.project-osrm.org/route/v1/driving/
+  const url = `
+https://router.project-osrm.org/route/v1/driving/
 ${origemLng},${origemLat};
 ${destinoLng},${destinoLat}
 ?overview=full
 &steps=true
-&geometries=geojson`.replace(/\s+/g,'');
+&geometries=geojson
+`.replace(/\s+/g,'');
 
   const resp =
     await fetch(url);
