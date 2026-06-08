@@ -35,7 +35,18 @@ export function inicializarMapa(containerId = 'mapa', accessToken = '') {
   mapas[containerId] = map;
 
   // Cria o marcador do usuário
-  userMarker = new maplibregl.Marker({ color: '#007AFF' })
+const el =
+  document.createElement(
+    'div'
+  );
+
+el.className =
+  'user-marker';
+
+userMarker =
+  new maplibregl.Marker({
+    element: el
+  })
     .setLngLat([defaultLng, defaultLat])
     .addTo(map);
 
