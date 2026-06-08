@@ -417,26 +417,12 @@ function atualizarTextoBotao(){
 // ======================
 
 export async function proximoHotel(){
-  console.log(
-    'CURRENT INDEX:',
-    state.currentIndex
-  );
 
-  console.log(
-    'TOTAL:',
-    state.routeOrder.length
-  );
-
-
-  
   if(
   state.currentIndex >=
   state.routeOrder.length
 ){
-console.log(
-  'CHAMANDO FINALIZAR'
-);
-  await finalizarModoRota();
+await finalizarModoRota();
 
   return;
 
@@ -468,6 +454,7 @@ console.log(
     false;
 
   state.currentIndex++;
+  state.lastInstruction = '';
 
 const proximoHotel = HOTELS.find(
   h =>
