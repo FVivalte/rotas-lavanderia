@@ -48,12 +48,12 @@ export function obterStepAtual(){
 // ======================
 
 export function traduzirInstrucao(
-  step
+  step,
+  distancia = false
 ){
 
   if(
-    !step ||
-    !step.maneuver
+    !step?.maneuver
   ){
     return null;
   }
@@ -64,72 +64,59 @@ export function traduzirInstrucao(
   const modifier =
     step.maneuver.modifier;
 
-  // Curvas
+  let texto =
+    'Continue em frente';
 
   if(type === 'turn'){
 
-    if(
-      modifier === 'right'
-    ){
-      return 'Vire à direita';
+    if(modifier === 'right'){
+      texto = 'vire à direita';
     }
 
-    if(
-      modifier === 'left'
-    ){
-      return 'Vire à esquerda';
+    else if(modifier === 'left'){
+      texto = 'vire à esquerda';
     }
 
-    if(
+    else if(
       modifier === 'slight right'
     ){
-      return 'Mantenha-se à direita';
+      texto =
+        'mantenha-se à direita';
     }
 
-    if(
+    else if(
       modifier === 'slight left'
     ){
-      return 'Mantenha-se à esquerda';
+      texto =
+        'mantenha-se à esquerda';
     }
 
   }
 
-  // Rotatória
-
-  if(
+  else if(
     type === 'roundabout'
   ){
-    return 'Entre na rotatória';
+
+    texto =
+      'entre na rotatória';
+
   }
 
-  // Chegada
-
-  if(
+  else if(
     type === 'arrive'
   ){
-    return 'Você chegou ao destino';
+
+    texto =
+      'você chegou ao destino';
+
   }
 
-  // Continuar
+  if(distancia){
 
-  if(
-    type === 'new name'
-  ){
-    return 'Continue em frente';
+    return `A 100 metros, ${texto}`;
+
   }
 
-  if(
-    type === 'continue'
-  ){
-    return 'Continue em frente';
-  }
-
-  if(
-    type === 'depart'
-  ){
-    return 'Siga em frente';
-  }
-
-  return 'Continue em frente';
+  return texto;
 
 }
