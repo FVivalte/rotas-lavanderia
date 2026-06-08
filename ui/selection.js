@@ -335,7 +335,7 @@ listaHoteis.addEventListener('change', (e) => {
     } else {
       state.activeSet.delete(id);
     }
-    
+    renderizarChipsRegioes();
     atualizarContadores();
     salvarEstadoApp();
   }
