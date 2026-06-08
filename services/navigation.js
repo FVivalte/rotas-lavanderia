@@ -1,18 +1,27 @@
-export function obterInstrucoes(
+import { state } from '../core/state.js';
+
+export function obterPrimeiraInstrucao(
   rota
 ){
 
   if(
     !rota ||
-    !rota.routes?.[0]
+    !rota.legs?.length
   ){
-    return [];
+    return null;
   }
 
-  return rota
-    .routes[0]
-    .legs[0]
-    .steps;
+  const step =
+    rota.legs[0]
+    ?.steps?.[0];
+
+  if(!step){
+    return null;
+  }
+
+  return traduzirInstrucao(
+    step
+  );
 
 }
 
@@ -21,14 +30,12 @@ export function traduzirInstrucao(
 ){
 
   const type =
-    step.maneuver.type;
+    step.maneuver?.type;
 
   const modifier =
-    step.maneuver.modifier;
+    step.maneuver?.modifier;
 
-  if(
-    type === 'turn'
-  ){
+  if(type === 'turn'){
 
     if(
       modifier === 'right'
