@@ -219,12 +219,7 @@ obterHoteisFiltrados()
     listaHoteis.appendChild(div);
 
   });
-//teste aqui
-  console.log(
-  'REGIAO SELECIONADA:',
-  state.selectedRegion
-);
-  //teste
+  
 function obterHoteisFiltrados(){
 
   if(
@@ -233,7 +228,10 @@ function obterHoteisFiltrados(){
   ){
     return HOTELS;
   }
-
+//teste console.log(
+  'REGIAO SELECIONADA:',
+  state.selectedRegion
+);//teste
   return HOTELS.filter(
     hotel =>
       hotel.region ===
