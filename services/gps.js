@@ -46,6 +46,14 @@ state.lastHeading = heading;
         heading,
         speed
       };
+      
+      if (
+  state.currentScreen === 'navigation'
+) {
+
+  state.cameraFollowing = true;
+
+}
 
 const hotelId =
   state.routeOrder[
