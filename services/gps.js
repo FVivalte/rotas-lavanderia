@@ -22,7 +22,12 @@ export function startGpsTracking() {
     pos => {
       const lat = pos.coords.latitude;
       const lng = pos.coords.longitude;
-      const heading = pos.coords.heading || 0;
+      const heading =
+  pos.coords.heading ??
+  state.lastHeading ??
+  0;
+
+state.lastHeading = heading;
       const speed = pos.coords.speed || 0;
 
       if (
