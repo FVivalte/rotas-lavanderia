@@ -221,6 +221,7 @@ obterHoteisFiltrados()
   });
 
 function obterHoteisFiltrados(){
+
   if(
     state.selectedRegion ===
     'Todas'
@@ -233,16 +234,6 @@ function obterHoteisFiltrados(){
       hotel.region ===
       state.selectedRegion
   );
-    console.log( //teste aqui
-  'REGIAO',
-  state.selectedRegion
-);
-
-console.log(
-  HOTELS.map(
-    h => h.region
-  )
-); //teste aqui
 
 }
 
