@@ -9,6 +9,7 @@ import {
   state
 }
 from '../core/state.js';
+
 import {
   inicializarMapa,
   adicionarMarcadoresHoteis,
@@ -24,7 +25,8 @@ import {
 
   telaSelecao,
   telaRota,
-  telaNavegacao
+  telaNavegacao,
+  filtroRegiao
 
 }
 from './elements.js';
