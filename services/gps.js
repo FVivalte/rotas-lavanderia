@@ -24,10 +24,21 @@ export function startGpsTracking() {
     pos => {
       const lat = pos.coords.latitude;
       const lng = pos.coords.longitude;
-      const heading =
-  pos.coords.heading ??
-  state.lastHeading ??
-  0;
+      let heading =
+  pos.coords.heading;
+
+// Se GPS não informar direção
+if(
+  heading === null ||
+  heading === undefined
+){
+  heading =
+    state.lastHeading || 0;
+}
+else{
+  state.lastHeading =
+    heading;
+}
 
 state.lastHeading = heading;
       const speed = pos.coords.speed || 0;
