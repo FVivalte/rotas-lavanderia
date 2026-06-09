@@ -1,5 +1,6 @@
 // services/map.js
 import { atualizarCamera } from './map-camera.js';
+import { MAPTILER_KEY } from '../config/map-config.js';
 
 // Variável escopo global do módulo
 let mapas = {};
@@ -7,9 +8,8 @@ let userMarker = null;
 let marcadoresSequencia = [];
 let marcadoresStatus = [];
 
-/**
- * Inicializa o mapa na tela.
- */
+/*** Inicializa o mapa na tela.*/
+
 export function getMapa(id = 'mapa'){
   return mapas[id];
 }
@@ -23,13 +23,23 @@ export function inicializarMapa(containerId = 'mapa', accessToken = '') {
   const defaultLng = -42.0541382;
   const defaultLat = -22.8601498;
 
-  const map = new maplibregl.Map({
-    container: containerId,
-    style:'https://demotiles.maplibre.org/style.json',
-    center: [defaultLng, defaultLat],
-    zoom: 15,
-    pitch: 0
-  });
+const map =
+new maplibregl.Map({
+
+  container:
+    containerId,
+
+  style:
+`https://api.maptiler.com/maps/streets/style.json?key=${MAPTILER_KEY}`,
+
+  center:[
+    defaultLng,
+    defaultLat
+  ],
+
+  zoom:15
+
+});
   
   // Guardamos a instância usando o ID fornecido (ex: 'mapa')
   mapas[containerId] = map;
@@ -281,14 +291,22 @@ export function inicializarMapaRota(){
     delete mapas['mapa-rota'];
   }
 
-  const map = new maplibregl.Map({
-    container: 'mapa-rota',
-    style:'https://demotiles.maplibre.org/style.json',
-    center: [-42.0541382, -22.8601498],
-    zoom: 12,
-    pitch: 0,
-    attributionControl: false
-  });
+  const map =
+new maplibregl.Map({
+
+  container:'mapa-rota',
+
+  style:
+'https://tiles.openfreemap.org/styles/bright',
+
+  center:[
+    -42.0541382,
+    -22.8601498
+  ],
+
+  zoom:12
+
+});
 
   mapas['mapa-rota'] = map;
   return map;
