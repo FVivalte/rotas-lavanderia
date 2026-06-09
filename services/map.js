@@ -30,11 +30,7 @@ export function inicializarMapa(containerId = 'mapa', accessToken = '') {
     zoom: 15,
     pitch: 0
   });
-//TESTE AQUI
-  console.log(
-  'CRIANDO MAPA ROTA'
-);
-  //TESTE AQUI
+  
   // Guardamos a instância usando o ID fornecido (ex: 'mapa')
   mapas[containerId] = map;
 
