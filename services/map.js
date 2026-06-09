@@ -25,7 +25,7 @@ export function inicializarMapa(containerId = 'mapa', accessToken = '') {
 
   const map = new maplibregl.Map({
     container: containerId,
-    style: 'https://tiles.openfreemap.org/styles/liberty',
+    style:'https://demotiles.maplibre.org/style.json',
     center: [defaultLng, defaultLat],
     zoom: 15,
     pitch: 0
@@ -283,7 +283,7 @@ export function inicializarMapaRota(){
 
   const map = new maplibregl.Map({
     container: 'mapa-rota',
-    style: 'https://tiles.openfreemap.org/styles/liberty',
+    style:'https://demotiles.maplibre.org/style.json',
     center: [-42.0541382, -22.8601498],
     zoom: 12,
     pitch: 0,
