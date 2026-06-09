@@ -50,7 +50,12 @@ function calcularCentroNavegacao(
       lat
     ]);
 
-  ponto.y += 250;
+  const altura =
+    map.getContainer()
+      .clientHeight;
+
+  ponto.y +=
+    altura * 0.30;
 
   const novoCentro =
     map.unproject(
@@ -60,7 +65,6 @@ function calcularCentroNavegacao(
   return [
 
     novoCentro.lng,
-
     novoCentro.lat
 
   ];
