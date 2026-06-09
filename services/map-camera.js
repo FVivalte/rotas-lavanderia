@@ -5,9 +5,13 @@ import { state } from '../core/state.js';
 // CONFIG
 // =========================
 const CAMERA_CONFIG = {
-  zoom: 17,
-  pitch: 60,
-  animationDuration: 1000
+
+  zoom:18,
+
+  pitch:70,
+
+  animationDuration:700
+
 };
 
 // =========================
@@ -46,7 +50,7 @@ function calcularCentroNavegacao(
       lat
     ]);
 
-  ponto.y += 180;
+  ponto.y += 250;
 
   const novoCentro =
     map.unproject(
