@@ -8,7 +8,7 @@ import { renderizarRelatorioModo } from '../ui/report.js';
 import { HOTELS } from '../data/dados.js';
 import { falar } from './voice.js';
 import { distanceInfo, durationInfo } from '../ui/elements.js';
-import { obterInstrucoes, carregarSteps, obterStepAtual, traduzirInstrucao } from './navigation.js';
+import { carregarSteps, obterStepAtual, traduzirInstrucao } from './navigation.js';
 
 // ======================
 // START GPS
@@ -127,20 +127,20 @@ if(
 
     }
 // verificar aqui possível erro
-const steps =
-  obterInstrucoes(
-    rota
-  );
+carregarSteps(
+  rota
+);
 
-if(
-  steps.length
-){
+const step =
+  obterStepAtual();
+
+if(step){
 
   const texto =
     traduzirInstrucao(
-      steps[0]
+      step
     );
-
+  
   if(
     texto !==
     state.lastInstruction
