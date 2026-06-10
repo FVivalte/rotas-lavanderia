@@ -5,544 +5,277 @@ import {
   updateMap,
   mapas,
   adicionarMarcadoresHoteis
-}
-from '../services/map.js';
+} from '../services/map.js';
 
 import { configurarListenersCamera } from '../services/map-camera.js';
 
-import {
-  HOTELS
-}
-from '../data/dados.js';
+import { HOTELS } from '../data/dados.js';
+import { state }  from '../core/state.js';
 
 import {
-  state
-}
-from '../core/state.js';
-
-import {
-
   telaNavegacao,
-
   hotelAtual,
   proximosHoteis,
   toggleVoz,
-
   checkEntrega,
   checkColeta,
-
   btnProximo,
-
   previewEntrega,
   previewColeta
-
-}
-from './elements.js';
+} from './elements.js';
 
 import {
-
   renderizarRelatorioModo,
   abrirTelaRelatorio
-
-}
-from './report.js';
+} from './report.js';
 
 import {
-
   startGpsTracking,
   stopGpsTracking
+} from '../services/gps.js';
 
+import { falar }         from '../services/voice.js';
+import { salvarEstadoApp } from '../storage/storage.js';
+
+// ─── marcadores de hotel acumulados no mapa de navegação ─────────────────────
+// BUG 5 CORRIGIDO: atualizarModoUI() chamava adicionarMarcadoresHoteis() sem nunca
+// limpar os anteriores — a cada "próximo hotel" empilhava um marcador novo
+// sem remover o do hotel anterior, lotando o mapa.
+let _marcadoresNav = [];
+
+function limparMarcadoresNav() {
+  _marcadoresNav.forEach(m => { try { m.remove(); } catch(e) {} });
+  _marcadoresNav = [];
 }
-from '../services/gps.js';
 
-import { falar }
-from '../services/voice.js';
+function adicionarMarcadorHotelNav(hotel) {
+  const map = mapas['mapa'];
+  if (!map) return;
 
-import {
+  // Cria marcador vermelho padrão
+  const marker = new maplibregl.Marker({ color: '#e53935' })
+    .setLngLat([Number(hotel.lng), Number(hotel.lat)])
+    .addTo(map);
 
-  salvarEstadoApp
-
+  _marcadoresNav.push(marker);
 }
-from '../storage/storage.js';
-
 
 // ======================
 // INICIAR MODO ROTA
 // ======================
+export function iniciarModoRota() {
 
-export function iniciarModoRota(){
-
-  if(toggleVoz){
-    toggleVoz.checked = false;
+  if (toggleVoz) {
+    toggleVoz.checked    = false;
     state.voiceNavigation = false;
   }
-  if(
-    state.routeOrder.length === 0
-  ){
 
-    alert(
-      'Gere a rota primeiro.'
-    );
-
+  if (state.routeOrder.length === 0) {
+    alert('Gere a rota primeiro.');
     return;
-
   }
 
-  state.currentIndex = 0;
+  state.currentIndex      = 0;
+  state.arrivalConfirmed  = false;
+  state.cameraFollowing   = true;
+  state.mapInitialized    = false;
 
-  state.arrivalConfirmed =
-    false;
+  state.routeReport = state.routeOrder.map(id => ({
+    id,
+    arrival:  null,
+    departure: null,
+    entrega:  false,
+    coleta:   false,
+    deliveryPhotos: [],
+    pickupPhotos:   []
+  }));
 
-  state.routeReport =
-    state.routeOrder.map(id => ({
-
-      id,
-
-      arrival:null,
-      departure:null,
-
-      entrega:false,
-      coleta:false,
-
-      deliveryPhotos:[],
-      pickupPhotos:[]
-
-    }));
-
-  state.mapInitialized = false;
-
-  state.cameraFollowing = true;
-
-  const primeiroHotel =
-  HOTELS.find(h =>
-    h.id === state.routeOrder[0]
-  );
-
-  if (primeiroHotel) {
-
-    const lat =
-      Number(primeiroHotel.lat);
-
-    const lng =
-      Number(primeiroHotel.lng);
-
-    if (
-      isNaN(lat) ||
-      isNaN(lng)
-    ) {
-
-      console.error(
-        'Hotel sem coordenadas válidas',
-        primeiroHotel
-      );
-
-    }
-
-  }
-
-  setTimeout(() => {
-
+  // Inicializa / redimensiona o mapa de navegação
+  // BUG 6 CORRIGIDO: setTimeout de 300ms era insuficiente em alguns devices;
+  // usar dois rAFs garante que o display:none foi removido e o layout recalculado
   const mapa = inicializarMapa('mapa');
-
   if (mapa) {
-    mapa.resize();
-    configurarListenersCamera(mapa);
+    const doResize = () => requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        mapa.resize();
+        configurarListenersCamera(mapa);
+      });
+    });
+    mapa.loaded() ? doResize() : mapa.once('load', doResize);
   }
 
-}, 300);
-  
-  if(
+  if (
+    state.userPosition &&
+    typeof state.userPosition.lat === 'number' &&
+    !isNaN(state.userPosition.lat)
+  ) {
+    updateMap(
+      state.userPosition.lat,
+      state.userPosition.lng,
+      state.userPosition.heading || 0,
+      state.userPosition.speed   || 0
+    );
+  }
 
-  state.userPosition &&
-
-  typeof state.userPosition.lat === 'number' &&
-  typeof state.userPosition.lng === 'number' &&
-
-  !isNaN(state.userPosition.lat) &&
-  !isNaN(state.userPosition.lng)
-
-){
-
-  updateMap(
-
-    state.userPosition.lat,
-    state.userPosition.lng,
-    state.userPosition.heading || 0,
-    state.userPosition.speed || 0
-
-  );
-
-}
   startGpsTracking();
-
   atualizarModoUI();
-
   renderizarRelatorioModo();
-
   renderizarPreviewsFotos();
-
   salvarEstadoApp();
-
 }
-
 
 // ======================
 // UPDATE UI
 // ======================
+export function atualizarModoUI() {
 
-export function atualizarModoUI(){
-
-  if(
-    state.currentIndex >=
-    state.routeOrder.length
-  ){
-
-    if(hotelAtual){
-
-      hotelAtual.innerHTML = `
-
-        <div>
-
-          <strong>
-            Rota finalizada
-          </strong>
-
-        </div>
-
-      `;
-
+  if (state.currentIndex >= state.routeOrder.length) {
+    if (hotelAtual) {
+      hotelAtual.innerHTML = '<div><strong>Rota finalizada</strong></div>';
     }
-
-    if(proximosHoteis){
-
-      proximosHoteis.innerHTML = '';
-
-    }
-
-    return;
-
-  }
-
-  const id =
-    state.routeOrder[
-      state.currentIndex
-    ];
-
-  const hotel =
-    HOTELS.find(
-      h => h.id === id
-    );
-
-if (
-  hotel &&
-  mapas['mapa'] &&
-  !state.userPosition
-) {
-
-  const lat = Number(hotel.lat);
-  const lng = Number(hotel.lng);
-
-  if (
-    !isNaN(lat) &&
-    !isNaN(lng)
-  ) {
-
-    mapas['mapa'].flyTo({
-      center: [lng, lat],
-      zoom: 16,
-      duration: 1500
-    });
-
-  }
-
-}
-
-  if(!hotel){
+    if (proximosHoteis) proximosHoteis.innerHTML = '';
     return;
   }
 
-  if (hotel) {
+  const id    = state.routeOrder[state.currentIndex];
+  const hotel = HOTELS.find(h => h.id === id);
 
-  adicionarMarcadoresHoteis(
-    [hotel],
-    'mapa'
-  );
+  // Centraliza no hotel se o GPS ainda não deu posição
+  if (hotel && mapas['mapa'] && !state.userPosition) {
+    const lat = Number(hotel.lat);
+    const lng = Number(hotel.lng);
+    if (!isNaN(lat) && !isNaN(lng)) {
+      mapas['mapa'].flyTo({ center: [lng, lat], zoom: 16, duration: 1500 });
+    }
+  }
 
-}
-  
-  if(hotelAtual){
+  if (!hotel) return;
 
+  // Troca o marcador — limpa o anterior antes de adicionar o novo
+  limparMarcadoresNav();
+  adicionarMarcadorHotelNav(hotel);
+
+  if (hotelAtual) {
     hotelAtual.innerHTML = `
-
-      <div style="font-weight:700">
-
-        ${hotel.name}
-
-      </div>
-
-      <div class="muted">
-
-        ${hotel.address}
-
-      </div>
-
+      <div style="font-weight:700">${hotel.name}</div>
+      <div class="muted">${hotel.address}</div>
     `;
-
   }
 
   renderizarProximosHoteis();
 
-  const entry =
-    state.routeReport[
-      state.currentIndex
-    ];
-
-  if(checkEntrega){
-
-    checkEntrega.checked =
-      entry.entrega;
-
-  }
-
-  if(checkColeta){
-
-    checkColeta.checked =
-      entry.coleta;
-
-  }
+  const entry = state.routeReport[state.currentIndex];
+  if (checkEntrega) checkEntrega.checked = entry?.entrega ?? false;
+  if (checkColeta)  checkColeta.checked  = entry?.coleta  ?? false;
 
   atualizarTextoBotao();
-
 }
-
 
 // ======================
 // PRÓXIMOS HOTÉIS
 // ======================
-
-function renderizarProximosHoteis(){
-
-  if(!proximosHoteis){
-    return;
-  }
-
+function renderizarProximosHoteis() {
+  if (!proximosHoteis) return;
   proximosHoteis.innerHTML = '';
 
-  for(let i = 1; i <= 2; i++){
+  for (let i = 1; i <= 2; i++) {
+    const idx = state.currentIndex + i;
+    if (idx >= state.routeOrder.length) continue;
 
-    const idx =
-      state.currentIndex + i;
+    const hotel = HOTELS.find(h => h.id === state.routeOrder[idx]);
+    if (!hotel) continue;
 
-    if(
-      idx >=
-      state.routeOrder.length
-    ){
-      continue;
-    }
-
-    const hotel =
-      HOTELS.find(
-        h =>
-          h.id ===
-          state.routeOrder[idx]
-      );
-
-    if(!hotel){
-      continue;
-    }
-
-    const div =
-      document.createElement('div');
-
-    div.className =
-      'next-card';
-
+    const div = document.createElement('div');
+    div.className = 'next-card';
     div.innerHTML = `
-
-      <strong>
-
-        ${hotel.name}
-
-      </strong>
-
-      <div
-        class="muted"
-        style="font-size:0.85rem"
-      >
-
-        ${hotel.address}
-
-      </div>
-
+      <strong>${hotel.name}</strong>
+      <div class="muted" style="font-size:0.85rem">${hotel.address}</div>
     `;
-
-    proximosHoteis
-      .appendChild(div);
-
+    proximosHoteis.appendChild(div);
   }
-
 }
-
 
 // ======================
 // TEXTO BOTÃO
 // ======================
-
-function atualizarTextoBotao(){
-
-  if(!btnProximo){
-    return;
-  }
-
-  if(
-    state.currentIndex ===
-    state.routeOrder.length - 1
-  ){
-
-    btnProximo.textContent =
-      'Finalizar';
-
-  }else{
-
-    btnProximo.textContent =
-      'Próximo hotel';
-
-  }
-
+function atualizarTextoBotao() {
+  if (!btnProximo) return;
+  btnProximo.textContent =
+    state.currentIndex === state.routeOrder.length - 1 ? 'Finalizar' : 'Próximo hotel';
 }
-
 
 // ======================
 // PRÓXIMO HOTEL
 // ======================
+export async function proximoHotel() {
 
-export async function proximoHotel(){
-
-  if(
-  state.currentIndex >=
-  state.routeOrder.length
-){
-await finalizarModoRota();
-
-  return;
-
-}
-
-  const entry =
-    state.routeReport[
-      state.currentIndex
-    ];
-
-  const agora =
-    new Date().toISOString();
-
-  if(!entry.arrival){
-
-    entry.arrival = agora;
-
+  if (state.currentIndex >= state.routeOrder.length) {
+    await finalizarModoRota();
+    return;
   }
 
+  const entry = state.routeReport[state.currentIndex];
+  const agora = new Date().toISOString();
+
+  if (!entry.arrival)  entry.arrival  = agora;
   entry.departure = agora;
+  entry.entrega   = checkEntrega?.checked ?? false;
+  entry.coleta    = checkColeta?.checked  ?? false;
 
-  entry.entrega =
-    checkEntrega.checked;
-
-  entry.coleta =
-    checkColeta.checked;
-
-  state.arrivalConfirmed =
-    false;
-
+  state.arrivalConfirmed    = false;
   state.currentIndex++;
-  state.currentSteps = [];
-  state.currentStepIndex = 0;
-  state.announcedStepIndex = -1;
-  state.lastInstruction = '';
+  state.currentSteps        = [];
+  state.currentStepIndex    = 0;
+  state.announcedStepIndex  = -1;
+  state.lastInstruction     = '';
 
-const proximoHotel = HOTELS.find(
-  h =>
-    h.id ===
-    state.routeOrder[
-      state.currentIndex
-    ]
-);
+  const proximo = HOTELS.find(h => h.id === state.routeOrder[state.currentIndex]);
+  if (proximo && state.voiceNavigation) {
+    falar(`Próximo hotel ${proximo.name}`);
+  }
 
-if (
-  proximoHotel &&
-  state.voiceNavigation
-) {
-
-  falar(
-    `Próximo hotel ${proximoHotel.name}`
-  );
-
-}
-
-  if(
-    state.currentIndex >=
-    state.routeOrder.length
-  ){
-
+  if (state.currentIndex >= state.routeOrder.length) {
     finalizarModoRota();
-
     return;
-
   }
 
   atualizarModoUI();
-
   renderizarRelatorioModo();
 
-  if (mapas['mapa']) {
-    mapas['mapa'].resize();
+  if (mapas['mapa']) mapas['mapa'].resize();
+
+  // BUG 7 CORRIGIDO: updateMap() era chamado sem argumentos — usava undefined,
+  // o que movia o marcador para [0,0] (Oceano Atlântico)
+  if (state.userPosition) {
+    updateMap(
+      state.userPosition.lat,
+      state.userPosition.lng,
+      state.userPosition.heading || 0,
+      state.userPosition.speed   || 0
+    );
   }
 
-  updateMap();
-
   renderizarPreviewsFotos();
-
   salvarEstadoApp();
-
 }
-
 
 // ======================
 // FINALIZAR
 // ======================
-
-export async function finalizarModoRota(){
+export async function finalizarModoRota() {
   console.log('FINALIZAR MODO ROTA');
   stopGpsTracking();
-
+  limparMarcadoresNav();
   atualizarModoUI();
-
   renderizarRelatorioModo();
-
   salvarEstadoApp();
-  
-  await abrirTelaRelatorio(
-    state.routeReport
-  );
-
+  await abrirTelaRelatorio(state.routeReport);
 }
-
 
 // ======================
 // FOTO PREVIEW
 // ======================
-
-function renderizarPreviewsFotos(){
-
-  if(previewEntrega){
-
-    previewEntrega.innerHTML = '';
-
-  }
-
-  if(previewColeta){
-
-    previewColeta.innerHTML = '';
-
-  }
-
+function renderizarPreviewsFotos() {
+  if (previewEntrega) previewEntrega.innerHTML = '';
+  if (previewColeta)  previewColeta.innerHTML  = '';
 }
