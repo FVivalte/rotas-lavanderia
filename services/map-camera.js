@@ -5,72 +5,44 @@ import { state } from '../core/state.js';
 // CONFIG
 // =========================
 const CAMERA_CONFIG = {
-
-  zoom:18,
-
-  pitch:70,
-
-  animationDuration:700
-
+  zoom: 18,
+  pitch: 60,              // BUG 1 CORRIGIDO: era 70 — muito inclinado, escondia a rota à frente
+  animationDuration: 700
 };
 
 // =========================
 // LISTENERS
 // =========================
 export function configurarListenersCamera(map) {
-  if (!map) return;
+  if (!map || map.__cameraConfigured) return;
 
-  // Se o usuário arrastar o mapa manualmente, para de seguir a câmera do GPS automaticamente
-if (!map.__cameraConfigured) {
-
-  map.on(
-    'dragstart',
-    () => {
-      state.cameraFollowing = false;
-    }
-  );
+  map.on('dragstart', () => {
+    state.cameraFollowing = false;
+  });
 
   map.__cameraConfigured = true;
-
 }
+
+// =========================
+// CALCULAR CENTRO
+// BUG 1 CORRIGIDO: era 0.70 (marcador ficava 70% do topo, escondendo tudo à frente)
+// Valor correto: 0.25 — marcador fica no quarto inferior, mostrando ~75% do mapa à frente
+// =========================
+function calcularCentroNavegacao(map, lat, lng) {
+  const ponto = map.project([lng, lat]);
+  const altura = map.getContainer().clientHeight;
+
+  ponto.y -= altura * 0.25;   // desloca o centro para CIMA, empurrando o marcador para BAIXO
+
+  return [
+    map.unproject(ponto).lng,
+    map.unproject(ponto).lat
+  ];
 }
 
 // =========================
 // ATUALIZAR CAMERA
 // =========================
-function calcularCentroNavegacao(
-  map,
-  lat,
-  lng
-){
-
-  const ponto =
-    map.project([
-      lng,
-      lat
-    ]);
-
-  const altura =
-    map.getContainer()
-      .clientHeight;
-
-  ponto.y +=
-    altura * 0.70;
-
-  const novoCentro =
-    map.unproject(
-      ponto
-    );
-
-  return [
-
-    novoCentro.lng,
-    novoCentro.lat
-
-  ];
-
-}
-
 export function atualizarCamera(map, lat, lng, heading = 0, speed = 0) {
   if (
     typeof lat !== 'number' ||
@@ -82,22 +54,13 @@ export function atualizarCamera(map, lat, lng, heading = 0, speed = 0) {
     return;
   }
 
-  // Se o usuário desativou o modo "seguir", não mexe na câmera
-  if (!state.cameraFollowing) {
-    return;
-  }
+  if (!state.cameraFollowing) return;
 
-  // Transição suave para a nova coordenada do GPS
   map.easeTo({
-    center:
-  calcularCentroNavegacao(
-    map,
-    lat,
-    lng
-  ), // Padrão da biblioteca: [Longitude, Latitude]
+    center: calcularCentroNavegacao(map, lat, lng),
     zoom: CAMERA_CONFIG.zoom,
     pitch: CAMERA_CONFIG.pitch,
-    bearing: heading || 0, // Rotaciona o mapa baseado na direção que o usuário está andando
+    bearing: heading || 0,
     duration: CAMERA_CONFIG.animationDuration
   });
 }
