@@ -2,7 +2,7 @@
 import { state } from '../core/state.js';
 import { updateMap, desenharRotaOSRM } from './map.js';
 import { obterRota } from './osrm.js';
-import { getDistanceMeters } from '../utils/utils.js'; // Removido o parseCoords desnecessário
+import { getDistanceMeters } from '../utils/utils.js';
 import { atualizarModoUI } from '../ui/mode.js';
 import { renderizarRelatorioModo } from '../ui/report.js';
 import { HOTELS } from '../data/dados.js';
@@ -13,8 +13,10 @@ import { carregarSteps, obterStepAtual, traduzirInstrucao } from './navigation.j
 // ======================
 // START GPS
 // ======================
-
 export function startGpsTracking() {
+  // BUG 2 CORRIGIDO: evita registrar múltiplos watchPosition se já estiver rodando
+  if (state.watchId !== null) return;
+
   if (!navigator.geolocation) {
     alert('GPS não suportado neste navegador/dispositivo.');
     return;
@@ -24,23 +26,14 @@ export function startGpsTracking() {
     pos => {
       const lat = pos.coords.latitude;
       const lng = pos.coords.longitude;
-      let heading =
-  pos.coords.heading;
 
-// Se GPS não informar direção
-if(
-  heading === null ||
-  heading === undefined
-){
-  heading =
-    state.lastHeading || 0;
-}
-else{
-  state.lastHeading =
-    heading;
-}
+      let heading = pos.coords.heading;
+      if (heading === null || heading === undefined) {
+        heading = state.lastHeading || 0;
+      } else {
+        state.lastHeading = heading;
+      }
 
-state.lastHeading = heading;
       const speed = pos.coords.speed || 0;
 
       if (
@@ -53,139 +46,50 @@ state.lastHeading = heading;
         return;
       }
 
-      state.userPosition = {
-        lat,
-        lng,
-        heading,
-        speed
-      };
-      
-      if (
-  state.currentScreen === 'navigation'
-) {
+      state.userPosition = { lat, lng, heading, speed };
 
-  state.cameraFollowing = true;
+      // Reativa câmera ao atualizar posição na tela de navegação
+      if (state.currentScreen === 'tela-navegacao') {
+        state.cameraFollowing = true;
+      }
 
-}
+      const hotelId = state.routeOrder[state.currentIndex];
+      const hotel   = HOTELS.find(h => h.id === hotelId);
 
-const hotelId =
-  state.routeOrder[
-    state.currentIndex
-  ];
+      if (hotel) {
+        obterRota(lat, lng, Number(hotel.lat), Number(hotel.lng))
+          .then(rota => {
+            if (!rota) return;
 
-const hotel =
-  HOTELS.find(
-    h => h.id === hotelId
-  );
+            desenharRotaOSRM(rota.geometry.coordinates, 'mapa');
 
-if (hotel) {
+            // BUG 3 CORRIGIDO: só carrega steps uma vez por destino, não a cada tick do GPS
+            // Antes chamava carregarSteps(rota) SEMPRE, reiniciando as instruções
+            if (!state.currentSteps.length) {
+              carregarSteps(rota);
+            }
 
-  obterRota(
+            if (distanceInfo) {
+              distanceInfo.textContent = `${(rota.distance / 1000).toFixed(1)} km`;
+            }
+            if (durationInfo) {
+              durationInfo.textContent = `${Math.round(rota.duration / 60)} min`;
+            }
 
-    lat,
-    lng,
+            const step = obterStepAtual();
+            if (step) {
+              const texto = traduzirInstrucao(step);
+              if (texto !== state.lastInstruction) {
+                state.lastInstruction = texto;
+                if (state.voiceNavigation) falar(texto);
+              }
+            }
+          })
+          .catch(err => console.error('OSRM erro:', err));
+      }
 
-    Number(
-      hotel.lat
-    ),
-
-    Number(
-      hotel.lng
-    )
-
-  )
-
-  .then(rota => {
-
-    if (!rota) {
-      return;
-    }
-
-    desenharRotaOSRM(
-      rota.geometry.coordinates,
-      'mapa'
-    );
-if(
-  !state.currentSteps.length
-){
-
-  carregarSteps(
-    rota
-  );
-
-}
-
-    if (
-      distanceInfo
-    ) {
-
-      distanceInfo.textContent =
-        `${(
-          rota.distance / 1000
-        ).toFixed(1)} km`;
-
-    }
-
-    if (
-      durationInfo
-    ) {
-
-      durationInfo.textContent =
-
-        `${Math.round(
-          rota.duration / 60
-        )} min`;
-
-    }
-// verificar aqui possível erro
-carregarSteps(
-  rota
-);
-
-const step =
-  obterStepAtual();
-
-if(step){
-
-  const texto =
-    traduzirInstrucao(
-      step
-    );
-  
-  if(
-    texto !==
-    state.lastInstruction
-  ){
-
-    state.lastInstruction =
-      texto;
-
-    if(
-      state.voiceNavigation
-    ){
-
-      falar(texto);
-
-    }
-
-  }
-
-}
-// verificar aqui possível erro ⬆️
-
-  });
-
-}
-
-      // Atualiza a posição visual no mapa
-updateMap(
-lat,
-lng,
-heading,
-speed);
-verificarInstrucao();
-
-      // Verifica se o motorista chegou perto do hotel atual da rota
+      updateMap(lat, lng, heading, speed);
+      verificarInstrucao();
       verificarChegada();
     },
     err => {
@@ -194,7 +98,7 @@ verificarInstrucao();
     {
       enableHighAccuracy: true,
       maximumAge: 1000,
-      timeout: 10000 // Aumentado para 10s para evitar quedas em conexões oscilantes
+      timeout: 10000
     }
   );
 }
@@ -213,32 +117,19 @@ export function stopGpsTracking() {
 // CHECK ARRIVAL
 // ======================
 export function verificarChegada() {
-  // Evita rodar se a rota já terminou
-  if (state.currentIndex >= state.routeOrder.length) {
-    return;
-  }
+  if (state.currentIndex >= state.routeOrder.length) return;
+  if (state.arrivalConfirmed) return;
 
-  // Evita disparar múltiplos alerts se já confirmou a chegada neste ponto
-  if (state.arrivalConfirmed) {
-    return;
-  }
-
-  // Pega o ID do hotel atual na sequência da rota
-  const id = state.routeOrder[state.currentIndex];
-
-  // Busca o hotel correspondente na lista do arquivo dados.js
+  const id    = state.routeOrder[state.currentIndex];
   const hotel = HOTELS.find(h => h.id === id);
 
   if (!hotel) {
-    console.warn(`Hotel com ID ${id} não foi encontrado em dados.js`);
+    console.warn(`Hotel com ID ${id} não encontrado`);
     return;
   }
 
-  if (!state.userPosition) {
-    return;
-  }
+  if (!state.userPosition) return;
 
-  // CORREÇÃO: Pegando direto as propriedades lat e lng do objeto do hotel
   const distance = getDistanceMeters(
     state.userPosition.lat,
     state.userPosition.lng,
@@ -246,112 +137,56 @@ export function verificarChegada() {
     hotel.lng
   );
 
-  // Se estiver a menos de 90 metros do local
   if (distance <= 90) {
+    state.arrivalConfirmed = true;
 
-  state.arrivalConfirmed = true;
-
-  // Fala somente se o switch estiver ligado
-  if (state.voiceNavigation) {
-
-    falar(
-      `Você chegou ao hotel ${hotel.name}`
-    );
-
-  }
-
-  const ok = confirm(
-    `Você chegou em: ${hotel.name}?`
-  );
-
-  if (ok) {
-
-    state.routeReport[
-      state.currentIndex
-    ].arrival =
-      new Date().toISOString();
-
-    renderizarRelatorioModo();
-
-    atualizarModoUI();
-
-  }
-
-  else {
-
-    // Se clicar cancelar
-    state.arrivalConfirmed = false;
-
-  }
-
-}
-}
-
-function verificarInstrucao(){
-
-  const step =
-    obterStepAtual();
-
-  if(!step){
-    return;
-  }
-
-  const ponto =
-    step.maneuver.location;
-
-  if(!ponto){
-    return;
-  }
-
-  const distancia =
-    getDistanceMeters(
-
-      state.userPosition.lat,
-      state.userPosition.lng,
-
-      ponto[1],
-      ponto[0]
-
-    );
-
-  // Falar a 100m
-
-  if(
-
-    distancia <= 100 &&
-
-    state.announcedStepIndex !==
-    state.currentStepIndex
-
-  ){
-
-    const texto =
-      traduzirInstrucao(
-        step,
-        true
-      );
-
-    state.announcedStepIndex =
-      state.currentStepIndex;
-
-    if(
-      state.voiceNavigation
-    ){
-
-      falar(texto);
-
+    if (state.voiceNavigation) {
+      falar(`Você chegou ao hotel ${hotel.name}`);
     }
 
+    const ok = confirm(`Você chegou em: ${hotel.name}?`);
+
+    if (ok) {
+      state.routeReport[state.currentIndex].arrival = new Date().toISOString();
+      renderizarRelatorioModo();
+      atualizarModoUI();
+    } else {
+      state.arrivalConfirmed = false;
+    }
+  }
+}
+
+// ======================
+// VERIFICAR INSTRUÇÃO
+// ======================
+function verificarInstrucao() {
+  const step = obterStepAtual();
+  if (!step) return;
+
+  const ponto = step.maneuver.location;
+  if (!ponto) return;
+
+  // BUG 4 CORRIGIDO: verificação de segurança — userPosition pode ser null
+  // se verificarInstrucao() for chamada antes do primeiro fix do GPS
+  if (!state.userPosition) return;
+
+  const distancia = getDistanceMeters(
+    state.userPosition.lat,
+    state.userPosition.lng,
+    ponto[1],
+    ponto[0]
+  );
+
+  if (
+    distancia <= 100 &&
+    state.announcedStepIndex !== state.currentStepIndex
+  ) {
+    const texto = traduzirInstrucao(step, true);
+    state.announcedStepIndex = state.currentStepIndex;
+    if (state.voiceNavigation) falar(texto);
   }
 
-  // Passou da manobra
-
-  if(
-    distancia <= 20
-  ){
-
+  if (distancia <= 20) {
     state.currentStepIndex++;
-
   }
-
 }
